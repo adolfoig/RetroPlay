@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/juegosFragment"
+        android:icon="@drawable/mandoretro"
+        android:title="Juegos" />
+
+    <item
+        android:id="@+id/favoritosFragment"
+        android:icon="@drawable/estrella"
+        android:title="Favoritos" />
+
+    <item
+        android:id="@+id/rankingFragment"
+        android:icon="@drawable/clasificacion"
+        android:title="Clasificación" />
+
+    <item
+        android:id="@+id/logrosFragment"
+        android:icon="@drawable/insignia"
+        android:title="Logros"/>
+</menu>

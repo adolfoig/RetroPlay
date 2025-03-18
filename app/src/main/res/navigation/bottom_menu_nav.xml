@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottom_menu_nav"
+    app:startDestination="@id/juegosFragment">
+
+    <fragment
+        android:id="@+id/juegosFragment"
+        android:name="com.example.retroplay.JuegosFragment"
+        android:label="fragment_juegos"
+        tools:layout="@layout/fragment_juegos" />
+    <fragment
+        android:id="@+id/favoritosFragment"
+        android:name="com.example.retroplay.FavoritosFragment"
+        android:label="fragment_favoritos"
+        tools:layout="@layout/fragment_favoritos" />
+    <fragment
+        android:id="@+id/rankingFragment"
+        android:name="com.example.retroplay.RankingFragment"
+        android:label="fragment_ranking"
+        tools:layout="@layout/fragment_ranking" />
+    <fragment
+        android:id="@+id/logrosFragment"
+        android:name="com.example.retroplay.LogrosFragment"
+        android:label="fragment_logros"
+        tools:layout="@layout/fragment_logros" />
+</navigation>
