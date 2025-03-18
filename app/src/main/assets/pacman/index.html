@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML5 Pacman</title>
+
+  <style type="text/css">
+    @font-face {
+      font-family: 'BDCartoonShoutRegular';
+      src: url('BD_Cartoon_Shout-webfont.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    body {
+      background-color: #000000; /* Fondo oscuro */
+      color: #ffffff; /* Texto blanco */
+      font-family: 'Arial', sans-serif; /* Fuente moderna */
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: calc(100vh - 20px); /* Usar toda la altura de la pantalla menos 20px */
+    }
+
+    #pacman {
+      height: 450px;
+      width: 340px;
+      margin: 20px auto;
+    }
+
+    #controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    #startGame {
+      margin-bottom: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s; /* Transiciones suaves */
+      background-color: #007bff; /* Color de fondo azul */
+      color: white; /* Color de texto blanco */
+    }
+
+    #startGame:hover {
+      background-color: #0056b3; /* Color de fondo azul más oscuro al pasar el mouse */
+      transform: translateY(-2px); /* Efecto de elevación */
+    }
+
+    #directional-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      justify-items: center;
+      align-items: center;
+      width: 200px;
+      margin: 0 auto; /* Centrar los botones */
+    }
+
+    #directional-buttons button {
+      width: 60px;
+      height: 60px;
+      font-size: 24px; /* Aumentar el tamaño de la fuente */
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s; /* Transiciones suaves */
+      background-color: #007bff; /* Color de fondo azul */
+      color: white; /* Color de texto blanco */
+    }
+
+    #directional-buttons button:hover {
+      background-color: #0056b3; /* Color de fondo azul más oscuro al pasar el mouse */
+      transform: translateY(-2px); /* Efecto de elevación */
+    }
+
+    #directional-buttons .empty {
+      visibility: hidden; /* Ocultar elementos vacíos */
+    }
+  </style>
+</head>
+
+<body>
+<div id="pacman"></div>
+<script src="pacman.js"></script>
+<script src="modernizr-1.5.min.js"></script>
+
+<script>
+  var el = document.getElementById("pacman");
+
+  if (Modernizr.canvas && Modernizr.localstorage &&
+      Modernizr.audio && (Modernizr.audio.ogg || Modernizr.audio.mp3)) {
+    window.setTimeout(function () { PACMAN.init(el, "./"); }, 0);
+  } else {
+    el.innerHTML = "Lo siento, necesita un navegador decente<br /><small>" +
+      "(Firefox 3.6+, Chrome 4+, Opera 10+ y Safari 4+)</small>";
+  }
+</script>
+
+<div id="controls">
+  <!-- Botón para iniciar la partida -->
+  <button id="startGame">Iniciar Partida</button>
+
+  <!-- Controles direccionales -->
+  <div id="directional-buttons">
+    <div class="empty"></div>
+    <button id="moveUp">⬆️</button>
+    <div class="empty"></div>
+    <button id="moveLeft">⬅️</button>
+    <div class="empty"></div>
+    <button id="moveRight">➡️</button>
+    <div class="empty"></div>
+    <button id="moveDown">⬇️</button>
+    <div class="empty"></div>
+  </div>
+</div>
+
+</body>
+</html>
