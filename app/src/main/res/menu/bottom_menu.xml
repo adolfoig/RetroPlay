@@ -12,11 +12,11 @@
 
     <item
         android:id="@+id/rankingFragment"
-        android:icon="@drawable/clasificacion"
+        android:icon="@drawable/ranking"
         android:title="Clasificación" />
 
     <item
         android:id="@+id/logrosFragment"
-        android:icon="@drawable/insignia"
+        android:icon="@drawable/trofeo"
         android:title="Logros"/>
 </menu>
