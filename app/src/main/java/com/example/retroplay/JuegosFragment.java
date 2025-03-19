@@ -49,12 +49,12 @@ public class JuegosFragment extends Fragment {
         NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
 
         // Configurar RecyclerView
-        RecyclerView juegosRecyclerView = view.findViewById(R.id.juegosRecyclerView);
+        /*         RecyclerView juegosRecyclerView = view.findViewById(R.id.juegosRecyclerView);
         juegosRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // Crear el adaptador y configurarlo
         adapter = new JuegosAdapter(navController, R.id.action_juegosFragment2_to_detailFragment);
-        juegosRecyclerView.setAdapter(adapter);
+        juegosRecyclerView.setAdapter(adapter);               */
 
         // Cargar los juegos desde Firestore
         //loadJuegosFromFirestore();

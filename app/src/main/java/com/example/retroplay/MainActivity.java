@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private void mostrarLoginFragment() {
         // Si el usuario no está autenticado, mostramos el LoginFragment
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, new LoginFragment()) // Asegúrate de que el contenedor esté correctamente definido en el layout
+                .replace(R.id.nav_host_fragment, new LoginFragment()) // Asegúrate de que el contenedor esté correctamente definido en el layout
                 .commit();
     }
 
