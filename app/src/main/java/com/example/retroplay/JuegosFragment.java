@@ -31,6 +31,8 @@ public class JuegosFragment extends Fragment {
     private ArrayList<Juego> listaJuegos;
     private JuegosAdapter adapter;
 
+    NavController navController;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,23 +48,23 @@ public class JuegosFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_juegos, container, false);
 
         // Obtener el NavController
-        NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+        navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
 
         // Configurar RecyclerView
-        /*         RecyclerView juegosRecyclerView = view.findViewById(R.id.juegosRecyclerView);
+        RecyclerView juegosRecyclerView = view.findViewById(R.id.recyclerViewJuegos);
         juegosRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // Crear el adaptador y configurarlo
-        adapter = new JuegosAdapter(navController, R.id.action_juegosFragment2_to_detailFragment);
-        juegosRecyclerView.setAdapter(adapter);               */
+        adapter = new JuegosAdapter(navController, R.id.action_juegosFragment_to_detailFragment);
+        juegosRecyclerView.setAdapter(adapter);
 
         // Cargar los juegos desde Firestore
-        //loadJuegosFromFirestore();
+        loadJuegosFromFirestore();
 
         return view;
     }
 
-    /*private void loadJuegosFromFirestore() {
+    private void loadJuegosFromFirestore() {
         db.collection("Juegos")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -84,7 +86,7 @@ public class JuegosFragment extends Fragment {
                         Toast.makeText(getContext(), "Error al cargar los juegos.", Toast.LENGTH_SHORT).show();
                     }
                 });
-    }*/
+    }
 
     class JuegosViewHolder extends RecyclerView.ViewHolder {
         final ViewholderJuegosBinding binding;
@@ -116,14 +118,18 @@ public class JuegosFragment extends Fragment {
         public void onBindViewHolder(@NonNull JuegosViewHolder holder, int position) {
             Juego juego = listaJuegos.get(position);
             holder.binding.textNombreJuego.setText(juego.getNombre());
+            holder.binding.imagenJuego.setImageResource(R.drawable.pacman);
 
             // Usar Glide para cargar la imagen
-            Glide.with(holder.itemView.getContext())
-                    .load(juego.getRutaImagen()) // Cargar la imagen desde la URL
-                    .into(holder.binding.imagenJuego); // Establecer la imagen en el ImageView
+            //Glide.with(holder.itemView.getContext())
+            //                    .load(juego.getRutaImagen()) // Cargar la imagen desde la URL
+            //                    .into(holder.binding.imagenJuego);
+            // Establecer la imagen en el ImageView
 
-            // Manejar el clic en un item del RecyclerView
+            // Manejar el clic en un item del RecyclerView;
             holder.itemView.setOnClickListener(v -> navegarPantallaDetalle(juego));
+
+            holder.binding.btnJugar.setOnClickListener(v -> navegarAWebView(juego.getRutaArchivo(), juego.getId()));
         }
 
         @Override
@@ -142,4 +148,13 @@ public class JuegosFragment extends Fragment {
             navController.navigate(idAction, args); // Navegar a la pantalla de detalle
         }
     }
+
+    private void navegarAWebView(String urlJuego, String idJuego) {
+        Bundle bundle = new Bundle();
+        bundle.putString("urlJuego", urlJuego);
+        bundle.putString("idJuego", idJuego);
+        // Pasamos la URL del juego
+        navController.navigate(R.id.action_juegosFragment_to_jugarJuegoFragment, bundle); // Navegar al fragmento con el WebView
+    }
 }
+

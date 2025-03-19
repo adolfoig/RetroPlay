@@ -1,6 +1,7 @@
 package com.example.retroplay;
 
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -31,10 +32,14 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
         if (currentUser == null) {
-            // Si el usuario no está autenticado, redirigir al login
+            // Si no está logueado, mostramos el fragmento de Login
             mostrarLoginFragment();
-        } else{
+            // Ocultamos el Toolbar y el BottomNavigation
+            ocultarInterfaz();
+        } else {
+            // Si está logueado, mostramos el BottomNavigation y el Toolbar
             irAlBottomMenu();
+            mostrarInterfaz();
         }
     }
 
@@ -51,5 +56,17 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(binding.bottomNavView,navController);
         NavigationUI.setupWithNavController(binding.toolbar,navController);
 
+    }
+
+    private void ocultarInterfaz() {
+        // Ocultamos el Toolbar y BottomNavigation
+        binding.appBarLayout.setVisibility(View.GONE);
+        binding.bottomNavView.setVisibility(View.GONE);
+    }
+
+    private void mostrarInterfaz() {
+        // Mostramos el Toolbar y BottomNavigation
+        binding.appBarLayout.setVisibility(View.VISIBLE);
+        binding.bottomNavView.setVisibility(View.VISIBLE);
     }
 }
