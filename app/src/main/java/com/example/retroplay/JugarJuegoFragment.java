@@ -22,6 +22,7 @@ public class JugarJuegoFragment extends Fragment {
 
     FragmentJugarJuegoBinding binding;
     private WebView gameWebView;
+    String idJuego;
 
     @Nullable
     @Override
@@ -39,7 +40,20 @@ public class JugarJuegoFragment extends Fragment {
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
 
-        gameWebView.loadUrl("file:///android_asset/pacman/index.html");
+        // Recoger el id del juego
+        Bundle args = getArguments();
+        if (args != null) {
+            idJuego = args.getString("idJuego");
+        }
+
+        if(idJuego.equals("1")){
+            gameWebView.loadUrl("file:///android_asset/pacman/index.html");
+        } else if(idJuego.equals("2")){
+            gameWebView.loadUrl("file:///android_asset/classic-tetris-js-master/index.html");
+        } else if(idJuego.equals("3")){
+            gameWebView.loadUrl("file:///android_asset/flappy-bird-master/index.html");
+        }
+
     }
 
     @Override

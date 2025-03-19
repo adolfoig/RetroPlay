@@ -118,7 +118,17 @@ public class JuegosFragment extends Fragment {
         public void onBindViewHolder(@NonNull JuegosViewHolder holder, int position) {
             Juego juego = listaJuegos.get(position);
             holder.binding.textNombreJuego.setText(juego.getNombre());
-            holder.binding.imagenJuego.setImageResource(R.drawable.pacman);
+
+            if(juego.getId().equals("1")){
+                holder.binding.imagenJuego.setImageResource(R.drawable.pacman);
+            } else if(juego.getId().equals("2")){
+                holder.binding.imagenJuego.setImageResource(R.drawable.tetris);
+
+            } else if(juego.getId().equals("3")){
+                holder.binding.imagenJuego.setImageResource(R.drawable.flappybird);
+            }
+
+
 
             // Usar Glide para cargar la imagen
             //Glide.with(holder.itemView.getContext())
@@ -129,7 +139,7 @@ public class JuegosFragment extends Fragment {
             // Manejar el clic en un item del RecyclerView;
             holder.itemView.setOnClickListener(v -> navegarPantallaDetalle(juego));
 
-            holder.binding.btnJugar.setOnClickListener(v -> navegarAWebView(juego.getRutaArchivo(), juego.getId()));
+            holder.binding.btnJugar.setOnClickListener(v -> navegarAWebView(juego.getId()));
         }
 
         @Override
@@ -149,9 +159,8 @@ public class JuegosFragment extends Fragment {
         }
     }
 
-    private void navegarAWebView(String urlJuego, String idJuego) {
+    private void navegarAWebView(String idJuego) {
         Bundle bundle = new Bundle();
-        bundle.putString("urlJuego", urlJuego);
         bundle.putString("idJuego", idJuego);
         // Pasamos la URL del juego
         navController.navigate(R.id.action_juegosFragment_to_jugarJuegoFragment, bundle); // Navegar al fragmento con el WebView

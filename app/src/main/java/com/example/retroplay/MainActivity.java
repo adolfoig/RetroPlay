@@ -2,8 +2,11 @@ package com.example.retroplay;
 
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -41,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
             irAlBottomMenu();
             mostrarInterfaz();
         }
+        setupNavListener();
     }
 
     private void mostrarLoginFragment() {
@@ -59,14 +63,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void ocultarInterfaz() {
-        // Ocultamos el Toolbar y BottomNavigation
-        binding.appBarLayout.setVisibility(View.GONE);
+        ViewGroup.LayoutParams appBarParams = binding.appBarLayout.getLayoutParams();
+        appBarParams.height = 0;
+        binding.appBarLayout.setLayoutParams(appBarParams);
+
+        ViewGroup.LayoutParams toolbarParams = binding.toolbar.getLayoutParams();
+        toolbarParams.height = 0;
+        binding.toolbar.setLayoutParams(toolbarParams);
+
+        ViewGroup.LayoutParams bottomNavParams = binding.bottomNavView.getLayoutParams();
+        bottomNavParams.height = 0;
+        binding.bottomNavView.setLayoutParams(bottomNavParams);
         binding.bottomNavView.setVisibility(View.GONE);
+
     }
 
+
     private void mostrarInterfaz() {
-        // Mostramos el Toolbar y BottomNavigation
         binding.appBarLayout.setVisibility(View.VISIBLE);
         binding.bottomNavView.setVisibility(View.VISIBLE);
+    }
+
+    private void setupNavListener() {
+        NavController navController = ((NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)).getNavController();
+
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            if (destination.getId() == R.id.jugarJuegoFragment) {
+                ocultarInterfaz();
+            } else {
+                mostrarInterfaz();
+            }
+        });
     }
 }
