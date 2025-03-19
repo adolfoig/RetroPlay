@@ -122,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.getId() == R.id.jugarJuegoFragment) {
                 ocultarInterfaz();
+            }else {
+                mostrarInterfaz2();
             }
         });
     }
