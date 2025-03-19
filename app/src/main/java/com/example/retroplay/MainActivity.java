@@ -38,11 +38,11 @@ public class MainActivity extends AppCompatActivity {
             // Si no está logueado, mostramos el fragmento de Login
             mostrarLoginFragment();
             // Ocultamos el Toolbar y el BottomNavigation
-            ocultarInterfaz();
+            ocultarInterfaz2();
         } else {
             // Si está logueado, mostramos el BottomNavigation y el Toolbar
             irAlBottomMenu();
-            mostrarInterfaz();
+            mostrarInterfaz2();
         }
         setupNavListener();
     }
@@ -84,9 +84,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void ocultarInterfaz2() {
-        binding.bottomNavView.setVisibility(View.GONE);
+        // Ocultamos el Toolbar y BottomNavigation
         binding.appBarLayout.setVisibility(View.GONE);
-        binding.toolbar.setVisibility(View.GONE);
+        binding.bottomNavView.setVisibility(View.GONE);
+    }
+
+    private void mostrarInterfaz2() {
+        // Mostramos el Toolbar y BottomNavigation
+        binding.appBarLayout.setVisibility(View.VISIBLE);
+        binding.bottomNavView.setVisibility(View.VISIBLE);
     }
 
     private void mostrarInterfaz() {
@@ -114,10 +120,8 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = ((NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)).getNavController();
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            if (destination.getId() == R.id.jugarJuegoFragment || destination.getId() == R.id.loginFragment || destination.getId() == R.id.registroFragment) {
-                ocultarInterfaz();  // Ocultar cuando esté en login, registro o jugarJuego
-            } else {
-                mostrarInterfaz();  // Mostrar en otros fragmentos
+            if (destination.getId() == R.id.jugarJuegoFragment) {
+                ocultarInterfaz();
             }
         });
     }

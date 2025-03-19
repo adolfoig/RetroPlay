@@ -95,8 +95,6 @@ public class JuegosFragment extends Fragment {
                             Toast.makeText(getContext(), "Error al cargar los juegos.", Toast.LENGTH_SHORT).show();
                         }
                     });
-        } else {
-            Toast.makeText(getContext(), "Debes iniciar sesión para ver tus favoritos", Toast.LENGTH_SHORT).show();
         }
     }
 

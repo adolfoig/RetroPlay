@@ -43,4 +43,5 @@
             app:menu="@menu/bottom_menu" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
