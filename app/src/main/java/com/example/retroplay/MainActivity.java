@@ -9,9 +9,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.retroplay.Registro.LoginFragment;
-import com.example.retroplay.Registro.RegistroFragment;
 import com.example.retroplay.databinding.ActivityMainBinding;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -52,5 +50,6 @@ public class MainActivity extends AppCompatActivity {
         NavController navController=((NavHostFragment)getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)).getNavController();
         NavigationUI.setupWithNavController(binding.bottomNavView,navController);
         NavigationUI.setupWithNavController(binding.toolbar,navController);
+
     }
 }
