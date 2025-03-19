@@ -48,50 +48,76 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void mostrarLoginFragment() {
-        // Si el usuario no está autenticado, mostramos el LoginFragment
+        // Si el usuario no está autenticado, ocultamos la interfaz
+        ocultarInterfaz();
+
+        // Reemplazamos el fragmento de Login
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.nav_host_fragment, new LoginFragment()) // Asegúrate de que el contenedor esté correctamente definido en el layout
                 .commit();
     }
 
-    private void irAlBottomMenu(){
+    private void irAlBottomMenu() {
         setSupportActionBar(binding.toolbar);
-        NavController navController=((NavHostFragment)getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)).getNavController();
-        NavigationUI.setupWithNavController(binding.bottomNavView,navController);
-        NavigationUI.setupWithNavController(binding.toolbar,navController);
-
+        NavController navController = ((NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)).getNavController();
+        NavigationUI.setupWithNavController(binding.bottomNavView, navController);
+        NavigationUI.setupWithNavController(binding.toolbar, navController);
     }
 
     private void ocultarInterfaz() {
+        // Ponerlo en 0dp para ocultarlo
         ViewGroup.LayoutParams appBarParams = binding.appBarLayout.getLayoutParams();
         appBarParams.height = 0;
         binding.appBarLayout.setLayoutParams(appBarParams);
+        binding.toolbar.setVisibility(View.GONE);
+
 
         ViewGroup.LayoutParams toolbarParams = binding.toolbar.getLayoutParams();
         toolbarParams.height = 0;
         binding.toolbar.setLayoutParams(toolbarParams);
+        binding.toolbar.setVisibility(View.GONE);
 
         ViewGroup.LayoutParams bottomNavParams = binding.bottomNavView.getLayoutParams();
         bottomNavParams.height = 0;
         binding.bottomNavView.setLayoutParams(bottomNavParams);
         binding.bottomNavView.setVisibility(View.GONE);
-
     }
 
+    private void ocultarInterfaz2() {
+        binding.bottomNavView.setVisibility(View.GONE);
+        binding.appBarLayout.setVisibility(View.GONE);
+        binding.toolbar.setVisibility(View.GONE);
+    }
 
     private void mostrarInterfaz() {
+        // Restaurar altura y visibilidad de AppBarLayout
+        ViewGroup.LayoutParams appBarParams = binding.appBarLayout.getLayoutParams();
+        appBarParams.height = getResources().getDimensionPixelSize(android.R.dimen.app_icon_size);
+        binding.appBarLayout.setLayoutParams(appBarParams);
         binding.appBarLayout.setVisibility(View.VISIBLE);
+
+        // Restaurar altura y visibilidad de Toolbar
+        ViewGroup.LayoutParams toolbarParams = binding.toolbar.getLayoutParams();
+        toolbarParams.height = getResources().getDimensionPixelSize(android.R.dimen.app_icon_size);
+        binding.toolbar.setLayoutParams(toolbarParams);
+        binding.toolbar.setVisibility(View.VISIBLE);
+
+        // Restaurar altura y visibilidad de BottomNavView
+        ViewGroup.LayoutParams bottomNavParams = binding.bottomNavView.getLayoutParams();
+        bottomNavParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        binding.bottomNavView.setLayoutParams(bottomNavParams);
         binding.bottomNavView.setVisibility(View.VISIBLE);
     }
 
+    // Método para ver si estás en el fragment jugarJuegos, login o registro y ocultar el menú
     private void setupNavListener() {
         NavController navController = ((NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)).getNavController();
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            if (destination.getId() == R.id.jugarJuegoFragment) {
-                ocultarInterfaz();
+            if (destination.getId() == R.id.jugarJuegoFragment || destination.getId() == R.id.loginFragment || destination.getId() == R.id.registroFragment) {
+                ocultarInterfaz();  // Ocultar cuando esté en login, registro o jugarJuego
             } else {
-                mostrarInterfaz();
+                mostrarInterfaz();  // Mostrar en otros fragmentos
             }
         });
     }

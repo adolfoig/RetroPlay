@@ -25,6 +25,9 @@
         <action
             android:id="@+id/action_favoritosFragment_to_detailFragment"
             app:destination="@id/detailFragment" />
+        <action
+            android:id="@+id/action_favoritosFragment_to_jugarJuegoFragment"
+            app:destination="@id/jugarJuegoFragment" />
     </fragment>
     <fragment
         android:id="@+id/rankingFragment"
@@ -50,4 +53,22 @@
         android:id="@+id/jugarJuegoFragment"
         android:name="com.example.retroplay.JugarJuegoFragment"
         android:label="JugarJuegoFragment" />
+    <fragment
+        android:id="@+id/registroFragment"
+        android:name="com.example.retroplay.Registro.RegistroFragment"
+        android:label="RegistroFragment" />
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.retroplay.Registro.LoginFragment"
+        android:label="LoginFragment" />
+    <activity
+        android:id="@+id/mainActivity"
+        android:name="com.example.retroplay.MainActivity"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" />
+    <activity
+        android:id="@+id/registroActivity"
+        android:name="com.example.retroplay.Registro.RegistroActivity"
+        android:label="fragment_registro"
+        tools:layout="@layout/fragment_registro" />
 </navigation>

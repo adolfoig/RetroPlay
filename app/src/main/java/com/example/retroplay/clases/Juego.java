@@ -8,17 +8,19 @@ public class Juego implements Serializable {
     private String descripcion;
     private String rutaImagen;
     private String rutaArchivo;
+    private boolean favorito;
 
     public Juego() {
         // Constructor vacío necesario para Firestore
     }
 
-    public Juego(String id, String nombre, String descripcion, String rutaImagen, String rutaArchivo) {
+    public Juego(String id, String nombre, String descripcion, String rutaImagen, String rutaArchivo, boolean favorito) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.rutaImagen = rutaImagen;
         this.rutaArchivo = rutaArchivo;
+        this.favorito = favorito;
     }
 
     // Getters y setters
@@ -60,5 +62,13 @@ public class Juego implements Serializable {
 
     public void setRutaArchivo(String rutaArchivo) {
         this.rutaArchivo = rutaArchivo;
+    }
+
+    public boolean isFavorito() {
+        return favorito;
+    }
+
+    public void setFavorito(boolean favorito) {
+        this.favorito = favorito;
     }
 }
