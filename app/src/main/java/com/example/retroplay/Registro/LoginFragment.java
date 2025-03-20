@@ -1,12 +1,16 @@
 package com.example.retroplay.Registro;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -36,6 +40,7 @@ public class LoginFragment extends Fragment {
     private ActivityResultLauncher<Intent> googleSignInLauncher;
     private GoogleSignInClient googleSignInClient;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflamos la vista y configuramos el binding
@@ -47,7 +52,6 @@ public class LoginFragment extends Fragment {
         configurarClienteGoogleSignIn();
         inicializarLauncherGoogleSignIn();
 
-
         // Evento para el botón de Google Sign-In
         binding.googleSignInButton.setOnClickListener(v -> signInWithGoogle());
 
@@ -55,7 +59,19 @@ public class LoginFragment extends Fragment {
         binding.loginButton.setOnClickListener(v -> loginUser());
 
         // Evento para abrir el fragmento de registro
-        binding.registerTextView.setOnClickListener(v -> irRegistroFragment());
+        binding.registerTextView.setOnClickListener(v -> irRegistroActivity());
+
+        // Listener para cerrar el teclado cuando el usuario toque fuera del campo de texto
+        binding.getRoot().setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                View currentFocus = getActivity().getCurrentFocus();
+                if (currentFocus != null) {
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
+                }
+            }
+            return false;
+        });
 
         return binding.getRoot(); // Retornamos la vista inflada
     }
@@ -94,7 +110,6 @@ public class LoginFragment extends Fragment {
             GoogleSignInAccount account = task.getResult(ApiException.class);
             firebaseAuthWithGoogle(account);
         } catch (ApiException e) {
-            // Imprime el código de error y el mensaje en el Logcat
             Log.e("GoogleSignIn", "Error al iniciar sesión con Google: " + e.getStatusCode() + " - " + e.getMessage());
             Toast.makeText(getActivity(), "Error en el inicio de sesión con Google: " + e.getStatusCode(), Toast.LENGTH_SHORT).show();
         }
@@ -135,8 +150,6 @@ public class LoginFragment extends Fragment {
             Toast.makeText(getActivity(), "El correo tiene que contener un @", Toast.LENGTH_SHORT).show();
         }
 
-
-
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(getActivity(), task -> {
                     if (task.isSuccessful()) {
@@ -149,14 +162,8 @@ public class LoginFragment extends Fragment {
                 });
     }
 
-    private void irRegistroFragment() {
-        RegistroFragment registroFragment = new RegistroFragment();
-
-        // Reemplazar el fragmento actual por el de registro
-        getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, registroFragment)
-                .addToBackStack(null) // Añadir a la pila de retroceso
-                .commit();
+    private void irRegistroActivity() {
+        Intent intent = new Intent(getActivity(), RegistroActivity.class);
+        startActivity(intent);
     }
-
 }

@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -18,7 +19,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.retroplay.R;
-import com.example.retroplay.databinding.FragmentRegistroBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -44,7 +44,7 @@ public class RegistroFragment extends Fragment {
         // Constructor vacío requerido
     }
 
-    @SuppressLint("MissingInflatedId")
+    @SuppressLint({"MissingInflatedId", "ClickableViewAccessibility"})
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -69,6 +69,23 @@ public class RegistroFragment extends Fragment {
 
         // Acción para registrar usuario
         registerButton.setOnClickListener(v -> registerUser());
+
+        // Listener para cerrar el teclado cuando el usuario toque fuera de los campos de texto
+        view.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                View currentFocus = getActivity().getCurrentFocus();
+                if (currentFocus != null) {
+                    currentFocus.clearFocus(); // Limpiar el foco
+                    // Ocultar el teclado
+                    android.view.inputmethod.InputMethodManager imm =
+                            (android.view.inputmethod.InputMethodManager) getActivity().getSystemService(getContext().INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
+                    }
+                }
+            }
+            return false;
+        });
 
         return view;
     }
@@ -128,7 +145,7 @@ public class RegistroFragment extends Fragment {
                         if (user == null) {
                             Toast.makeText(getActivity(), "Error: usuario no autenticado", Toast.LENGTH_SHORT).show();
                             return;
-                        }else {
+                        } else {
                             uploadProfileImage(user);
                         }
                     } else {
@@ -177,7 +194,7 @@ public class RegistroFragment extends Fragment {
     private void irLoginFragment() {
         LoginFragment loginFragment = new LoginFragment();
 
-        // Reemplazar el fragmento actual por el de registro
+        // Reemplazar el fragmento actual por el de login
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, loginFragment)
                 .addToBackStack(null) // Añadir a la pila de retroceso
