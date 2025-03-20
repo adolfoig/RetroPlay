@@ -108,8 +108,6 @@ public class RegistroFragment extends Fragment {
             return;
         }
 
-        // Validar la fecha de nacimiento (ejemplo simple: no mayor de 120 años)
-
         // Verificar si las contraseñas coinciden
         if (!password.equals(confirmPassword)) {
             Toast.makeText(getActivity(), "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();

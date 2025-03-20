@@ -3,6 +3,7 @@ package com.example.retroplay.Registro;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,18 +61,15 @@ public class LoginFragment extends Fragment {
     }
 
     private void configurarClienteGoogleSignIn() {
-        // Configurar Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id)) // Usa tu Web client ID
                 .requestEmail()
                 .build();
 
-        // Inicializar Google Sign-In
         googleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
     }
 
     private void inicializarLauncherGoogleSignIn() {
-        // Inicializar el ActivityResultLauncher para manejar la respuesta de Google Sign-In
         googleSignInLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -96,7 +94,9 @@ public class LoginFragment extends Fragment {
             GoogleSignInAccount account = task.getResult(ApiException.class);
             firebaseAuthWithGoogle(account);
         } catch (ApiException e) {
-            Toast.makeText(getActivity(), "Error al iniciar sesión con Google", Toast.LENGTH_SHORT).show();
+            // Imprime el código de error y el mensaje en el Logcat
+            Log.e("GoogleSignIn", "Error al iniciar sesión con Google: " + e.getStatusCode() + " - " + e.getMessage());
+            Toast.makeText(getActivity(), "Error en el inicio de sesión con Google: " + e.getStatusCode(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -105,9 +105,11 @@ public class LoginFragment extends Fragment {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(getActivity(), task -> {
                     if (task.isSuccessful()) {
+                        Log.d("GoogleSignIn", "Inicio de sesión con Google exitoso");
                         Toast.makeText(getActivity(), "Inicio de sesión con Google exitoso", Toast.LENGTH_SHORT).show();
                         redirectToMain();
                     } else {
+                        Log.e("GoogleSignIn", "Error en firebaseAuthWithGoogle", task.getException());
                         Toast.makeText(getActivity(), "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -129,6 +131,11 @@ public class LoginFragment extends Fragment {
             Toast.makeText(getActivity(), "Completa todos los campos", Toast.LENGTH_SHORT).show();
             return;
         }
+        if(!email.contains("@")){
+            Toast.makeText(getActivity(), "El correo tiene que contener un @", Toast.LENGTH_SHORT).show();
+        }
+
+
 
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(getActivity(), task -> {
@@ -137,7 +144,7 @@ public class LoginFragment extends Fragment {
                         Toast.makeText(getActivity(), "Inicio de sesión exitoso: " + usuario.getEmail(), Toast.LENGTH_SHORT).show();
                         redirectToMain();
                     } else {
-                        Toast.makeText(getActivity(), "Error debes registrarte primero: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Login incorrecto ", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
