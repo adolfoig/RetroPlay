@@ -20,7 +20,6 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
-    AppBarConfiguration mAppBarConfiguration;
     private FirebaseAuth mAuth;
 
     @Override
@@ -28,15 +27,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView((binding = ActivityMainBinding.inflate(getLayoutInflater())).getRoot());
 
-        // Configura el Toolbar como la ActionBar
-        setSupportActionBar(binding.toolbar);
-
-        // Configura el NavController
-        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        NavController navController = navHostFragment.getNavController();
-
-        // Configura el NavController para que pueda manejar las acciones de navegación
-        NavigationUI.setupActionBarWithNavController(this, navController);
 
         // Inicializamos FirebaseAuth
         mAuth = FirebaseAuth.getInstance();
@@ -141,23 +131,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-    private void setupNavListener2() {
-        NavController navController = ((NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)).getNavController();
-
-        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            if (destination.getId() != R.id.juegosFragment) {
-                mostrarInterfaz();
-            } else if(destination.getId() == R.id.favoritosFragment){
-                mostrarInterfaz();
-            } else if(destination.getId() == R.id.rankingFragment){
-                mostrarInterfaz();
-            } else if(destination.getId() == R.id.logrosFragment){
-                mostrarInterfaz();
-            }
-        });
-    }
-
-
-
 }

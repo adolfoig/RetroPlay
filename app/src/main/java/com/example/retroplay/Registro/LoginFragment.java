@@ -142,12 +142,14 @@ public class LoginFragment extends Fragment {
                 });
     }
 
-    public void irRegistroFragment() {
-        // Obtén el NavController de manera correcta
-        NavController navController = NavHostFragment.findNavController(this);
+    private void irRegistroFragment() {
+        RegistroFragment registroFragment = new RegistroFragment();
 
-        // Navega al fragmento de registro
-        //navController.navigate(R.id.action_loginFragment_to_registroFragment);
+        // Reemplazar el fragmento actual por el de registro
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, registroFragment)
+                .addToBackStack(null) // Añadir a la pila de retroceso
+                .commit();
     }
 
 }

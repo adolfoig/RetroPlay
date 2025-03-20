@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/logros"
+    android:padding="10dp"
+    android:layout_margin="5dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/textoDescipcion"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_horizontal"
+        android:text="Texto de ejemplo"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"/>
+
+    <ImageView
+        android:id="@+id/imagen"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/medallablanca"/>
+</LinearLayout>

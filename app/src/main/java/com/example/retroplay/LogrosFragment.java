@@ -2,63 +2,95 @@ package com.example.retroplay;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link LogrosFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import com.example.retroplay.clases.Logro;
+import com.example.retroplay.databinding.FragmentLogrosBinding;
+import com.example.retroplay.databinding.ViewholderLogrosBinding;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class LogrosFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private FragmentLogrosBinding binding;
+    private List<Logro> logrosList;
+    private LogroAdapter logroAdapter;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = FragmentLogrosBinding.inflate(inflater, container, false);
+        View view = binding.getRoot();
 
-    public LogrosFragment() {
-        // Required empty public constructor
-    }
+        // Configurar RecyclerView
+        binding.recyclerViewLogros.setLayoutManager(new LinearLayoutManager(getContext()));
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment LogrosFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static LogrosFragment newInstance(String param1, String param2) {
-        LogrosFragment fragment = new LogrosFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+        // Crear lista de logros
+        logrosList = new ArrayList<>();
+        logrosList.add(new Logro("Conseguir 50 puntos en PACMAN", R.drawable.medallablanca));
+        logrosList.add(new Logro("Conseguir 150 puntos en PACMAN", R.drawable.medallablanca));
+        logrosList.add(new Logro("Conseguir 250 puntos en PACMAN", R.drawable.medallablanca));
+
+        // Configurar el adaptador
+        logroAdapter = new LogroAdapter(logrosList);
+        binding.recyclerViewLogros.setAdapter(logroAdapter);
+
+        return view;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null; // Evita memory leaks
+    }
+
+    // Clase interna para representar un logro
+
+    // Adaptador con ViewBinding
+    private static class LogroAdapter extends RecyclerView.Adapter<LogroAdapter.LogroViewHolder> {
+
+        private final List<Logro> logrosList;
+
+        public LogroAdapter(List<Logro> logrosList) {
+            this.logrosList = logrosList;
         }
-    }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_logros, container, false);
+        @NonNull
+        @Override
+        public LogroViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            ViewholderLogrosBinding binding = ViewholderLogrosBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            return new LogroViewHolder(binding);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull LogroViewHolder holder, int position) {
+            Logro logro = logrosList.get(position);
+            holder.binding.textoDescipcion.setText(logro.getDescripcion());
+            holder.binding.imagen.setImageResource(logro.getImagenMedalla());
+        }
+
+        @Override
+        public int getItemCount() {
+            return logrosList.size();
+        }
+
+        // ViewHolder con ViewBinding
+        static class LogroViewHolder extends RecyclerView.ViewHolder {
+            private final ViewholderLogrosBinding binding;
+
+            public LogroViewHolder(@NonNull ViewholderLogrosBinding binding) {
+                super(binding.getRoot());
+                this.binding = binding;
+            }
+        }
     }
 }
