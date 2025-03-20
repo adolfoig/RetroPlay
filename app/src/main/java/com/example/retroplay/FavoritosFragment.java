@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.retroplay.clases.Juego;
 import com.example.retroplay.databinding.FragmentFavoritosBinding;
+import com.example.retroplay.databinding.ViewholderFavoritosBinding;
 import com.example.retroplay.databinding.ViewholderJuegosBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -128,14 +129,14 @@ public class FavoritosFragment extends Fragment {
         @Override
         public FavoritosViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            return new FavoritosViewHolder(ViewholderJuegosBinding.inflate(inflater, parent, false));
+            return new FavoritosViewHolder(ViewholderFavoritosBinding.inflate(inflater, parent, false));
         }
 
         @Override
         public void onBindViewHolder(@NonNull FavoritosViewHolder holder, int position) {
             Juego juego = listaFavoritos.get(position);
             holder.binding.textNombreJuego.setText(juego.getNombre());
-            // Usar Glide para cargar la imagen desde URL si está disponible
+            // Insertar imagen segun el id del juego
             if (juego.getId().equals("1")) {
                 holder.binding.imagenJuego.setImageResource(R.drawable.pacman);
             } else if (juego.getId().equals("2")) {
@@ -161,9 +162,9 @@ public class FavoritosFragment extends Fragment {
         }
 
         class FavoritosViewHolder extends RecyclerView.ViewHolder {
-            final ViewholderJuegosBinding binding;
+            final ViewholderFavoritosBinding binding;
 
-            public FavoritosViewHolder(ViewholderJuegosBinding binding) {
+            public FavoritosViewHolder(ViewholderFavoritosBinding binding) {
                 super(binding.getRoot());
                 this.binding = binding;
             }
