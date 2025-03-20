@@ -10,6 +10,9 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.retroplay.MainActivity;
 import com.example.retroplay.R;
@@ -42,6 +45,7 @@ public class LoginFragment extends Fragment {
 
         configurarClienteGoogleSignIn();
         inicializarLauncherGoogleSignIn();
+
 
         // Evento para el botón de Google Sign-In
         binding.googleSignInButton.setOnClickListener(v -> signInWithGoogle());
@@ -138,13 +142,12 @@ public class LoginFragment extends Fragment {
                 });
     }
 
-    private void irRegistroFragment() {
-        RegistroFragment registroFragment = new RegistroFragment();
+    public void irRegistroFragment() {
+        // Obtén el NavController de manera correcta
+        NavController navController = NavHostFragment.findNavController(this);
 
-        // Reemplazar el fragmento actual por el de registro
-        getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, registroFragment)
-                .addToBackStack(null) // Añadir a la pila de retroceso
-                .commit();
+        // Navega al fragmento de registro
+        //navController.navigate(R.id.action_loginFragment_to_registroFragment);
     }
+
 }

@@ -28,6 +28,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView((binding = ActivityMainBinding.inflate(getLayoutInflater())).getRoot());
 
+        // Configura el Toolbar como la ActionBar
+        setSupportActionBar(binding.toolbar);
+
+        // Configura el NavController
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        NavController navController = navHostFragment.getNavController();
+
+        // Configura el NavController para que pueda manejar las acciones de navegación
+        NavigationUI.setupActionBarWithNavController(this, navController);
+
         // Inicializamos FirebaseAuth
         mAuth = FirebaseAuth.getInstance();
 
@@ -42,11 +52,11 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // Si está logueado, mostramos el BottomNavigation y el Toolbar
             irAlBottomMenu();
-            //mostrarInterfaz();
         }
+
         setupNavListener();
-        //setupNavListener2();
     }
+
 
     private void mostrarLoginFragment() {
         // Si el usuario no está autenticado, ocultamos la interfaz
@@ -124,6 +134,9 @@ public class MainActivity extends AppCompatActivity {
             if (destination.getId() == R.id.jugarJuegoFragment) {
                 ocultarInterfaz();
             } else if(destination.getId() == R.id.loginButton){
+                ocultarInterfaz2();
+            }
+            else if(destination.getId() == R.id.registroFragment){
                 ocultarInterfaz2();
             }
         });
