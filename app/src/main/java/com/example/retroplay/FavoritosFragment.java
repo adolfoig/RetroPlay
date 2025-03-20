@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -145,6 +147,10 @@ public class FavoritosFragment extends Fragment {
                 holder.binding.imagenJuego.setImageResource(R.drawable.flappybird);
             }
 
+            holder.binding.imagenEstrella.setImageResource((R.drawable.estrella));
+
+            holder.binding.imagenEstrella.setOnClickListener(v -> quitarFavorito(juego.getId(), holder.binding.imagenEstrella));
+
             // Manejar el clic en un item del RecyclerView
             holder.itemView.setOnClickListener(v -> navegarPantallaDetalle(juego));
 
@@ -180,6 +186,56 @@ public class FavoritosFragment extends Fragment {
             Bundle bundle = new Bundle();
             bundle.putString("idJuego", idJuego);
             navController.navigate(R.id.action_favoritosFragment_to_jugarJuegoFragment, bundle); // Navegar al fragmento con el WebView
+        }
+
+        private void quitarFavorito(String idJuego, ImageButton imagenEstrella) {
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+            FirebaseUser user = auth.getCurrentUser();
+            if (user != null) {
+                String idUsuario = user.getUid();  // Obtener ID del usuario
+
+                // Buscar el documento en la colección "Favoritos" que coincida con el idUsuario y el idJuego
+                db.collection("Favoritos")
+                        .whereEqualTo("idUsuario", idUsuario)
+                        .whereEqualTo("idJuego", idJuego)
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                QuerySnapshot querySnapshot = task.getResult();
+                                if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                                    // Si se encuentra el documento, eliminarlo
+                                    for (QueryDocumentSnapshot document : querySnapshot) {
+                                        db.collection("Favoritos").document(document.getId()).delete()
+                                                .addOnSuccessListener(aVoid -> {
+                                                    Toast.makeText(getContext(), "Juego eliminado de favoritos", Toast.LENGTH_SHORT).show();
+                                                    // Actualizar el estado del juego a no favorito
+                                                    imagenEstrella.setImageResource(R.drawable.estrellablanca); // Estrella vacía
+
+                                                    // Eliminar el juego de la lista y notificar al adaptador
+                                                    for (int i = 0; i < listaFavoritos.size(); i++) {
+                                                        if (listaFavoritos.get(i).getId().equals(idJuego)) {
+                                                            listaFavoritos.remove(i);
+                                                            notifyItemRemoved(i);
+                                                            break;
+                                                        }
+                                                    }
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Toast.makeText(getContext(), "Error al eliminar favorito", Toast.LENGTH_SHORT).show();
+                                                });
+                                    }
+                                } else {
+                                    Toast.makeText(getContext(), "Este juego no está en tus favoritos", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                Toast.makeText(getContext(), "Error al verificar si el juego está en favoritos", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            } else {
+                Toast.makeText(getContext(), "Debes iniciar sesión para gestionar favoritos", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

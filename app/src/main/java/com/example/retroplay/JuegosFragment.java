@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -204,50 +205,78 @@ public class JuegosFragment extends Fragment {
         navController.navigate(R.id.action_juegosFragment_to_jugarJuegoFragment, bundle); // Navegar al fragmento con el WebView
     }
 
+    private void quitarFavorito(String idJuego, ImageButton imagenEstrella, View v) {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        FirebaseUser user = auth.getCurrentUser();
+        if (user != null) {
+            String idUsuario = user.getUid();
+
+            // Buscar el favorito en Firestore y eliminarlo
+            db.collection("Favoritos")
+                    .whereEqualTo("idUsuario", idUsuario)
+                    .whereEqualTo("idJuego", idJuego)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                db.collection("Favoritos").document(document.getId()).delete()
+                                        .addOnSuccessListener(aVoid -> {
+                                            Toast.makeText(v.getContext(), "Juego eliminado de favoritos", Toast.LENGTH_SHORT).show();
+                                            imagenEstrella.setImageResource(R.drawable.estrellablanca); // Estrella vacía
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(v.getContext(), "Error al eliminar favorito", Toast.LENGTH_SHORT).show();
+                                        });
+                            }
+                        } else {
+                            Toast.makeText(v.getContext(), "No se encontró el favorito", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        } else {
+            Toast.makeText(v.getContext(), "Debes iniciar sesión para modificar favoritos", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void aniadirFavorito(String idJuego, ImageButton imagenEstrella, View v, int position) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         FirebaseUser user = auth.getCurrentUser();
         if (user != null) {
-            String idUsuario = user.getUid();  // Obtener ID del usuario
+            String idUsuario = user.getUid();
 
-            // Verificar si el juego ya está en favoritos para el usuario
+            // Verificar si el juego ya está en favoritos
             db.collection("Favoritos")
                     .whereEqualTo("idUsuario", idUsuario)
                     .whereEqualTo("idJuego", idJuego)
                     .get()
                     .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            QuerySnapshot querySnapshot = task.getResult();
-                            if (querySnapshot != null && !querySnapshot.isEmpty()) {
-                                // Si el juego ya está en favoritos, mostrar un mensaje
-                                Toast.makeText(v.getContext(), "Este juego ya está en tus favoritos", Toast.LENGTH_SHORT).show();
-                            } else {
-                                // Si el juego no está en favoritos, añadirlo
-                                Map<String, Object> favorito = new HashMap<>();
-                                favorito.put("idUsuario", idUsuario);
-                                favorito.put("idJuego", idJuego);
-
-                                // Guardar en Firestore en la colección "Favoritos"
-                                db.collection("Favoritos")
-                                        .add(favorito)
-                                        .addOnSuccessListener(documentReference -> {
-                                            Toast.makeText(v.getContext(), "Juego añadido a favoritos", Toast.LENGTH_SHORT).show();
-                                            // Actualizar el estado del juego a favorito
-                                            imagenEstrella.setImageResource(R.drawable.estrella); // Estrella llena
-                                            // Notificar al adaptador que el estado del juego ha cambiado
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            Toast.makeText(v.getContext(), "Error al añadir favorito", Toast.LENGTH_SHORT).show();
-                                        });
-                            }
+                        if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
+                            // Si el juego ya está en favoritos, eliminarlo
+                            quitarFavorito(idJuego, imagenEstrella, v);
                         } else {
-                            Toast.makeText(v.getContext(), "Error al verificar si el juego ya está en favoritos", Toast.LENGTH_SHORT).show();
+                            // Si el juego no está en favoritos, añadirlo
+                            Map<String, Object> favorito = new HashMap<>();
+                            favorito.put("idUsuario", idUsuario);
+                            favorito.put("idJuego", idJuego);
+
+                            db.collection("Favoritos")
+                                    .add(favorito)
+                                    .addOnSuccessListener(documentReference -> {
+                                        Toast.makeText(v.getContext(), "Juego añadido a favoritos", Toast.LENGTH_SHORT).show();
+                                        imagenEstrella.setImageResource(R.drawable.estrella); // Estrella llena
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(v.getContext(), "Error al añadir favorito", Toast.LENGTH_SHORT).show();
+                                    });
                         }
                     });
         } else {
-            Toast.makeText(v.getContext(), "Debes iniciar sesión para guardar favoritos", Toast.LENGTH_SHORT).show();
+            Toast.makeText(v.getContext(), "Debes iniciar sesión para modificar favoritos", Toast.LENGTH_SHORT).show();
         }
     }
+
+
 }
