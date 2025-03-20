@@ -42,14 +42,15 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // Si está logueado, mostramos el BottomNavigation y el Toolbar
             irAlBottomMenu();
-            mostrarInterfaz2();
+            //mostrarInterfaz();
         }
         setupNavListener();
+        //setupNavListener2();
     }
 
     private void mostrarLoginFragment() {
         // Si el usuario no está autenticado, ocultamos la interfaz
-        ocultarInterfaz();
+        ocultarInterfaz2();
 
         // Reemplazamos el fragmento de Login
         getSupportFragmentManager().beginTransaction()
@@ -95,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         binding.bottomNavView.setVisibility(View.VISIBLE);
     }
 
-    private void mostrarInterfaz() {
+    public void mostrarInterfaz() {
         // Restaurar altura y visibilidad de AppBarLayout
         ViewGroup.LayoutParams appBarParams = binding.appBarLayout.getLayoutParams();
         appBarParams.height = getResources().getDimensionPixelSize(android.R.dimen.app_icon_size);
@@ -122,9 +123,28 @@ public class MainActivity extends AppCompatActivity {
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.getId() == R.id.jugarJuegoFragment) {
                 ocultarInterfaz();
-            }else {
-                mostrarInterfaz2();
+            } else if(destination.getId() == R.id.loginButton){
+                ocultarInterfaz2();
             }
         });
     }
+
+    private void setupNavListener2() {
+        NavController navController = ((NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)).getNavController();
+
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            if (destination.getId() != R.id.juegosFragment) {
+                mostrarInterfaz();
+            } else if(destination.getId() == R.id.favoritosFragment){
+                mostrarInterfaz();
+            } else if(destination.getId() == R.id.rankingFragment){
+                mostrarInterfaz();
+            } else if(destination.getId() == R.id.logrosFragment){
+                mostrarInterfaz();
+            }
+        });
+    }
+
+
+
 }

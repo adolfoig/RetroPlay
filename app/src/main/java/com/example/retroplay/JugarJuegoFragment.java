@@ -61,6 +61,10 @@ public class JugarJuegoFragment extends Fragment {
         super.onDestroyView();
         if (gameWebView != null) {
             gameWebView.destroy();
+
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).mostrarInterfaz();
+            };
         }
     }
 }
