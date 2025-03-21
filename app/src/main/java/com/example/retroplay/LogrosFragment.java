@@ -1,6 +1,10 @@
 package com.example.retroplay;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -8,21 +12,24 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
 import com.example.retroplay.clases.Logro;
 import com.example.retroplay.databinding.FragmentLogrosBinding;
 import com.example.retroplay.databinding.ViewholderLogrosBinding;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LogrosFragment extends Fragment {
 
     private FragmentLogrosBinding binding;
-    private List<Logro> logrosList;
+    private List<Logro> listaLogros = new ArrayList<>();
     private LogroAdapter logroAdapter;
 
     @Nullable
@@ -34,15 +41,12 @@ public class LogrosFragment extends Fragment {
         // Configurar RecyclerView
         binding.recyclerViewLogros.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Crear lista de logros
-        logrosList = new ArrayList<>();
-        logrosList.add(new Logro("Conseguir 50 puntos en PACMAN", R.drawable.medallablanca));
-        logrosList.add(new Logro("Conseguir 150 puntos en PACMAN", R.drawable.medallablanca));
-        logrosList.add(new Logro("Conseguir 250 puntos en PACMAN", R.drawable.medallablanca));
-
         // Configurar el adaptador
-        logroAdapter = new LogroAdapter(logrosList);
+        logroAdapter = new LogroAdapter(listaLogros);
         binding.recyclerViewLogros.setAdapter(logroAdapter);
+
+        // Cargar logros desde Firebase
+        cargarLogrosDesdeFireBase();
 
         return view;
     }
@@ -53,9 +57,44 @@ public class LogrosFragment extends Fragment {
         binding = null; // Evita memory leaks
     }
 
-    // Clase interna para representar un logro
+    private void cargarLogrosDesdeFireBase() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    // Adaptador con ViewBinding
+        db.collection("LogrosDisponibles")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        if (querySnapshot != null) {
+                            listaLogros.clear();  // Limpiar la lista antes de añadir los nuevos logros
+                            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                                Logro logro = document.toObject(Logro.class);
+                                if (logro != null) {
+                                    listaLogros.add(logro);
+                                }
+                            }
+
+                            // Ordenar la lista localmente por puntuacionRequerida (convertida a int)
+                            ordenarLogrosPorPuntuacion();
+
+                            // Notificar al adaptador que los datos han cambiado
+                            logroAdapter.notifyDataSetChanged();
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "Error al cargar los logros.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void ordenarLogrosPorPuntuacion() {
+        Collections.sort(listaLogros, (logro1, logro2) -> {
+            int puntuacion1 = Integer.parseInt(logro1.getPuntuacion());
+            int puntuacion2 = Integer.parseInt(logro2.getPuntuacion());
+            return Integer.compare(puntuacion1, puntuacion2); // Ordenar de menor a mayor
+        });
+    }
+
+        // Adaptador con ViewBinding
     private static class LogroAdapter extends RecyclerView.Adapter<LogroAdapter.LogroViewHolder> {
 
         private final List<Logro> logrosList;
@@ -75,7 +114,7 @@ public class LogrosFragment extends Fragment {
         public void onBindViewHolder(@NonNull LogroViewHolder holder, int position) {
             Logro logro = logrosList.get(position);
             holder.binding.textoDescipcion.setText(logro.getDescripcion());
-            holder.binding.imagen.setImageResource(logro.getImagenMedalla());
+            holder.binding.imagen.setImageResource(R.drawable.medallablanca);
         }
 
         @Override

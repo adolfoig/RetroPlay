@@ -1,8 +1,9 @@
 package com.example.retroplay.clases;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Usuario {
+public class Usuario implements Serializable {
 
     private String id;
     private String nombre;
