@@ -29,7 +29,6 @@ import java.util.Map;
 
 public class JuegosFragment extends Fragment {
 
-    private FirebaseFirestore db;
     private ArrayList<Juego> listaJuegos;
     private JuegosAdapter adapter;
 
@@ -39,7 +38,7 @@ public class JuegosFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Inicializar Firebase Firestore
-        db = FirebaseFirestore.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         listaJuegos = new ArrayList<>();
     }
 
@@ -266,7 +265,7 @@ public class JuegosFragment extends Fragment {
                                     .add(favorito)
                                     .addOnSuccessListener(documentReference -> {
                                         Toast.makeText(v.getContext(), "Juego añadido a favoritos", Toast.LENGTH_SHORT).show();
-                                        imagenEstrella.setImageResource(R.drawable.estrella); // Estrella llena
+                                        imagenEstrella.setImageResource(R.drawable.estrella);
                                     })
                                     .addOnFailureListener(e -> {
                                         Toast.makeText(v.getContext(), "Error al añadir favorito", Toast.LENGTH_SHORT).show();
