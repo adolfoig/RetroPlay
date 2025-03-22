@@ -6,9 +6,9 @@ public class Logro implements Serializable {
     private  String descripcion;
     private  int imagenMedalla;
 
-    private String puntuacion;
+    private int puntuacion;
 
-    public Logro(String descripcion, int imagenMedalla, String puntuacion){
+    public Logro(String descripcion, int imagenMedalla, int puntuacion){
 
         this.descripcion = descripcion;
         this.imagenMedalla = imagenMedalla;
@@ -34,11 +34,11 @@ public class Logro implements Serializable {
         this.imagenMedalla = imagenMedalla;
     }
 
-    public String getPuntuacion() {
+    public int getPuntuacion() {
         return puntuacion;
     }
 
-    public void setPuntuacion(String puntuacion) {
+    public void setPuntuacion(int puntuacion) {
         this.puntuacion = puntuacion;
     }
 }

@@ -87,11 +87,8 @@ public class LogrosFragment extends Fragment {
     }
 
     private void ordenarLogrosPorPuntuacion() {
-        Collections.sort(listaLogros, (logro1, logro2) -> {
-            int puntuacion1 = Integer.parseInt(logro1.getPuntuacion());
-            int puntuacion2 = Integer.parseInt(logro2.getPuntuacion());
-            return Integer.compare(puntuacion1, puntuacion2); // Ordenar de menor a mayor
-        });
+        // Ordenar logros por puntuación (sin conversión, ya que es int)
+        Collections.sort(listaLogros, (logro1, logro2) -> Integer.compare(logro1.getPuntuacion(), logro2.getPuntuacion()));
     }
 
         // Adaptador con ViewBinding

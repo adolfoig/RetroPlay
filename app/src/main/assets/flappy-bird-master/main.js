@@ -648,7 +648,43 @@ getReady = {
         }
     }
 }
-//game over screen
+// Función para enviar la puntuación al servidor
+async function sendScore(score) {
+    try {
+        const response = await fetch('http://192.168.1.42:3000/score', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ score: score }), // Envía la puntuación como JSON
+        });
+        if (!response.ok) {
+            throw new Error('Error al enviar la puntuación');
+        }
+
+        const data = await response.json();
+        console.log('Respuesta del servidor:', data);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// Función para obtener la puntuación del servidor
+async function getScore() {
+    try {
+        const response = await fetch('http://192.168.1.42:3000/score');
+        if (!response.ok) {
+            throw new Error('Error al obtener la puntuación');
+        }
+
+        const data = await response.json();
+        return data.score; // Devuelve la puntuación
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// Modificar la lógica de gameOver para enviar la puntuación
 gameOver = {
     //object's key-value properties pinpointing its location
     imgX: 174,
@@ -656,19 +692,29 @@ gameOver = {
     width: 226,
     height: 158,
     //values for drawing on canvas
-    x: cvs.width/2 - 226/2,
-    y: cvs.height/2 - 160,
+    x: cvs.width / 2 - 226 / 2,
+    y: cvs.height / 2 - 160,
     w: 226,
-    h:160,
+    h: 160,
     //object's render function that utilizes all above values to draw image onto canvas
-    render: function() {
+    render: function () {
         //only draw this if the game state is on game over
         if (gameState.current == gameState.gameOver) {
-            ctx.drawImage(theme1, this.imgX,this.imgY,this.width,this.height, this.x,this.y,this.w,this.h)
-            description.style.visibility = "visible"
+            ctx.drawImage(theme1, this.imgX, this.imgY, this.width, this.height, this.x, this.y, this.w, this.h);
+            description.style.visibility = "visible";
+
+            // Enviar la puntuación al servidor cuando el juego termina
+            const finalScore = score.current; // Obtén la puntuación actual
+            console.log('Puntuación final:', finalScore); // Verifica que la puntuación sea la correcta
+            sendScore(finalScore); // Envía la puntuación al servidor
+
+            // Opcional: Obtener la puntuación más reciente del servidor
+            getScore().then((latestScore) => {
+                console.log('Última puntuación del servidor:', latestScore);
+            });
         }
     }
-}
+};
 /************************
 ***** FUNCTIONS: ********
 ************************/
@@ -748,14 +794,7 @@ document.body.addEventListener('keydown', (e) => {
             SFX_SWOOSH.play()
             gameState.current = gameState.getReady
 
-            let finalScore = score.current; // Enviamos solo el valor numérico de la puntuación
-            sendScoreToAndroid(finalScore);
-        }
-    }
 
-    function sendScoreToAndroid(score) {
-        if (window.Android) {
-            window.Android.receiveScore(score); // Enviar la puntuación a Android
         }
     }
 })
