@@ -156,12 +156,16 @@ public class JuegosFragment extends Fragment {
             holder.binding.textNombreJuego.setText(juego.getNombre());
 
             // Establecer la imagen dependiendo del ID del juego
-            if (juego.getId().equals("1")) {
-                holder.binding.imagenJuego.setImageResource(R.drawable.pacman);
-            } else if (juego.getId().equals("2")) {
-                holder.binding.imagenJuego.setImageResource(R.drawable.tetris);
-            } else if (juego.getId().equals("3")) {
-                holder.binding.imagenJuego.setImageResource(R.drawable.flappybird);
+            switch (juego.getId()) {
+                case "1":
+                    holder.binding.imagenJuego.setImageResource(R.drawable.pacman);
+                    break;
+                case "2":
+                    holder.binding.imagenJuego.setImageResource(R.drawable.tetris);
+                    break;
+                case "3":
+                    holder.binding.imagenJuego.setImageResource(R.drawable.flappybird);
+                    break;
             }
 
             // Actualizar la estrella dependiendo del estado "favorito" del juego
@@ -192,7 +196,7 @@ public class JuegosFragment extends Fragment {
 
         private void navegarPantallaDetalle(Juego juego) {
             Bundle args = new Bundle();
-            args.putSerializable("juego", juego); // No es necesario hacer un casting a Serializable si ya lo implementa
+            args.putSerializable("juego", juego);
             navController.navigate(idAction, args); // Navegar a la pantalla de detalle
         }
     }
