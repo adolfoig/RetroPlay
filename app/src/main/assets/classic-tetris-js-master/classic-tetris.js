@@ -1346,7 +1346,43 @@ class ClassicTetris {
       }
     }
   }
-  
+
+  // Función para enviar la puntuación al servidor
+  async function sendScore(score) {
+      try {
+          const response = await fetch('http://192.168.1.42:3000/score', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ score: score }), // Envía la puntuación como JSON
+          });
+          if (!response.ok) {
+              throw new Error('Error al enviar la puntuación');
+          }
+
+          const data = await response.json();
+          console.log('Respuesta del servidor:', data);
+      } catch (error) {
+          console.error('Error:', error);
+      }
+  }
+
+  // Función para obtener la puntuación del servidor
+  async function getScore() {
+      try {
+          const response = await fetch('http://192.168.1.42:3000/score');
+          if (!response.ok) {
+              throw new Error('Error al obtener la puntuación');
+          }
+
+          const data = await response.json();
+          return data.score; // Devuelve la puntuación
+      } catch (error) {
+          console.error('Error:', error);
+      }
+  }
+
   _triggerGameOver() {
     // stop theme song
     if (this.gameTheme) {
@@ -1369,6 +1405,16 @@ class ClassicTetris {
       score: this.score,
       lines: this.lines
     });
+
+    const finalScore = this.score; // Obtén la puntuación actual
+    console.log('Puntuación final:', finalScore); // Verifica que la puntuación sea la correcta
+    sendScore(finalScore); // Envía la puntuación al servidor
+
+    // Opcional: Obtener la puntuación más reciente del servidor
+    getScore().then((latestScore) => {
+       console.log('Última puntuación del servidor:', latestScore);
+    });
+
   }
   
   _processGameOver() {
