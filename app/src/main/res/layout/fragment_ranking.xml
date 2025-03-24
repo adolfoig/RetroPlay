@@ -1,14 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RankingFragment">
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/gris_medio_oscuro"
+    tools:context=".MainActivity">
 
-    <!-- TODO: Update blank fragment layout -->
+    <!-- Título "Elegir Juego" -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Elegir Juego:"
+        android:textSize="20sp"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="8dp"/>
 
-</FrameLayout>
+    <!-- Spinner para seleccionar juego -->
+    <Spinner
+        android:id="@+id/spinnerJuegos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:background="@android:drawable/btn_dropdown"/>
+
+    <!-- Título del juego seleccionado -->
+    <TextView
+        android:id="@+id/tvTituloJuego"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TEXTO JUEGO"
+        android:layout_gravity="center"
+        android:textSize="24sp"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Tabla de puntuaciones -->
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="*"
+        android:shrinkColumns="*"
+        android:background="@android:color/white">
+
+        <!-- Encabezados de la tabla -->
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#DDDDDD">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="JUGADOR"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                android:padding="8dp"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="PUNTUACIÓN"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                android:padding="8dp"/>
+        </TableRow>
+
+        <!-- Fila 1 - Jugador Adolfo -->
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/nombreJugador"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Ejemplo"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:padding="8dp"/>
+
+            <TextView
+                android:id="@+id/puntuacionJugador"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="170"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:padding="8dp"/>
+        </TableRow>
+
+        <!-- Fila 2 - Jugador Carlos -->
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#EEEEEE"/>
+    </TableLayout>
+</LinearLayout>
