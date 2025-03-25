@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-
     <string name="registro" tools:ignore="ExtraTranslation">REGISTRATE</string>
     <string name="iniciasesion" tools:ignore="MissingTranslation">INICIA SESION</string>
+    <string name="correoElectronico" tools:ignore="ExtraTranslation">Correo electrónico</string>
+    <string name="contraseña" tools:ignore="ExtraTranslation">Contraseña</string>
+    <string name="iniciarSesion" tools:ignore="ExtraTranslation">Iniciar sesión</string>
+    <string name="irRegistro" tools:ignore="ExtraTranslation">¿Aún no tienes cuenta? Regístrate aquí!!</string>
 
 </resources>
