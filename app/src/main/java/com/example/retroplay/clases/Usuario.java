@@ -30,8 +30,8 @@ public class Usuario implements Serializable {
         this.id = id;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getNombre(String nombre) {
+        return this.nombre;
     }
 
     public void setNombre(String nombre) {

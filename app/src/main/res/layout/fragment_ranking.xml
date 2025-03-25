@@ -30,7 +30,7 @@
         android:id="@+id/tvTituloJuego"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TEXTO JUEGO"
+        android:text="Ningun juego elegido"
         android:layout_gravity="center"
         android:textSize="24sp"
         android:textColor="@android:color/black"
@@ -39,6 +39,7 @@
 
     <!-- Tabla de puntuaciones -->
     <TableLayout
+        android:id="@+id/tablaPuntuaciones"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:stretchColumns="*"
@@ -72,8 +73,8 @@
                 android:padding="8dp"/>
         </TableRow>
 
-        <!-- Fila 1 - Jugador Adolfo -->
         <TableRow
+            android:id="@+id/tableRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/white">
