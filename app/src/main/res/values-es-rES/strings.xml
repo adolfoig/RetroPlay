@@ -17,4 +17,11 @@
     <string name="fotoPerfil" tools:ignore="ExtraTranslation">Elige una foto de perfil</string>
     <string name="registrarse" tools:ignore="ExtraTranslation">Registrarse</string>
 
+    <!-- Bottom menu -->
+
+    <string name="juegos" tools:ignore="ExtraTranslation,MissingTranslation">Juegos</string>
+    <string name="favoritos" tools:ignore="ExtraTranslation,MissingTranslation">Favoritos</string>
+    <string name="ranking" tools:ignore="ExtraTranslation,MissingTranslation">Ranking</string>
+    <string name="logros" tools:ignore="ExtraTranslation,MissingTranslation">Logros</string>
+
 </resources>

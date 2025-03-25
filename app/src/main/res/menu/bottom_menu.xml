@@ -3,20 +3,20 @@
     <item
         android:id="@+id/juegosFragment"
         android:icon="@drawable/mandoretro"
-        android:title="Juegos" />
+        android:title="@string/juegos"/>
 
     <item
         android:id="@+id/favoritosFragment"
         android:icon="@drawable/estrella"
-        android:title="Favoritos" />
+        android:title="@string/favoritos" />
 
     <item
         android:id="@+id/rankingFragment"
         android:icon="@drawable/ranking"
-        android:title="Clasificación" />
+        android:title="@string/ranking" />
 
     <item
         android:id="@+id/logrosFragment"
         android:icon="@drawable/trofeo"
-        android:title="Logros"/>
+        android:title="@string/logros"/>
 </menu>

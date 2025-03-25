@@ -11,10 +11,18 @@
     <string name="irRegistro" tools:ignore="ExtraTranslation,StringEscaping">Don't have an account yet? Sign up here!¿</string>
 
     <!-- Registro fragment -->
+
     <string name="registrate" tools:ignore="ExtraTranslation">REGISTER</string>
     <string name="nombreUsuario" tools:ignore="ExtraTranslation">User name</string>
     <string name="confirmarPassword" tools:ignore="ExtraTranslation">Repeat password</string>
     <string name="fotoPerfil" tools:ignore="ExtraTranslation">Choose a profile picture</string>
     <string name="registrarse" tools:ignore="ExtraTranslation">Register</string>
+
+    <!-- Bottom menu -->
+
+    <string name="juegos" tools:ignore="ExtraTranslation,MissingTranslation">Games</string>
+    <string name="favoritos" tools:ignore="ExtraTranslation,MissingTranslation">Favorites</string>
+    <string name="ranking" tools:ignore="ExtraTranslation,MissingTranslation">Ranking</string>
+    <string name="logros" tools:ignore="ExtraTranslation,MissingTranslation">Achievements</string>
 
 </resources>
