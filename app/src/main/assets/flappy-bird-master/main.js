@@ -1,10 +1,12 @@
+
 const ip = '192.168.1.42';
 const puerto = '3000';
-const score = 100;
-
 /************************
 ***** DECLARATIONS: *****
 ************************/
+
+
+
 let cvs         //  canvas
 let ctx         //  context'2d'
 let description //  game description

@@ -1,7 +1,4 @@
-// Definir variables para la IP, puerto y el score
-const ip = '192.168.1.42';
-const puerto = '3000';
-const score = 100;
+
 
 /*jslint browser: true, undef: true, eqeqeq: true, nomen: true, white: true */
 /*global window: false, document: false */
@@ -15,9 +12,45 @@ const score = 100;
 
 
 
+// Definir variables para la IP, puerto y el score
+const ip = '192.168.1.42';
+const puerto = '3000';
 
+ // Función para enviar la puntuación al servidor
+    async function sendScore(score) {
+        try {
+            const response = await fetch(`http://${ip}:${puerto}/score`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ score: score }), // Envía la puntuación como JSON
+            });
+            if (!response.ok) {
+                throw new Error('Error al enviar la puntuación');
+            }
 
-//GUARDAR EN LA BASE DE DATOS
+            const data = await response.json();
+            console.log('Respuesta del servidor:', data);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    // Función para obtener la puntuación del servidor
+    async function getScore() {
+        try {
+            const response = await fetch(`http://${ip}:${puerto}/score`);
+            if (!response.ok) {
+                throw new Error('Error al obtener la puntuación');
+            }
+
+            const data = await response.json();
+            return data.score; // Devuelve la puntuación
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
 
 var NONE        = 4,
     UP          = 3,
@@ -887,41 +920,6 @@ var PACMAN = (function () {
         });
     }
 
-    // Función para enviar la puntuación al servidor
-    async function sendScore(score) {
-        try {
-            const response = await fetch(`http://${ip}:${puerto}/score`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ score: score }), // Envía la puntuación como JSON
-            });
-            if (!response.ok) {
-                throw new Error('Error al enviar la puntuación');
-            }
-
-            const data = await response.json();
-            console.log('Respuesta del servidor:', data);
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-
-    // Función para obtener la puntuación del servidor
-    async function getScore() {
-        try {
-            const response = await fetch(`http://${ip}:${puerto}/score`);
-            if (!response.ok) {
-                throw new Error('Error al obtener la puntuación');
-            }
-
-            const data = await response.json();
-            return data.score; // Devuelve la puntuación
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
 
 
     function setState(nState) { 
@@ -1352,8 +1350,6 @@ Object.prototype.clone = function () {
     return newObj;
 };
 
-const mysql = require('mysql2');
-
 // Crear conexión
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -1363,19 +1359,5 @@ const connection = mysql.createConnection({
     port: 3306
 });
 
-// Conectar a la base de datos
-connection.connect((err) => {
-    if (err) throw err;
-    console.log('Conectado a la base de datos MySQL!');
-});
-
-// Función para guardar puntuación
-function saveScore(userId, gameId, score) {
-    const query = 'INSERT INTO Puntuaciones (id_usuario, id_juego, puntuacion, fecha) VALUES (?, ?, ?, NOW())';
-    connection.query(query, [userId, gameId, score], (err, results) => {
-        if (err) throw err;
-        console.log('Puntuación guardada:', results.insertId);
-    });
-}
 
 

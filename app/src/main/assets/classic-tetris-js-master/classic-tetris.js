@@ -1,7 +1,6 @@
 // Definir variables para la IP, puerto y el score
 const ip = '192.168.1.42';
 const puerto = '3000';
-const score = 100; // Esto puede ser dinámico, dependiendo de tu aplicación
 
 // Función para enviar la puntuación al servidor
 async function sendScore(score) {
