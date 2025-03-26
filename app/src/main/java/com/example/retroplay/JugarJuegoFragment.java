@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.retroplay.clases.Logro;
 import com.example.retroplay.databinding.FragmentJugarJuegoBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -187,45 +189,31 @@ public class JugarJuegoFragment extends Fragment {
         if (user != null) {
             String idUsuario = user.getUid();
 
-            // Obtener la puntuación máxima almacenada para este usuario
             db.collection("Puntuaciones")
                     .whereEqualTo("idUsuario", idUsuario)
-                    .whereEqualTo("idJuego", idJuego) // Asegurarse de que el juego sea el correcto
+                    .whereEqualTo("idJuego", idJuego)
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                            // Si existe el documento para este usuario y juego
-                            DocumentSnapshot document = task.getResult().getDocuments().get(0);  // Obtener el primer documento (debería ser único)
+                            DocumentSnapshot document = task.getResult().getDocuments().get(0);
                             int puntuacionMaxima = document.getLong("puntuacionMaxima").intValue();
                             String fechaPuntuacionMaxima = document.getString("fechaPuntuacionMaxima");
 
-                            // Verificar si la puntuación actual es mayor que la máxima
                             int puntuacionMayor = Math.max(puntuacion, puntuacionMaxima);
                             String fechaPuntuacionActual = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
 
-                            // Actualizar el documento con la nueva puntuación
                             HashMap<String, Object> datosPuntuacion = new HashMap<>();
                             datosPuntuacion.put("puntuacionActual", (long) puntuacion);
-                            datosPuntuacion.put("fechaPuntuacionActual", fechaPuntuacionActual);  // Fecha de la puntuación actual
-                            datosPuntuacion.put("puntuacionMaxima", (long) puntuacionMayor);  // Guardar la puntuación máxima
-                            datosPuntuacion.put("fechaPuntuacionMaxima", puntuacionMayor > puntuacionMaxima ? fechaPuntuacionActual : fechaPuntuacionMaxima);  // Fecha de la puntuación máxima
+                            datosPuntuacion.put("fechaPuntuacionActual", fechaPuntuacionActual);
+                            datosPuntuacion.put("puntuacionMaxima", (long) puntuacionMayor);
+                            datosPuntuacion.put("fechaPuntuacionMaxima", puntuacionMayor > puntuacionMaxima ? fechaPuntuacionActual : fechaPuntuacionMaxima);
 
-                            // Actualizar el documento en Firestore
                             db.collection("Puntuaciones")
-                                    .document(document.getId())  // Obtener el ID del documento existente
-                                    .update(datosPuntuacion)  // Actualizar el documento con los nuevos datos
-                                    .addOnSuccessListener(aVoid -> {
-                                        if (getActivity() != null) {
-                                            Toast.makeText(getActivity(), "Puntuación actualizada exitosamente", Toast.LENGTH_SHORT).show();
-                                        }
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        if (getActivity() != null) {
-                                            Toast.makeText(getActivity(), "Error al actualizar la puntuación: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
+                                    .document(document.getId())
+                                    .update(datosPuntuacion)
+                                    .addOnSuccessListener(aVoid -> verificarYGuardarLogros(puntuacion))
+                                    .addOnFailureListener(e -> Log.e("Error", "Error al actualizar puntuación", e));
                         } else {
-                            // Si no existe puntuación para este usuario y juego, guardarla como nueva
                             guardarPrimeraPuntuacion(idUsuario, puntuacion);
                         }
                     });
@@ -255,6 +243,47 @@ public class JugarJuegoFragment extends Fragment {
                 .addOnFailureListener(e -> {
                     if (getActivity() != null) {
                         Toast.makeText(getActivity(), "Error al guardar puntuación: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void verificarYGuardarLogros(int puntuacion) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String userId = user.getUid();
+
+        // 1. Obtener todos los logros disponibles para este juego
+        db.collection("LogrosDisponibles")
+                .whereEqualTo("idJuego", idJuego)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    for (DocumentSnapshot logroDoc : querySnapshot.getDocuments()) {
+                        Logro logro = logroDoc.toObject(Logro.class);
+                        if (logro != null && puntuacion >= logro.getPuntuacion()) {
+                            // 2. Verificar si ya está obtenido
+                            db.collection("LogrosObtenidos")
+                                    .whereEqualTo("idUsuario", userId)
+                                    .whereEqualTo("idLogro", logroDoc.getId())
+                                    .get()
+                                    .addOnSuccessListener(obtainedQuery -> {
+                                        if (obtainedQuery.isEmpty()) {
+                                            // 3. Guardar logro obtenido
+                                            Map<String, Object> logroObtenido = new HashMap<>();
+                                            logroObtenido.put("idUsuario", userId);
+                                            logroObtenido.put("idLogro", logroDoc.getId());
+                                            logroObtenido.put("fechaObtencion", new Date());
+                                            logroObtenido.put("idJuego", idJuego);
+
+                                            db.collection("LogrosObtenidos")
+                                                    .add(logroObtenido)
+                                                    .addOnSuccessListener(documentReference -> {
+                                                        Log.d("Logros", "Logro guardado: " + logroDoc.getId());
+                                                    });
+                                        }
+                                    });
+                        }
                     }
                 });
     }
