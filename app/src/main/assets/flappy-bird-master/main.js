@@ -718,6 +718,16 @@ gameOver = {
             getScore().then((latestScore) => {
                 console.log('Última puntuación del servidor:', latestScore);
             });
+        } else {
+        // Enviar la puntuación al servidor cuando el juego termina
+                            const finalScore = 0; // Obtén la puntuación actual
+                            console.log('Puntuación final:', finalScore); // Verifica que la puntuación sea la correcta
+                            sendScore(finalScore); // Envía la puntuación al servidor
+
+                            // Opcional: Obtener la puntuación más reciente del servidor
+                            getScore().then((latestScore) => {
+                                console.log('Última puntuación del servidor:', latestScore);
+                            });
         }
     }
 };

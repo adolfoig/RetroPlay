@@ -16,6 +16,12 @@
 const ip = '192.168.1.42';
 const puerto = '3000';
 
+let finalScore = 0;
+console.log('Puntuación final:', finalScore); // Verifica que la puntuación sea la correcta
+sendScore(finalScore); // Envía la puntuación al servidor
+getScore().then((latestScore) => {
+});
+
  // Función para enviar la puntuación al servidor
     async function sendScore(score) {
         try {

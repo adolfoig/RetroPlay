@@ -2,6 +2,16 @@
 const ip = '192.168.1.42';
 const puerto = '3000';
 
+// Enviar la puntuación al servidor cuando el juego termina
+                    const finalScore = 0; // Obtén la puntuación actual
+                    console.log('Puntuación final:', finalScore); // Verifica que la puntuación sea la correcta
+                    sendScore(finalScore); // Envía la puntuación al servidor
+
+                    // Opcional: Obtener la puntuación más reciente del servidor
+                    getScore().then((latestScore) => {
+                        console.log('Última puntuación del servidor:', latestScore);
+                    });
+
 // Función para enviar la puntuación al servidor
 async function sendScore(score) {
     try {
@@ -1389,20 +1399,21 @@ class ClassicTetris {
   }
 
   _triggerGameOver() {
+
+  // Enviar la puntuación al servidor cuando el juego termina
+                    const finalScore = this.score; // Obtén la puntuación actual
+                    console.log('Puntuación final:', finalScore); // Verifica que la puntuación sea la correcta
+                    sendScore(finalScore); // Envía la puntuación al servidor
+
+                    // Opcional: Obtener la puntuación más reciente del servidor
+                    getScore().then((latestScore) => {
+                        console.log('Última puntuación del servidor:', latestScore);
+                    });
+
     // stop theme song
     if (this.gameTheme) {
       this.gameTheme.pause();
     }
-
-    // Enviar la puntuación al servidor cuando el juego termina
-                const finalScore = this.score; // Obtén la puntuación actual
-                console.log('Puntuación final:', finalScore); // Verifica que la puntuación sea la correcta
-                sendScore(finalScore); // Envía la puntuación al servidor
-
-                // Opcional: Obtener la puntuación más reciente del servidor
-                getScore().then((latestScore) => {
-                    console.log('Última puntuación del servidor:', latestScore);
-                });
 
     // play game over sound
     if (this.gameOverSound) {
