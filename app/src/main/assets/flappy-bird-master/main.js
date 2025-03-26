@@ -1,3 +1,7 @@
+const ip = '192.168.1.42';
+const puerto = '3000';
+const score = 100;
+
 /************************
 ***** DECLARATIONS: *****
 ************************/
@@ -651,7 +655,7 @@ getReady = {
 // Función para enviar la puntuación al servidor
 async function sendScore(score) {
     try {
-        const response = await fetch('http://192.168.1.42:3000/score', {
+        const response = await fetch(`http://${ip}:${puerto}/score`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -672,7 +676,7 @@ async function sendScore(score) {
 // Función para obtener la puntuación del servidor
 async function getScore() {
     try {
-        const response = await fetch('http://192.168.1.42:3000/score');
+        const response = await fetch(`http://${ip}:${puerto}/score`);
         if (!response.ok) {
             throw new Error('Error al obtener la puntuación');
         }

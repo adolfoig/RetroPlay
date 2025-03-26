@@ -1,3 +1,8 @@
+// Definir variables para la IP, puerto y el score
+const ip = '192.168.1.42';
+const puerto = '3000';
+const score = 100;
+
 /*jslint browser: true, undef: true, eqeqeq: true, nomen: true, white: true */
 /*global window: false, document: false */
 
@@ -882,39 +887,41 @@ var PACMAN = (function () {
         });
     }
 
-    async function getScore() {
-    try {
-        const response = await fetch('http://192.168.1.42:3000/score');
-        if (!response.ok) {
-            throw new Error('Error al obtener la puntuación');
-        }
-
-        const data = await response.json();
-        return data.score; // Devuelve la puntuación
-    } catch (error) {
-        console.error('Error:', error);
-    }
-}
-
+    // Función para enviar la puntuación al servidor
     async function sendScore(score) {
-    try {
-        const response = await fetch('http://192.168.1.42:3000/score', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ score: score }), // Envía la puntuación como JSON
-        });
-        if (!response.ok) {
-            throw new Error('Error al enviar la puntuación');
-        }
+        try {
+            const response = await fetch(`http://${ip}:${puerto}/score`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ score: score }), // Envía la puntuación como JSON
+            });
+            if (!response.ok) {
+                throw new Error('Error al enviar la puntuación');
+            }
 
-        const data = await response.json();
-        console.log('Respuesta del servidor:', data);
-    } catch (error) {
-        console.error('Error:', error);
+            const data = await response.json();
+            console.log('Respuesta del servidor:', data);
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
-}
+
+    // Función para obtener la puntuación del servidor
+    async function getScore() {
+        try {
+            const response = await fetch(`http://${ip}:${puerto}/score`);
+            if (!response.ok) {
+                throw new Error('Error al obtener la puntuación');
+            }
+
+            const data = await response.json();
+            return data.score; // Devuelve la puntuación
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
 
 
     function setState(nState) { 
