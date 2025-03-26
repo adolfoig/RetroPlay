@@ -91,6 +91,8 @@ public class LogrosFragment extends Fragment {
         Collections.sort(listaLogros, (logro1, logro2) -> Integer.compare(logro1.getPuntuacion(), logro2.getPuntuacion()));
     }
 
+
+
         // Adaptador con ViewBinding
     private static class LogroAdapter extends RecyclerView.Adapter<LogroAdapter.LogroViewHolder> {
 
