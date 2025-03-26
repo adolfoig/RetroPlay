@@ -3,20 +3,40 @@ package com.example.retroplay.clases;
 import java.io.Serializable;
 
 public class Logro implements Serializable {
+    private String id;
     private  String descripcion;
     private  int imagenMedalla;
-
     private int puntuacion;
 
-    public Logro(String descripcion, int imagenMedalla, int puntuacion){
+    private boolean obtenido;
 
+
+    public Logro(String id,String descripcion, int imagenMedalla, int puntuacion, boolean obtenido){
+        this.id = id;
         this.descripcion = descripcion;
         this.imagenMedalla = imagenMedalla;
         this.puntuacion = puntuacion;
+        this.obtenido = obtenido;
     }
      public Logro() {
 
      }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public boolean isObtenido() {
+        return obtenido;
+    }
+
+    public void setObtenido(boolean obtenido) {
+        this.obtenido = obtenido;
+    }
 
     public String getDescripcion() {
         return descripcion;
