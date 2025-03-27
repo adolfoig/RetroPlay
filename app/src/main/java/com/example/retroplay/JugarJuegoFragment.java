@@ -43,6 +43,9 @@ public class JugarJuegoFragment extends Fragment {
     String idJuego;
     private ExecutorService executorService;
     private FirebaseFirestore firestore;
+    private final String IP = "192.168.1.42";  // Dirección IP del servidor
+    private final int PUERTO = 3000;  // Puerto del servidor
+    private final String URL = "http://" + IP + ":" + PUERTO + "/score";  // Crear la URL
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -108,7 +111,7 @@ public class JugarJuegoFragment extends Fragment {
     private void fetchScore() {
         executorService.execute(() -> {
             Log.d("Puntuacion", "Intentando obtener puntuación...");
-            String result = getScore("http://192.168.1.42:3000/score");  // Obtener la puntuación desde el servidor
+            String result = getScore(URL);  // Obtener la puntuación desde el servidor
 
             try {
                 JSONObject jsonObject = new JSONObject(result);
