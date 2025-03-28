@@ -39,16 +39,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
+        // Configura el NavController (usa la variable de clase)
+        this.navController = ((NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment))
+                .getNavController();
+
         if (currentUser == null) {
-            mostrarLoginFragment();
+            navController.navigate(R.id.loginFragment); // Usa la navegación del NavController
             ocultarInterfaz2();
         } else {
             irAlBottomMenu();
         }
 
-        // Configura el NavController (usa la variable de clase)
-        this.navController = ((NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment))
-                .getNavController();
 
         // Configura el AppBarConfiguration con los fragments deseados
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -155,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             );
 
             // Oculta o muestra la interfaz según el fragmento actual
-            if (destinationId == R.id.loginButton || destinationId == R.id.registroFragment || destinationId == R.id.jugarJuegoFragment) {
+            if (destinationId == R.id.loginFragment || destinationId == R.id.registroFragment || destinationId == R.id.jugarJuegoFragment) {
                 ocultarInterfaz2();
             } else {
                 mostrarInterfaz2(); // Muestra la interfaz por defecto en otros fragmentos
