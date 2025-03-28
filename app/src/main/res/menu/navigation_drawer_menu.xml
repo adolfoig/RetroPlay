@@ -7,6 +7,11 @@
         android:checkableBehavior="single">
 
         <item
+            android:id="@+id/nav_juegosFragment"
+            android:title="Juegos">
+        </item>
+
+        <item
             android:id="@+id/nav_actualizarUsuario"
             android:title="Actualizar usuario">
         </item>
@@ -16,6 +21,5 @@
             android:id="@+id/nav_cerrarSesion"
             android:title="Cerrar sesión">
         </item>
-
     </group>
 </menu>

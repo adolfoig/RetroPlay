@@ -99,7 +99,7 @@ public class JugarJuegoFragment extends Fragment {
             gameWebView.destroy();
 
             if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).mostrarInterfaz();
+                ((MainActivity) getActivity()).mostrarInterfaz2();
             }
 
             Log.d("Puntuación", "onDestroy ejecutado");

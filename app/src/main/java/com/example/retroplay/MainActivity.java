@@ -1,5 +1,6 @@
 package com.example.retroplay;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +17,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.retroplay.Registro.LoginFragment;
+import com.example.retroplay.Registro.RegistroActivity;
 import com.example.retroplay.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -88,10 +90,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationUI.setupWithNavController(binding.bottomNavView, navController);
         NavigationUI.setupWithNavController(binding.toolbar, navController);
 
-        // Asegura que el ícono de hamburguesa se muestre cuando sea necesario
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
     }
 
     private void ocultarInterfaz() {
@@ -116,12 +114,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         binding.bottomAppBar.setVisibility(View.GONE);
     }
 
-    private void mostrarInterfaz2() {
+    void mostrarInterfaz2() {
         // Mostramos el Toolbar y BottomNavigation
         binding.bottomNavView.setVisibility(View.VISIBLE);
+        binding.toolbar.setVisibility(View.VISIBLE);
+        binding.bottomAppBar.setVisibility(View.VISIBLE);
+
     }
 
-    public void mostrarInterfaz() {
+    private void ocultarBottomNavView(){
+        binding.bottomNavView.setVisibility(View.GONE);
+        binding.bottomAppBar.setVisibility(View.GONE);
+    }
+
+    private void mostrarInterfaz() {
 
         // Restaurar altura y visibilidad de Toolbar
         ViewGroup.LayoutParams toolbarParams = binding.toolbar.getLayoutParams();
@@ -143,22 +149,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             // Solo habilitar el Drawer en el fragmento juegosFragment
             boolean shouldEnableDrawer = destinationId == R.id.juegosFragment;
-            
+
             binding.drawerLayout.setDrawerLockMode(
                     shouldEnableDrawer ? DrawerLayout.LOCK_MODE_UNLOCKED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED
             );
 
             // Oculta o muestra la interfaz según el fragmento actual
-            if (destinationId == R.id.jugarJuegoFragment) {
-                ocultarInterfaz();
-            } else if (destinationId == R.id.loginButton || destinationId == R.id.registroFragment || destinationId == R.id.nav_actualizarUsuario
-                    || destinationId == R.id.nav_cerrarSesion) {
+            if (destinationId == R.id.loginButton || destinationId == R.id.registroFragment || destinationId == R.id.jugarJuegoFragment) {
                 ocultarInterfaz2();
             } else {
                 mostrarInterfaz2(); // Muestra la interfaz por defecto en otros fragmentos
             }
         });
     }
+
 
 
     private void openFragment(Fragment fragment) {
@@ -173,8 +177,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int itemId = item.getItemId();
         if (itemId == R.id.nav_actualizarUsuario) {
             openFragment(new ActualizarUsuarioFragment());
+            ocultarBottomNavView();
         } else if (itemId == R.id.nav_cerrarSesion) {
             openFragment(new CerrarSesionFragment());
+            ocultarBottomNavView();
+        } else if(itemId == R.id.nav_juegosFragment){
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
         }
         binding.drawerLayout.closeDrawer(GravityCompat.START);
         return true;
