@@ -2,7 +2,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">RetroPlay</string>
     <string name="default_web_client_id">583642395601-2gu1tvl877i1dtdcpvt5ci0j75ood0gl.apps.googleusercontent.com</string>
-
+    <string name="navigation_drawer_open" tools:ignore="MissingTranslation">Open Navigation Drawer</string>
+    <string name="navigation_drawer_close" tools:ignore="MissingTranslation">Close Navigation Drawer</string>
 
     <!-- Login fragment -->
 
@@ -27,5 +28,7 @@
     <string name="favoritos" tools:ignore="ExtraTranslation,MissingTranslation">Favorites</string>
     <string name="ranking" tools:ignore="ExtraTranslation,MissingTranslation">Ranking</string>
     <string name="logros" tools:ignore="ExtraTranslation,MissingTranslation">Achievements</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment" tools:ignore="MissingTranslation">Hello blank fragment</string>
 
 </resources>
