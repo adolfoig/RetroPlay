@@ -14,7 +14,7 @@
     <string name="correoElectronico" tools:ignore="ExtraTranslation">Email</string>
     <string name="contraseña" tools:ignore="ExtraTranslation,MissingTranslation">Password</string>
     <string name="iniciarSesion" tools:ignore="ExtraTranslation">Login</string>
-    <string name="irRegistro" tools:ignore="ExtraTranslation">Don\'t have an account yet? Sign up here!¿</string>
+    <string name="irRegistro" tools:ignore="ExtraTranslation">Don\'t have an account yet? Sign up here!!</string>
 
     <!-- Registro fragment -->
     <string name="registrate" tools:ignore="ExtraTranslation">REGISTER</string>
