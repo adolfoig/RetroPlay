@@ -13,7 +13,7 @@
 
 
 // Definir variables para la IP, puerto y el score
-const ip = '192.168.1.42';
+const ip = '192.168.1.35';
 const puerto = '3000';
 
 let finalScore = 0;
