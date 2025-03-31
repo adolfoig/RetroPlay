@@ -17,7 +17,6 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.retroplay.Registro.LoginFragment;
-import com.example.retroplay.Registro.RegistroActivity;
 import com.example.retroplay.databinding.ActivityMainBinding;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -89,7 +88,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavController navController = ((NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)).getNavController();
         NavigationUI.setupWithNavController(binding.bottomNavView, navController);
         NavigationUI.setupWithNavController(binding.toolbar, navController);
-
     }
 
     private void ocultarInterfaz() {
@@ -125,21 +123,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void ocultarBottomNavView(){
         binding.bottomNavView.setVisibility(View.GONE);
         binding.bottomAppBar.setVisibility(View.GONE);
-    }
-
-    private void mostrarInterfaz() {
-
-        // Restaurar altura y visibilidad de Toolbar
-        ViewGroup.LayoutParams toolbarParams = binding.toolbar.getLayoutParams();
-        toolbarParams.height = getResources().getDimensionPixelSize(android.R.dimen.app_icon_size);
-        binding.toolbar.setLayoutParams(toolbarParams);
-        binding.toolbar.setVisibility(View.VISIBLE);
-
-        // Restaurar altura y visibilidad de BottomNavView
-        ViewGroup.LayoutParams bottomNavParams = binding.bottomNavView.getLayoutParams();
-        bottomNavParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        binding.bottomNavView.setLayoutParams(bottomNavParams);
-        binding.bottomNavView.setVisibility(View.VISIBLE);
     }
 
     // Método para ver si estás en el fragment jugarJuegos, login o registro y ocultar el menú
