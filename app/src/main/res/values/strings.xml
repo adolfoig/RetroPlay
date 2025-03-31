@@ -5,6 +5,9 @@
     <string name="navigation_drawer_open" tools:ignore="MissingTranslation">Open Navigation Drawer</string>
     <string name="navigation_drawer_close" tools:ignore="MissingTranslation">Close Navigation Drawer</string>
 
+    <!-- Juegos ViewHolder -->
+    <string name="jugar" tools:ignore="ExtraTranslation">Play</string>
+
     <!-- Login fragment -->
     <string name="registro">SIGN UP</string>
     <string name="iniciasesion" tools:ignore="MissingTranslation">SIGN IN</string>

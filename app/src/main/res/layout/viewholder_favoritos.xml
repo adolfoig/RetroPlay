@@ -50,7 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#4CAF50"
-                android:text="Jugar" />
+                android:text="@string/jugar" />
 
             <!-- Espaciador para empujar el botón hacia la derecha -->
             <ImageButton

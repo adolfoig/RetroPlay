@@ -52,7 +52,7 @@
                 android:layout_width="155dp"
                 android:layout_height="90dp"
                 android:backgroundTint="#4CAF50"
-                android:text="Jugar" />
+                android:text="@string/jugar" />
 
             <View
                 android:layout_width="0dp"
