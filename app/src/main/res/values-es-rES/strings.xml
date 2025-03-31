@@ -28,4 +28,19 @@
     <string name="ranking" tools:ignore="ExtraTranslation,MissingTranslation">Ranking</string>
     <string name="logros" tools:ignore="ExtraTranslation,MissingTranslation">Logros</string>
 
+    <!-- Actualiar usuario fragment -->
+    <string name="actualizarUsuario" tools:ignore="ExtraTranslation,MissingTranslation">Actualizar usuario</string>
+    <string name="actualizar" tools:ignore="ExtraTranslation,MissingTranslation">Actualizar</string>
+    <string name="cambiarImagen" tools:ignore="ExtraTranslation,MissingTranslation">Cambiar imagen de perfil</string>
+    <string name="passwordAntigua" tools:ignore="ExtraTranslation,MissingTranslation">Escribe la antigua contraseña</string>
+    <string name="passwordNueva" tools:ignore="ExtraTranslation,MissingTranslation">Escribe la nueva contraseña</string>
+
+    <!-- Cerrar sesion fragment -->
+    <string name="cerrarSesion" tools:ignore="ExtraTranslation,MissingTranslation">¿Desea cerrar sesión?</string>
+    <string name="si" tools:ignore="ExtraTranslation,MissingTranslation">Sí</string>
+    <string name="no" tools:ignore="ExtraTranslation,MissingTranslation">No</string>
+
+
+
+
 </resources>

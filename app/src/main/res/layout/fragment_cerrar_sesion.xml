@@ -10,7 +10,6 @@
     android:gravity="center"
     tools:context=".CerrarSesionFragment">
 
-    <!-- Texto centrado -->
     <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -24,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="¿Desea cerrar sesión?"
+            android:text="@string/cerrarSesion"
             android:textColor="@color/azul"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -36,7 +35,6 @@
             android:shadowRadius="25"/>
     </androidx.cardview.widget.CardView>
 
-    <!-- Contenedor horizontal para los botones -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -44,25 +42,23 @@
         android:gravity="center"
         android:paddingHorizontal="16dp">
 
-        <!-- Botón Sí (alineado a la izquierda) -->
         <Button
             android:id="@+id/btnSi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sí"
+            android:text="@string/si"
             android:layout_weight="1"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="20dp"
             android:backgroundTint="@color/azul"
             android:textColor="@color/white"/>
 
-        <!-- Botón No (alineado a la derecha) -->
         <Button
             android:id="@+id/btnNo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No"
+            android:text="@string/no"
             android:layout_weight="1"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="20dp"
             android:backgroundTint="@color/azul"
             android:textColor="@color/white"/>
     </LinearLayout>
