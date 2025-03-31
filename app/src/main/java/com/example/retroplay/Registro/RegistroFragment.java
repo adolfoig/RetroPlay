@@ -176,7 +176,6 @@ public class RegistroFragment extends Fragment {
         Map<String, Object> userData = new HashMap<>();
         userData.put("nombre", nameEditText.getText().toString().trim());
         userData.put("email", emailEditText.getText().toString().trim());
-        userData.put("puntuacionGlobal", 0);
         userData.put("profileImageUrl", profileImageUrl);
 
         firestore.collection("Usuarios").document(user.getUid())

@@ -87,7 +87,7 @@
         app:hintTextColor="@color/azul">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/textoPassword"
+            android:id="@+id/textoPasswordAntigua"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:background="@drawable/rounded_edittext_background"
@@ -107,7 +107,7 @@
         app:hintTextColor="@color/azul">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/textoConfirmarPassword"
+            android:id="@+id/textoPasswordNueva"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:background="@drawable/rounded_edittext_background"
@@ -144,7 +144,7 @@
         android:id="@+id/btnRegistrarUsuario"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/registrarse"
+        android:text="@string/actualizar"
         android:backgroundTint="@color/azul"
         android:textColor="@color/white"
         android:layout_marginBottom="10dp"

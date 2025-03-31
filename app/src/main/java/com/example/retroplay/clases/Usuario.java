@@ -22,6 +22,8 @@ public class Usuario implements Serializable {
         this.puntuacionGlobal = puntuacionGlobal;
     }
 
+
+
     public String getId() {
         return id;
     }
@@ -30,7 +32,7 @@ public class Usuario implements Serializable {
         this.id = id;
     }
 
-    public String getNombre(String nombre) {
+    public String getNombre() {
         return this.nombre;
     }
 
