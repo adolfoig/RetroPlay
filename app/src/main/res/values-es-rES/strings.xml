@@ -6,7 +6,6 @@
     <string name="navigation_drawer_close" tools:ignore="ExtraTranslation,MissingTranslation">Cerrando Navigation Drawer</string>
 
     <!-- Login fragment -->
-
     <string name="registro" tools:ignore="ExtraTranslation">REGISTRATE</string>
     <string name="iniciasesion" tools:ignore="MissingTranslation">INICIA SESION</string>
     <string name="correoElectronico" tools:ignore="ExtraTranslation">Correo electrónico</string>
@@ -22,7 +21,6 @@
     <string name="registrarse" tools:ignore="ExtraTranslation">Registrarse</string>
 
     <!-- Bottom menu -->
-
     <string name="juegos" tools:ignore="ExtraTranslation,MissingTranslation">Juegos</string>
     <string name="favoritos" tools:ignore="ExtraTranslation,MissingTranslation">Favoritos</string>
     <string name="ranking" tools:ignore="ExtraTranslation,MissingTranslation">Ranking</string>
@@ -39,8 +37,4 @@
     <string name="cerrarSesion" tools:ignore="ExtraTranslation,MissingTranslation">¿Desea cerrar sesión?</string>
     <string name="si" tools:ignore="ExtraTranslation,MissingTranslation">Sí</string>
     <string name="no" tools:ignore="ExtraTranslation,MissingTranslation">No</string>
-
-
-
-
 </resources>
