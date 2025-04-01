@@ -57,12 +57,13 @@ public class ActualizarUsuarioFragment extends Fragment {
 
         cargarDatosUsuario();
         binding.btnRegistrarUsuario.setOnClickListener(v -> actualizarUsuario());
+
+        // Ocultar campo de email ya que no se va a modificar
     }
 
     private void cargarDatosUsuario() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
-            binding.textoEmail.setText(user.getEmail());
             db.collection("Usuarios").document(user.getUid())
                     .get()
                     .addOnSuccessListener(documentSnapshot -> {
@@ -84,12 +85,11 @@ public class ActualizarUsuarioFragment extends Fragment {
         }
 
         String nuevoNombre = binding.textoNombre.getText().toString().trim();
-        String nuevoEmail = binding.textoEmail.getText().toString().trim();
         String passwordActual = binding.textoPasswordAntigua.getText().toString().trim();
         String nuevaPassword = binding.textoPasswordNueva.getText().toString().trim();
 
-        if (nuevoNombre.isEmpty() || nuevoEmail.isEmpty()) {
-            showToast("Nombre y email son obligatorios");
+        if (nuevoNombre.isEmpty()) {
+            showToast("El nombre es obligatorio");
             return;
         }
 
@@ -100,17 +100,17 @@ public class ActualizarUsuarioFragment extends Fragment {
             return;
         }
 
-        verificarPasswordActual(user, passwordActual, nuevoNombre, nuevoEmail, nuevaPassword);
+        verificarPasswordActual(user, passwordActual, nuevoNombre, nuevaPassword);
     }
 
     private void verificarPasswordActual(FirebaseUser user, String passwordActual,
-                                         String nuevoNombre, String nuevoEmail, String nuevaPassword) {
+                                         String nuevoNombre, String nuevaPassword) {
         AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), passwordActual);
 
         user.reauthenticate(credential)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        actualizarDatosCompletos(user, nuevoNombre, nuevoEmail, nuevaPassword);
+                        actualizarDatosCompletos(user, nuevoNombre, nuevaPassword);
                     } else {
                         binding.textoPasswordAntigua.setError("Contraseña incorrecta");
                         binding.textoPasswordAntigua.requestFocus();
@@ -119,15 +119,14 @@ public class ActualizarUsuarioFragment extends Fragment {
                 });
     }
 
-    private void actualizarDatosCompletos(FirebaseUser user, String nombre, String email, String nuevaPassword) {
-        actualizarDatosFirestore(user.getUid(), nombre, email);
-        actualizarDatosAuth(user, nombre, email, nuevaPassword);
+    private void actualizarDatosCompletos(FirebaseUser user, String nombre, String nuevaPassword) {
+        actualizarDatosFirestore(user.getUid(), nombre);
+        actualizarDatosAuth(user, nombre, nuevaPassword);
     }
 
-    private void actualizarDatosFirestore(String userId, String nombre, String email) {
+    private void actualizarDatosFirestore(String userId, String nombre) {
         Map<String, Object> datosUsuario = new HashMap<>();
         datosUsuario.put("nombre", nombre);
-        datosUsuario.put("email", email);
 
         db.collection("Usuarios").document(userId)
                 .set(datosUsuario)
@@ -138,11 +137,10 @@ public class ActualizarUsuarioFragment extends Fragment {
                 });
     }
 
-    private void actualizarDatosAuth(FirebaseUser user, String nombre, String email, String nuevaPassword) {
+    private void actualizarDatosAuth(FirebaseUser user, String nombre, String nuevaPassword) {
         if (!isAdded()) return;
 
         final int[] totalOperations = {1}; // Actualización de nombre
-        if (!email.equals(user.getEmail())) totalOperations[0]++;
         if (!nuevaPassword.isEmpty()) totalOperations[0]++;
 
         final int[] completedOperations = {0};
@@ -151,18 +149,7 @@ public class ActualizarUsuarioFragment extends Fragment {
             completedOperations[0]++;
             if (completedOperations[0] == totalOperations[0]) {
                 showToast("Datos actualizados correctamente");
-                if (!email.equals(user.getEmail())) {
-                    // Enviar correo de verificación solo si el email cambió
-                    user.sendEmailVerification()
-                            .addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    showToast("Se ha enviado un correo de verificación");
-                                }
-                                cerrarSesion();
-                            });
-                } else {
-                    cerrarSesion();
-                }
+                cerrarSesion();
             }
         };
 
@@ -179,37 +166,7 @@ public class ActualizarUsuarioFragment extends Fragment {
                     checkCompletion.run();
                 });
 
-        // 2. Actualizar email si es diferente
-        if (!email.equals(user.getEmail())) {
-            // Primero reautenticar
-            AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), binding.textoPasswordAntigua.getText().toString());
-            user.reauthenticate(credential)
-                    .addOnSuccessListener(authTask -> {
-                        // Luego actualizar email
-                        user.updateEmail(email)
-                                .addOnCompleteListener(task -> {
-                                    if (task.isSuccessful()) {
-                                        Log.d("Auth", "Email actualizado");
-                                        // Enviar correo de verificación
-                                        user.sendEmailVerification()
-                                                .addOnCompleteListener(verificationTask -> {
-                                                    if (verificationTask.isSuccessful()) {
-                                                        showToast("Se ha enviado un correo de verificación");
-                                                    }
-                                                });
-                                    } else {
-                                        showToast("Error al actualizar email: " + task.getException().getMessage());
-                                    }
-                                    checkCompletion.run();
-                                });
-                    })
-                    .addOnFailureListener(e -> {
-                        showToast("Error de autenticación: " + e.getMessage());
-                        checkCompletion.run();
-                    });
-        }
-
-        // 3. Actualizar contraseña si se proporcionó
+        // 2. Actualizar contraseña si se proporcionó
         if (!nuevaPassword.isEmpty()) {
             user.updatePassword(nuevaPassword)
                     .addOnCompleteListener(task -> {
@@ -241,7 +198,6 @@ public class ActualizarUsuarioFragment extends Fragment {
         startActivity(intent);
         assert getActivity() != null;
         getActivity().finish();
-
     }
 
     @Override
