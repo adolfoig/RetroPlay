@@ -29,8 +29,11 @@ public class CerrarSesionFragment extends Fragment {
         binding = FragmentCerrarSesionBinding.inflate(inflater, container, false);
         mAuth = FirebaseAuth.getInstance();
 
+
+        // Como cierrar sesion va al Login
         binding.btnSi.setOnClickListener(v -> cerrarSesion());
 
+        // Como no se cierra sesion lleva al JuegosFragment
         binding.btnNo.setOnClickListener(v -> irAMain());
 
         return binding.getRoot();
