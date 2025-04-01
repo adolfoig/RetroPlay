@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     ActivityMainBinding binding;
     private FirebaseAuth mAuth;
-    AppBarConfiguration mAppBarConfiguration;
     NavController navController;
 
 
@@ -35,8 +34,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView((binding = ActivityMainBinding.inflate(getLayoutInflater())).getRoot());
 
+
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
+
+
 
         // Configura el NavController (usa la variable de clase)
         this.navController = ((NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment))
