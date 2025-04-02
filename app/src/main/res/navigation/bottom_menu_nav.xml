@@ -43,7 +43,7 @@
     <fragment
         android:id="@+id/detailFragment"
         android:name="com.example.retroplay.DetailFragment"
-        android:label="fragment_detail"
+        android:label="@string/detalle"
         tools:layout="@layout/fragment_detail" >
         <action
             android:id="@+id/action_detailFragment_to_jugarJuegoFragment"
@@ -71,4 +71,14 @@
         android:name="com.example.retroplay.Registro.RegistroActivity"
         android:label="fragment_registro"
         tools:layout="@layout/fragment_registro" />
+    <fragment
+        android:id="@+id/cerrarSesionFragment"
+        android:name="com.example.retroplay.CerrarSesionFragment"
+        android:label="@string/cerrarsesion"
+        tools:layout="@layout/fragment_cerrar_sesion" />
+    <fragment
+        android:id="@+id/actualizarUsuarioFragment"
+        android:name="com.example.retroplay.ActualizarUsuarioFragment"
+        android:label="@string/actualizarUsuario"
+        tools:layout="@layout/fragment_actualizar_usuario" />
 </navigation>

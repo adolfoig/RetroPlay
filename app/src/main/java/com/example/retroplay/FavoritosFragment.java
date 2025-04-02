@@ -1,241 +1,221 @@
 package com.example.retroplay;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
+import com.example.retroplay.Viewmodel.FavoritosViewModel;
 import com.example.retroplay.clases.Juego;
 import com.example.retroplay.databinding.FragmentFavoritosBinding;
 import com.example.retroplay.databinding.ViewholderFavoritosBinding;
-import com.example.retroplay.databinding.ViewholderJuegosBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class FavoritosFragment extends Fragment {
 
-    private FirebaseFirestore db;
-    private ArrayList<Juego> listaFavoritos;
+    private FavoritosViewModel viewModel;
     private FavoritosAdapter adapter;
     private NavController navController;
-    private FragmentFavoritosBinding binding; // Usamos FragmentFavoritosBinding
+    private FragmentFavoritosBinding binding;
+    private FirebaseFirestore db;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        viewModel = new ViewModelProvider(requireActivity()).get(FavoritosViewModel.class);
         db = FirebaseFirestore.getInstance();
-        listaFavoritos = new ArrayList<>();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflar el layout con ViewBinding
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentFavoritosBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
 
-        // Obtener el NavController
-        navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        navController = Navigation.findNavController(view);
 
-        // Configurar RecyclerView usando binding
-        binding.recyclerViewFavoritos.setLayoutManager(new GridLayoutManager(getContext(), 2));  // 2 juegos por fila
+        setupRecyclerView();
+        setupObservers();
+    }
 
-        // Crear el adaptador y configurarlo
+    private void setupRecyclerView() {
+        // Configurar layout y animaciones
+        binding.recyclerViewFavoritos.setLayoutManager(new GridLayoutManager(requireContext(), 2));
+
+        DefaultItemAnimator animator = new DefaultItemAnimator();
+        animator.setAddDuration(200);
+        animator.setRemoveDuration(200);
+        animator.setChangeDuration(150);
+        binding.recyclerViewFavoritos.setItemAnimator(animator);
+
         adapter = new FavoritosAdapter();
         binding.recyclerViewFavoritos.setAdapter(adapter);
-
-        // Cargar los favoritos desde Firestore
-        cargarFavoritosDesdeFireBase();
-
-        return binding.getRoot();  // Usar binding para retornar la vista
     }
 
-    private void cargarFavoritosDesdeFireBase() {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        String idUsuario = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : "";
+    private void setupObservers() {
+        viewModel.getFavoritos().observe(getViewLifecycleOwner(), juegos -> {
+            if (juegos != null) {
+                adapter.establecerLista(juegos);
+                binding.textoListaVacia.setVisibility(juegos.isEmpty() ? View.VISIBLE : View.GONE);
+            }
+        });
 
-        if (!idUsuario.isEmpty()) {
-            db.collection("Favoritos")
-                    .whereEqualTo("idUsuario", idUsuario)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            QuerySnapshot querySnapshot = task.getResult();
-                            if (querySnapshot != null) {
-                                ArrayList<String> idJuegosFavoritos = new ArrayList<>();
-                                for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                                    String idJuego = document.getString("idJuego");
-                                    if (idJuego != null && !idJuego.isEmpty()) {
-                                        idJuegosFavoritos.add(idJuego);
-                                    }
-                                }
+        viewModel.getJuegoSeleccionado().observe(getViewLifecycleOwner(), juego -> {
+            if (juego != null) {
+                navegarADetalle(juego);
+                viewModel.seleccionarJuego(null);
+            }
+        });
 
-                                // Ahora que tenemos todos los idJuego de los favoritos, obtenemos los juegos
-                                if (!idJuegosFavoritos.isEmpty()) {
-                                    cargarJuegosPorId(idJuegosFavoritos); // Pasamos la lista de idJuego para obtener los juegos
-                                }
-                            }
-                        } else {
-                            Toast.makeText(getContext(), "Error al cargar los favoritos.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }
+        viewModel.getJuegoEliminado().observe(getViewLifecycleOwner(), idJuego -> {
+            if (idJuego != null) {
+                Toast.makeText(requireContext(), "Juego eliminado de favoritos", Toast.LENGTH_SHORT).show();
+                viewModel.juegoEliminado.setValue(null);
+            }
+        });
+
+        viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
+            if (error != null) {
+                Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show();
+                viewModel.errorMessage.setValue(null);
+            }
+        });
     }
 
-    private void cargarJuegosPorId(List<String> idJuegosFavoritos) {
-        db.collection("Juegos")
-                .whereIn("id", idJuegosFavoritos)  // Consultar los juegos con los idJuego favoritos
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        QuerySnapshot querySnapshot = task.getResult();
-                        if (querySnapshot != null) {
-                            listaFavoritos.clear();
-                            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                                Juego juego = document.toObject(Juego.class);
-                                if (juego != null) {
-                                    listaFavoritos.add(juego);
-                                }
-                            }
-                            adapter.establecerLista(listaFavoritos);  // Actualizamos el adaptador con los juegos favoritos
-                        }
-                    } else {
-                        Toast.makeText(getContext(), "Error al cargar los juegos.", Toast.LENGTH_SHORT).show();
-                    }
-                });
+    private void navegarADetalle(Juego juego) {
+        Bundle args = new Bundle();
+        args.putSerializable("juego", juego);
+        navController.navigate(R.id.action_favoritosFragment_to_detailFragment, args);
     }
 
-
-    // Adaptador para mostrar los juegos favoritos
     class FavoritosAdapter extends RecyclerView.Adapter<FavoritosAdapter.FavoritosViewHolder> {
-
         private List<Juego> listaFavoritos = new ArrayList<>();
 
         @NonNull
         @Override
         public FavoritosViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            return new FavoritosViewHolder(ViewholderFavoritosBinding.inflate(inflater, parent, false));
+            ViewholderFavoritosBinding binding = ViewholderFavoritosBinding.inflate(
+                    LayoutInflater.from(parent.getContext()), parent, false);
+            return new FavoritosViewHolder(binding);
         }
 
         @Override
         public void onBindViewHolder(@NonNull FavoritosViewHolder holder, int position) {
-            Juego juego = listaFavoritos.get(position);
-            holder.binding.textNombreJuego.setText(juego.getNombre());
-            // Insertar imagen segun el id del juego
-            if (juego.getId().equals("1")) {
-                holder.binding.imagenJuego.setImageResource(R.drawable.pacman);
-            } else if (juego.getId().equals("2")) {
-                holder.binding.imagenJuego.setImageResource(R.drawable.tetris);
-            } else if (juego.getId().equals("3")) {
-                holder.binding.imagenJuego.setImageResource(R.drawable.flappybird);
-            }
-
-            holder.binding.imagenEstrella.setImageResource((R.drawable.estrella));
-
-            holder.binding.imagenEstrella.setOnClickListener(v -> quitarFavorito(juego.getId(), holder.binding.imagenEstrella));
-
-            // Manejar el clic en un item del RecyclerView
-            holder.itemView.setOnClickListener(v -> navegarPantallaDetalle(juego));
-
-            holder.binding.btnJugar.setOnClickListener(v -> navegarAWebView(juego.getId()));
+            holder.bind(listaFavoritos.get(position));
         }
 
         @Override
         public int getItemCount() {
-            return listaFavoritos != null ? listaFavoritos.size() : 0;
+            return listaFavoritos.size();
         }
 
-        public void establecerLista(List<Juego> listaFavoritos) {
-            this.listaFavoritos = listaFavoritos;
-            notifyDataSetChanged();  // Notificar a RecyclerView que los datos han cambiado
+        public void establecerLista(List<Juego> nuevaLista) {
+            // Actualización optimizada sin DiffUtil
+            int oldSize = listaFavoritos.size();
+            int newSize = nuevaLista.size();
+
+            listaFavoritos.clear();
+            listaFavoritos.addAll(nuevaLista);
+
+            if (oldSize == newSize) {
+                notifyItemRangeChanged(0, oldSize);
+            } else if (oldSize < newSize) {
+                if (oldSize > 0) notifyItemRangeChanged(0, oldSize);
+                notifyItemRangeInserted(oldSize, newSize - oldSize);
+            } else {
+                if (newSize > 0) notifyItemRangeChanged(0, newSize);
+                notifyItemRangeRemoved(newSize, oldSize - newSize);
+            }
         }
 
         class FavoritosViewHolder extends RecyclerView.ViewHolder {
             final ViewholderFavoritosBinding binding;
 
-            public FavoritosViewHolder(ViewholderFavoritosBinding binding) {
+            FavoritosViewHolder(ViewholderFavoritosBinding binding) {
                 super(binding.getRoot());
                 this.binding = binding;
             }
+
+            void bind(Juego juego) {
+                binding.textNombreJuego.setText(juego.getNombre());
+
+                // Configurar imagen según ID
+                switch (juego.getId()) {
+                    case "1":
+                        binding.imagenJuego.setImageResource(R.drawable.pacman);
+                        break;
+                    case "2":
+                        binding.imagenJuego.setImageResource(R.drawable.tetris);
+                        break;
+                    case "3":
+                        binding.imagenJuego.setImageResource(R.drawable.flappybird);
+                        break;
+                }
+
+                binding.imagenEstrella.setImageResource(R.drawable.estrella);
+                binding.imagenEstrella.setOnClickListener(v -> {
+                    // Cambio visual inmediato
+                    binding.imagenEstrella.setImageResource(R.drawable.estrellablanca);
+                    quitarFavorito(juego.getId());
+                });
+
+                itemView.setOnClickListener(v -> viewModel.seleccionarJuego(juego));
+                binding.btnJugar.setOnClickListener(v -> navegarAWebView(juego.getId()));
+            }
         }
 
-        private void navegarPantallaDetalle(Juego juego) {
-            Bundle args = new Bundle();
-            args.putSerializable("juego", juego); // No es necesario hacer un casting a Serializable si ya lo implementa
-            navController.navigate(R.id.action_favoritosFragment_to_detailFragment, args); // Navegar a la pantalla de detalle
-        }
-
-        private void navegarAWebView(String idJuego) {
-            Bundle bundle = new Bundle();
-            bundle.putString("idJuego", idJuego);
-            navController.navigate(R.id.action_favoritosFragment_to_jugarJuegoFragment, bundle); // Navegar al fragmento con el WebView
-        }
-
-        private void quitarFavorito(String idJuego, ImageButton imagenEstrella) {
-            FirebaseAuth auth = FirebaseAuth.getInstance();
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-            FirebaseUser user = auth.getCurrentUser();
+        private void quitarFavorito(String idJuego) {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             if (user != null) {
-                String idUsuario = user.getUid();  // Obtener ID del usuario
-
-                // Buscar el documento en la colección "Favoritos" que coincida con el idUsuario y el idJuego
                 db.collection("Favoritos")
-                        .whereEqualTo("idUsuario", idUsuario)
+                        .whereEqualTo("idUsuario", user.getUid())
                         .whereEqualTo("idJuego", idJuego)
                         .get()
                         .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                QuerySnapshot querySnapshot = task.getResult();
-                                if (querySnapshot != null && !querySnapshot.isEmpty()) {
-                                    // Si se encuentra el documento, eliminarlo
-                                    for (QueryDocumentSnapshot document : querySnapshot) {
-                                        db.collection("Favoritos").document(document.getId()).delete()
-                                                .addOnSuccessListener(aVoid -> {
-                                                    Toast.makeText(getContext(), "Juego eliminado de favoritos", Toast.LENGTH_SHORT).show();
-                                                    // Actualizar el estado del juego a no favorito
-                                                    imagenEstrella.setImageResource(R.drawable.estrellablanca); // Estrella vacía
-
-                                                    // Eliminar el juego de la lista y notificar al adaptador
-                                                    for (int i = 0; i < listaFavoritos.size(); i++) {
-                                                        if (listaFavoritos.get(i).getId().equals(idJuego)) {
-                                                            listaFavoritos.remove(i);
-                                                            notifyItemRemoved(i);
-                                                            break;
-                                                        }
-                                                    }
-                                                })
-                                                .addOnFailureListener(e -> {
-                                                    Toast.makeText(getContext(), "Error al eliminar favorito", Toast.LENGTH_SHORT).show();
-                                                });
-                                    }
-                                } else {
-                                    Toast.makeText(getContext(), "Este juego no está en tus favoritos", Toast.LENGTH_SHORT).show();
+                            if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    db.collection("Favoritos").document(document.getId()).delete()
+                                            .addOnSuccessListener(aVoid -> viewModel.quitarFavorito(idJuego))
+                                            .addOnFailureListener(e -> Toast.makeText(
+                                                    requireContext(),
+                                                    "Error al eliminar favorito",
+                                                    Toast.LENGTH_SHORT).show());
                                 }
-                            } else {
-                                Toast.makeText(getContext(), "Error al verificar si el juego está en favoritos", Toast.LENGTH_SHORT).show();
                             }
                         });
-            } else {
-                Toast.makeText(getContext(), "Debes iniciar sesión para gestionar favoritos", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void navegarAWebView(String idJuego) {
+        Bundle bundle = new Bundle();
+        bundle.putString("idJuego", idJuego);
+        navController.navigate(R.id.action_favoritosFragment_to_jugarJuegoFragment, bundle);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

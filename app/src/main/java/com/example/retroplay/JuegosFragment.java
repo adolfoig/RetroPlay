@@ -1,127 +1,67 @@
 package com.example.retroplay;
 
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.retroplay.Viewmodel.JuegosViewModel;
 import com.example.retroplay.clases.Juego;
 import com.example.retroplay.databinding.ViewholderJuegosBinding;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class JuegosFragment extends Fragment {
 
-    private ArrayList<Juego> listaJuegos;
+    private JuegosViewModel viewModel;
     private JuegosAdapter adapter;
-
-    NavController navController;
+    private NavController navController;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Inicializar Firebase Firestore
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        listaJuegos = new ArrayList<>();
+        viewModel = new ViewModelProvider(this).get(JuegosViewModel.class);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflar el layout para este fragmento
         View view = inflater.inflate(R.layout.fragment_juegos, container, false);
-
-        // Obtener el NavController
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
 
-        // Configurar RecyclerView
         RecyclerView juegosRecyclerView = view.findViewById(R.id.recyclerViewJuegos);
         juegosRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Crear el adaptador y configurarlo
         adapter = new JuegosAdapter(navController, R.id.action_juegosFragment_to_detailFragment);
         juegosRecyclerView.setAdapter(adapter);
 
-        // Cargar los juegos desde Firestore
-        cargarJuegosDesdeFireBase();
+        observarViewModel();
 
         return view;
     }
 
-    private void cargarJuegosDesdeFireBase() {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private void observarViewModel() {
+        viewModel.getJuegos().observe(getViewLifecycleOwner(), juegos -> {
+            if (juegos != null) {
+                adapter.establecerLista(juegos);
+            }
+        });
 
-        FirebaseUser user = auth.getCurrentUser();
-        if (user != null) {
-            String idUsuario = user.getUid();  // Obtener ID del usuario
-            db.collection("Juegos")
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            QuerySnapshot querySnapshot = task.getResult();
-                            if (querySnapshot != null) {
-                                listaJuegos.clear();  // Limpiar la lista antes de añadir los nuevos juegos
-                                for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                                    Juego juego = document.toObject(Juego.class);
-                                    // Verificar si el juego está en los favoritos
-                                    verificarFavorito(juego, idUsuario);  // Verificar si el juego está en favoritos
-                                    listaJuegos.add(juego);
-                                }
-
-                                // Asegúrate de actualizar el adaptador con la nueva lista
-                                if (adapter != null) {
-                                    adapter.establecerLista(listaJuegos);
-                                }
-                            }
-                        } else {
-                            Toast.makeText(getContext(), "Error al cargar los juegos.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }
-    }
-
-    private void verificarFavorito(Juego juego, String idUsuario) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        // Verificar si el juego ya está en favoritos para el usuario
-        db.collection("Favoritos")
-                .whereEqualTo("idUsuario", idUsuario)
-                .whereEqualTo("idJuego", juego.getId())
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        QuerySnapshot querySnapshot = task.getResult();
-                        if (querySnapshot != null && !querySnapshot.isEmpty()) {
-                            // Si el juego está en favoritos, actualizar la propiedad "isFavorito" del juego
-                            juego.setFavorito(true);  // Establecer que este juego está en favoritos
-                        } else {
-                            juego.setFavorito(false);  // Si no está en favoritos
-                        }
-
-                        // Notificar al adaptador que el estado del juego ha cambiado para actualizar la UI
-                        adapter.notifyDataSetChanged();
-                    } else {
-                        Toast.makeText(getContext(), "Error al verificar favoritos", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        viewModel.getMensajeError().observe(getViewLifecycleOwner(), mensaje -> {
+            if (mensaje != null) {
+                Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     class JuegosViewHolder extends RecyclerView.ViewHolder {
@@ -134,7 +74,7 @@ public class JuegosFragment extends Fragment {
     }
 
     public class JuegosAdapter extends RecyclerView.Adapter<JuegosViewHolder> {
-        List<Juego> listaJuegos;
+        private List<Juego> listaJuegos;
         private final NavController navController;
         private final int idAction;
 
@@ -147,7 +87,8 @@ public class JuegosFragment extends Fragment {
         @Override
         public JuegosViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-            return new JuegosViewHolder(ViewholderJuegosBinding.inflate(inflater, parent, false));
+            ViewholderJuegosBinding binding = ViewholderJuegosBinding.inflate(inflater, parent, false);
+            return new JuegosViewHolder(binding);
         }
 
         @Override
@@ -155,7 +96,7 @@ public class JuegosFragment extends Fragment {
             Juego juego = listaJuegos.get(position);
             holder.binding.textNombreJuego.setText(juego.getNombre());
 
-            // Establecer la imagen dependiendo del ID del juego
+            // Configurar imagen del juego
             switch (juego.getId()) {
                 case "1":
                     holder.binding.imagenJuego.setImageResource(R.drawable.pacman);
@@ -168,19 +109,16 @@ public class JuegosFragment extends Fragment {
                     break;
             }
 
-            // Actualizar la estrella dependiendo del estado "favorito" del juego
-            if (juego.isFavorito()) {
-                holder.binding.imagenEstrella.setImageResource(R.drawable.estrella); // Estrella llena
-            } else {
-                holder.binding.imagenEstrella.setImageResource(R.drawable.estrellablanca); // Estrella vacía
-            }
+            // Verificar y mostrar estado de favorito
+            actualizarIconoFavorito(holder.binding.imagenEstrella, juego.isFavorito());
 
-            // Llamar a aniadirFavorito cuando se hace clic en la estrella
-            holder.binding.imagenEstrella.setOnClickListener(v -> aniadirFavorito(juego.getId(), holder.binding.imagenEstrella, v, position));
+            // Listener para cambiar estado de favorito
+            holder.binding.imagenEstrella.setOnClickListener(v -> {
+                viewModel.toggleFavorito(juego);
+                actualizarIconoFavorito(holder.binding.imagenEstrella, !juego.isFavorito());
+            });
 
-            // Manejar el clic en un item del RecyclerView
             holder.itemView.setOnClickListener(v -> navegarPantallaDetalle(juego));
-
             holder.binding.btnJugar.setOnClickListener(v -> navegarAWebView(juego.getId()));
         }
 
@@ -191,95 +129,34 @@ public class JuegosFragment extends Fragment {
 
         public void establecerLista(List<Juego> listaJuegos) {
             this.listaJuegos = listaJuegos;
-            notifyDataSetChanged();
+
+            // Verificar estado de favoritos para cada juego
+            for (Juego juego : listaJuegos) {
+                viewModel.verificarFavorito(juego, esFavorito -> {
+                    juego.setFavorito(esFavorito);
+                    notifyDataSetChanged();
+                });
+            }
         }
 
         private void navegarPantallaDetalle(Juego juego) {
             Bundle args = new Bundle();
             args.putSerializable("juego", juego);
-            navController.navigate(idAction, args); // Navegar a la pantalla de detalle
+            navController.navigate(idAction, args);
+        }
+
+        private void actualizarIconoFavorito(ImageButton imagenEstrella, boolean esFavorito) {
+            if (esFavorito) {
+                imagenEstrella.setImageResource(R.drawable.estrella); // Estrella llena/color
+            } else {
+                imagenEstrella.setImageResource(R.drawable.estrellablanca); // Estrella vacía
+            }
         }
     }
 
     private void navegarAWebView(String idJuego) {
         Bundle bundle = new Bundle();
         bundle.putString("idJuego", idJuego);
-        // Pasamos la URL del juego
-        navController.navigate(R.id.action_juegosFragment_to_jugarJuegoFragment, bundle); // Navegar al fragmento con el WebView
+        navController.navigate(R.id.action_juegosFragment_to_jugarJuegoFragment, bundle);
     }
-
-    private void quitarFavorito(String idJuego, ImageButton imagenEstrella, View v) {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        FirebaseUser user = auth.getCurrentUser();
-        if (user != null) {
-            String idUsuario = user.getUid();
-
-            // Buscar el favorito en Firestore y eliminarlo
-            db.collection("Favoritos")
-                    .whereEqualTo("idUsuario", idUsuario)
-                    .whereEqualTo("idJuego", idJuego)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                db.collection("Favoritos").document(document.getId()).delete()
-                                        .addOnSuccessListener(aVoid -> {
-                                            Toast.makeText(v.getContext(), "Juego eliminado de favoritos", Toast.LENGTH_SHORT).show();
-                                            imagenEstrella.setImageResource(R.drawable.estrellablanca); // Estrella vacía
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            Toast.makeText(v.getContext(), "Error al eliminar favorito", Toast.LENGTH_SHORT).show();
-                                        });
-                            }
-                        } else {
-                            Toast.makeText(v.getContext(), "No se encontró el favorito", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        } else {
-            Toast.makeText(v.getContext(), "Debes iniciar sesión para modificar favoritos", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void aniadirFavorito(String idJuego, ImageButton imagenEstrella, View v, int position) {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        FirebaseUser user = auth.getCurrentUser();
-        if (user != null) {
-            String idUsuario = user.getUid();
-
-            // Verificar si el juego ya está en favoritos
-            db.collection("Favoritos")
-                    .whereEqualTo("idUsuario", idUsuario)
-                    .whereEqualTo("idJuego", idJuego)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
-                            // Si el juego ya está en favoritos, eliminarlo
-                            quitarFavorito(idJuego, imagenEstrella, v);
-                        } else {
-                            // Si el juego no está en favoritos, añadirlo
-                            Map<String, Object> favorito = new HashMap<>();
-                            favorito.put("idUsuario", idUsuario);
-                            favorito.put("idJuego", idJuego);
-
-                            db.collection("Favoritos")
-                                    .add(favorito)
-                                    .addOnSuccessListener(documentReference -> {
-                                        Toast.makeText(v.getContext(), "Juego añadido a favoritos", Toast.LENGTH_SHORT).show();
-                                        imagenEstrella.setImageResource(R.drawable.estrella);
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        Toast.makeText(v.getContext(), "Error al añadir favorito", Toast.LENGTH_SHORT).show();
-                                    });
-                        }
-                    });
-        } else {
-            Toast.makeText(v.getContext(), "Debes iniciar sesión para modificar favoritos", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-
 }

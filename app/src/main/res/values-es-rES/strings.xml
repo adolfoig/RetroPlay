@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name" translatable="false">RetroPlay</string>
+    <string name="app_name" translatable="false">RetroPlay2</string>
     <string name="default_web_client_id">583642395601-2gu1tvl877i1dtdcpvt5ci0j75ood0gl.apps.googleusercontent.com</string>
     <string name="navigation_drawer_open" tools:ignore="MissingTranslation">Abriendo Navigation Drawer</string>
     <string name="navigation_drawer_close" tools:ignore="ExtraTranslation,MissingTranslation">Cerrando Navigation Drawer</string>
@@ -37,7 +37,11 @@
     <string name="passwordNueva" tools:ignore="ExtraTranslation,MissingTranslation">Escribe la nueva contraseña</string>
 
     <!-- Cerrar sesion fragment -->
+    <string name="cerrarsesion" tools:ignore="ExtraTranslation,MissingTranslation">Cerrar sesión</string>
     <string name="cerrarSesion" tools:ignore="ExtraTranslation,MissingTranslation">¿Desea cerrar sesión?</string>
     <string name="si" tools:ignore="ExtraTranslation,MissingTranslation">Sí</string>
     <string name="no" tools:ignore="ExtraTranslation,MissingTranslation">No</string>
+
+    <!-- Detalle fragment -->
+    <string name="detalle" tools:ignore="ExtraTranslation,MissingTranslation">Detalle</string>
 </resources>

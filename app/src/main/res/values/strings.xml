@@ -37,7 +37,11 @@
     <string name="passwordNueva" tools:ignore="ExtraTranslation,MissingTranslation">Enter a new password</string>
 
     <!-- Cerrar sesion fragment -->
+    <string name="cerrarsesion" tools:ignore="ExtraTranslation,MissingTranslation">Log out</string>
     <string name="cerrarSesion" tools:ignore="ExtraTranslation,MissingTranslation">Do you want to log out?</string>
     <string name="si" tools:ignore="ExtraTranslation,MissingTranslation">Yes</string>
     <string name="no" tools:ignore="ExtraTranslation,MissingTranslation">No</string>
+
+    <!-- Detalle fragment -->
+    <string name="detalle" tools:ignore="ExtraTranslation,MissingTranslation">Detail</string>
 </resources>

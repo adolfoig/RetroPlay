@@ -29,9 +29,12 @@ public class CerrarSesionFragment extends Fragment {
         binding = FragmentCerrarSesionBinding.inflate(inflater, container, false);
         mAuth = FirebaseAuth.getInstance();
 
+
+        // Como cierrar sesion va al Login
         binding.btnSi.setOnClickListener(v -> cerrarSesion());
 
-        binding.btnNo.setOnClickListener(v -> irAJuegos());
+        // Como no se cierra sesion lleva al JuegosFragment
+        binding.btnNo.setOnClickListener(v -> irAMain());
 
         return binding.getRoot();
     }
@@ -39,23 +42,17 @@ public class CerrarSesionFragment extends Fragment {
     private void cerrarSesion() {
         mAuth.signOut();
         Toast.makeText(getContext(), "Sesión cerrada", Toast.LENGTH_SHORT).show();
-        irAlLogin();
+        irAMain();
     }
 
-    private void irAlLogin(){
+    private void irAMain(){
         Intent intent = new Intent(getContext(), MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         assert getActivity() != null;
         getActivity().finish();
-
     }
 
-    private void irAJuegos(){
-        Intent intent = new Intent(getContext(), JuegosFragment.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        assert getActivity() != null;
-        getActivity().finish();
-    }
+
+
 }
