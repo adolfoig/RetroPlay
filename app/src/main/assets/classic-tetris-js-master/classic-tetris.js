@@ -1,5 +1,5 @@
 // Definir variables para la IP, puerto y el score
-const ip = '192.168.1.35';
+const ip = '192.168.1.43';
 const puerto = '3000';
 
 // Enviar la puntuación al servidor cuando el juego termina
