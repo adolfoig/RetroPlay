@@ -11,11 +11,11 @@ import java.util.List;
 
 public class FavoritosViewModel extends ViewModel {
     private final FavoritosRepository repository = new FavoritosRepository();
-    private final MutableLiveData<List<Juego>> favoritosLiveData = new MutableLiveData<>();
     private final MutableLiveData<Juego> juegoSeleccionado = new MutableLiveData<>();
-    private final MutableLiveData<String> idJuegoParaJugar = new MutableLiveData<>();
     public final MutableLiveData<String> juegoEliminado = new MutableLiveData<>();
     public final MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    public final MutableLiveData<String> favoritoAgregado = new MutableLiveData<>();
+
 
     public FavoritosViewModel() {
         cargarFavoritos();
@@ -25,22 +25,51 @@ public class FavoritosViewModel extends ViewModel {
         repository.cargarFavoritos();
     }
 
-    public void quitarFavorito(String idJuego) {
-        repository.quitarFavorito(idJuego);
+    public void eliminarFavorito(Juego juego) {
+        repository.eliminarFavorito(juego.getId(), success -> {
+            if (success) {
+                juego.setFavorito(false);
+                juegoEliminado.postValue("Juego eliminado de favoritos"); // Esto activará el Toast en el Fragment
+            } else {
+                errorMessage.postValue("Error al eliminar favorito");
+            }
+        });
+    }
+
+    public void alternarFavorito(Juego juego) {
+        if (juego.isFavorito()) {
+            repository.eliminarFavorito(juego.getId(), success -> {
+                if (success) {
+                    juego.setFavorito(false);
+                    juegoEliminado.postValue("Juego eliminado de favoritos");
+                } else {
+                    errorMessage.postValue("Error al eliminar favorito");
+                }
+            });
+        } else {
+            repository.agregarFavorito(juego.getId(), success -> {
+                if (success) {
+                    juego.setFavorito(true);
+                    favoritoAgregado.postValue("Juego añadido a favoritos");
+                } else {
+                    errorMessage.postValue("Error al agregar favorito");
+                }
+            });
+        }
+    }
+
+    public void verificarEstadoFavorito(Juego juego, FavoritosRepository.RepositoryCallback<Boolean> callback) {
+        repository.verificarEstadoFavorito(juego, callback);
     }
 
     public void seleccionarJuego(Juego juego) {
         juegoSeleccionado.setValue(juego);
     }
 
-    public void prepararJuegoParaJugar(String idJuego) {
-        idJuegoParaJugar.setValue(idJuego);
-    }
-
     // Getters para LiveData
     public LiveData<List<Juego>> getFavoritos() { return repository.getFavoritosLiveData(); }
     public LiveData<Juego> getJuegoSeleccionado() { return juegoSeleccionado; }
-    public LiveData<String> getIdJuegoParaJugar() { return idJuegoParaJugar; }
     public LiveData<String> getJuegoEliminado() { return juegoEliminado; }
     public LiveData<String> getErrorMessage() { return errorMessage; }
+    public LiveData<String> getFavoritoAgregado() { return favoritoAgregado; }
 }
