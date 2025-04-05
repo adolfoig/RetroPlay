@@ -2,12 +2,9 @@ package com.example.retroplay.Repository;
 
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.retroplay.clases.Juego;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.example.retroplay.Model.Juego;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -55,7 +52,7 @@ public class JuegosRepository {
             favorito.put("idUsuario", idUsuario);
             favorito.put("idJuego", idJuego);
 
-            db.collection("Favoritos")  // Corregí el nombre de la colección (antes decía "Favoritos")
+            db.collection("Favoritos")
                     .add(favorito)
                     .addOnCompleteListener(task -> {
                         if (callback != null) {

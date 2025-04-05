@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.retroplay.Repository.FavoritosRepository;
-import com.example.retroplay.clases.Juego;
+import com.example.retroplay.Model.Juego;
 
 import java.util.List;
 

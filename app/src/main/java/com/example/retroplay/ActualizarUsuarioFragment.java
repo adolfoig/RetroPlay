@@ -3,7 +3,6 @@ package com.example.retroplay;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,36 +11,29 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
+import com.example.retroplay.Viewmodel.UsuarioViewModel;
 import com.example.retroplay.databinding.FragmentActualizarUsuarioBinding;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class ActualizarUsuarioFragment extends Fragment {
 
     private FragmentActualizarUsuarioBinding binding;
     private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
-    private Context appContext;
+    private UsuarioViewModel usuarioViewModel;
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        appContext = context.getApplicationContext();
+        mAuth = FirebaseAuth.getInstance();
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        usuarioViewModel = new ViewModelProvider(this).get(UsuarioViewModel.class);
     }
 
     @Override
@@ -55,25 +47,38 @@ public class ActualizarUsuarioFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        setupObservers();
         cargarDatosUsuario();
         binding.btnRegistrarUsuario.setOnClickListener(v -> actualizarUsuario());
+    }
 
-        // Ocultar campo de email ya que no se va a modificar
+    private void setupObservers() {
+        usuarioViewModel.getErrorMessage().observe(getViewLifecycleOwner(), message -> {
+            if (message != null) {
+                showToast(message);
+            }
+        });
+
+        usuarioViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            binding.btnRegistrarUsuario.setEnabled(!isLoading);
+        });
+
+        usuarioViewModel.getUpdateSuccess().observe(getViewLifecycleOwner(), success -> {
+            if (success) {
+                showToast("Datos actualizados correctamente");
+                cerrarSesion();
+            }
+        });
     }
 
     private void cargarDatosUsuario() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
-            db.collection("Usuarios").document(user.getUid())
-                    .get()
-                    .addOnSuccessListener(documentSnapshot -> {
-                        if (documentSnapshot.exists()) {
-                            String nombre = documentSnapshot.getString("nombre");
-                            binding.textoNombre.setText(nombre != null ? nombre : user.getDisplayName());
-                        } else {
-                            binding.textoNombre.setText(user.getDisplayName());
-                        }
-                    });
+            usuarioViewModel.getUserName(user.getUid()).observe(getViewLifecycleOwner(), nombre -> {
+                if (nombre != null) {
+                    binding.textoNombre.setText(nombre);
+                }
+            });
         }
     }
 
@@ -100,104 +105,28 @@ public class ActualizarUsuarioFragment extends Fragment {
             return;
         }
 
-        verificarPasswordActual(user, passwordActual, nuevoNombre, nuevaPassword);
-    }
-
-    private void verificarPasswordActual(FirebaseUser user, String passwordActual,
-                                         String nuevoNombre, String nuevaPassword) {
-        AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), passwordActual);
-
-        user.reauthenticate(credential)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        actualizarDatosCompletos(user, nuevoNombre, nuevaPassword);
-                    } else {
-                        binding.textoPasswordAntigua.setError("Contraseña incorrecta");
-                        binding.textoPasswordAntigua.requestFocus();
-                        showToast("La contraseña actual no es correcta");
-                    }
-                });
-    }
-
-    private void actualizarDatosCompletos(FirebaseUser user, String nombre, String nuevaPassword) {
-        actualizarDatosFirestore(user.getUid(), nombre);
-        actualizarDatosAuth(user, nombre, nuevaPassword);
-    }
-
-    private void actualizarDatosFirestore(String userId, String nombre) {
-        Map<String, Object> datosUsuario = new HashMap<>();
-        datosUsuario.put("nombre", nombre);
-
-        db.collection("Usuarios").document(userId)
-                .set(datosUsuario)
-                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Datos actualizados correctamente"))
-                .addOnFailureListener(e -> {
-                    Log.e("Firestore", "Error al actualizar datos", e);
-                    showToast("Error al guardar datos");
-                });
-    }
-
-    private void actualizarDatosAuth(FirebaseUser user, String nombre, String nuevaPassword) {
-        if (!isAdded()) return;
-
-        final int[] totalOperations = {1}; // Actualización de nombre
-        if (!nuevaPassword.isEmpty()) totalOperations[0]++;
-
-        final int[] completedOperations = {0};
-
-        Runnable checkCompletion = () -> {
-            completedOperations[0]++;
-            if (completedOperations[0] == totalOperations[0]) {
-                showToast("Datos actualizados correctamente");
-                cerrarSesion();
-            }
-        };
-
-        // 1. Actualizar nombre
-        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                .setDisplayName(nombre)
-                .build();
-
-        user.updateProfile(profileUpdates)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Log.d("Auth", "Nombre actualizado en Auth");
-                    }
-                    checkCompletion.run();
-                });
-
-        // 2. Actualizar contraseña si se proporcionó
-        if (!nuevaPassword.isEmpty()) {
-            user.updatePassword(nuevaPassword)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Log.d("Auth", "Contraseña actualizada");
-                            binding.textoPasswordAntigua.setText("");
-                            binding.textoPasswordNueva.setText("");
-                        }
-                        checkCompletion.run();
-                    });
-        }
+        usuarioViewModel.updateUser(user.getUid(), user.getEmail(), passwordActual, nuevoNombre, nuevaPassword);
     }
 
     private void showToast(String message) {
-        if (isAdded() && appContext != null) {
-            Toast.makeText(appContext, message, Toast.LENGTH_SHORT).show();
+        if (isAdded() && getContext() != null) {
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
         }
     }
 
     private void cerrarSesion() {
-        mAuth.signOut();
+        usuarioViewModel.signOut();
         Toast.makeText(getContext(), "Sesión cerrada", Toast.LENGTH_SHORT).show();
         irAlLogin();
     }
 
-    private void irAlLogin(){
+    private void irAlLogin() {
         Intent intent = new Intent(getContext(), MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
-        assert getActivity() != null;
-        getActivity().finish();
+        if (getActivity() != null) {
+            getActivity().finish();
+        }
     }
 
     @Override

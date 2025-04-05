@@ -14,7 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.retroplay.clases.Logro;
+import com.example.retroplay.Model.Logro;
 import com.example.retroplay.databinding.FragmentJugarJuegoBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;

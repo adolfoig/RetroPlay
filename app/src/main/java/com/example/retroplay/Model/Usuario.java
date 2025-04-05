@@ -1,4 +1,4 @@
-package com.example.retroplay.clases;
+package com.example.retroplay.Model;
 
 import java.io.Serializable;
 import java.util.Objects;

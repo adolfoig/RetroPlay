@@ -5,13 +5,13 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.retroplay.Repository.JuegosRepository;
-import com.example.retroplay.clases.Juego;
+import com.example.retroplay.Model.Juego;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class JuegosViewModel extends ViewModel {
-    private final JuegosRepository repository = new JuegosRepository();
+    private final JuegosRepository juegosRepository = new JuegosRepository();
     private final MutableLiveData<String> mensajeError = new MutableLiveData<>();
     private final MutableLiveData<List<Juego>> juegos = new MutableLiveData<>();
 
@@ -27,17 +27,17 @@ public class JuegosViewModel extends ViewModel {
     }
 
     private void cargarJuegos() {
-        repository.getJuegos().observeForever(juegos::setValue);
+        juegosRepository.getJuegos().observeForever(juegos::setValue);
     }
 
     public void verificarFavorito(Juego juego, JuegosRepository.RepositoryCallback<Boolean> callback) {
-        repository.verificarEstadoFavorito(juego, callback);
+        juegosRepository.verificarEstadoFavorito(juego, callback);
     }
 
     // JuegosViewModel.java
-    public void toggleFavorito(Juego juego) {
+    public void alternarFavorito(Juego juego) {
         if (juego.isFavorito()) {
-            repository.eliminarFavorito(juego.getId(), success -> {
+            juegosRepository.eliminarFavorito(juego.getId(), success -> {
                 if (success) {
                     juego.setFavorito(false);
                     // Notificar cambios
@@ -50,7 +50,7 @@ public class JuegosViewModel extends ViewModel {
                 }
             });
         } else {
-            repository.agregarFavorito(juego.getId(), success -> {
+            juegosRepository.agregarFavorito(juego.getId(), success -> {
                 if (success) {
                     juego.setFavorito(true);
                     // Notificar cambios
