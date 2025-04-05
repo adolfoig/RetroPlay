@@ -20,10 +20,6 @@ import com.example.retroplay.Viewmodel.FavoritosViewModel;
 import com.example.retroplay.Model.Juego;
 import com.example.retroplay.databinding.FragmentFavoritosBinding;
 import com.example.retroplay.databinding.ViewholderFavoritosBinding;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,13 +30,11 @@ public class FavoritosFragment extends Fragment {
     private FavoritosAdapter adapter;
     private NavController navController;
     private FragmentFavoritosBinding binding;
-    private FirebaseFirestore db;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(FavoritosViewModel.class);
-        db = FirebaseFirestore.getInstance();
     }
 
     @Override
@@ -59,7 +53,6 @@ public class FavoritosFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        // Configurar layout y animaciones
         binding.recyclerViewFavoritos.setLayoutManager(new GridLayoutManager(requireContext(), 2));
 
         DefaultItemAnimator animator = new DefaultItemAnimator();
@@ -100,6 +93,20 @@ public class FavoritosFragment extends Fragment {
                 viewModel.errorMessage.setValue(null);
             }
         });
+
+        viewModel.getJuegoEliminado().observe(getViewLifecycleOwner(), message -> {
+            if (message != null) {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+                viewModel.juegoEliminado.setValue(null); // Resetear el valor
+            }
+        });
+
+        viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
+            if (error != null) {
+                Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show();
+                viewModel.errorMessage.setValue(null); // Resetear el valor
+            }
+        });
     }
 
     private void navegarADetalle(Juego juego) {
@@ -130,7 +137,6 @@ public class FavoritosFragment extends Fragment {
         }
 
         public void establecerLista(List<Juego> nuevaLista) {
-            // Actualización optimizada sin DiffUtil
             int oldSize = listaFavoritos.size();
             int newSize = nuevaLista.size();
 
@@ -159,7 +165,6 @@ public class FavoritosFragment extends Fragment {
             void bind(Juego juego) {
                 binding.textNombreJuego.setText(juego.getNombre());
 
-                // Configurar imagen según ID
                 switch (juego.getId()) {
                     case "1":
                         binding.imagenJuego.setImageResource(R.drawable.pacman);
@@ -174,35 +179,12 @@ public class FavoritosFragment extends Fragment {
 
                 binding.imagenEstrella.setImageResource(R.drawable.estrella);
                 binding.imagenEstrella.setOnClickListener(v -> {
-                    // Cambio visual inmediato
                     binding.imagenEstrella.setImageResource(R.drawable.estrellablanca);
-                    quitarFavorito(juego.getId());
+                    viewModel.eliminarFavorito(juego);
                 });
 
                 itemView.setOnClickListener(v -> viewModel.seleccionarJuego(juego));
                 binding.btnJugar.setOnClickListener(v -> navegarAWebView(juego.getId()));
-            }
-        }
-
-        private void quitarFavorito(String idJuego) {
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            if (user != null) {
-                db.collection("Favoritos")
-                        .whereEqualTo("idUsuario", user.getUid())
-                        .whereEqualTo("idJuego", idJuego)
-                        .get()
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                    db.collection("Favoritos").document(document.getId()).delete()
-                                            .addOnSuccessListener(aVoid -> viewModel.quitarFavorito(idJuego))
-                                            .addOnFailureListener(e -> Toast.makeText(
-                                                    requireContext(),
-                                                    "Error al eliminar favorito",
-                                                    Toast.LENGTH_SHORT).show());
-                                }
-                            }
-                        });
             }
         }
     }
