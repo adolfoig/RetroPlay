@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.retroplay.Viewmodel.FavoritosViewModel;
-import com.example.retroplay.clases.Juego;
+import com.example.retroplay.Model.Juego;
 import com.example.retroplay.databinding.FragmentFavoritosBinding;
 import com.example.retroplay.databinding.ViewholderFavoritosBinding;
 import com.google.firebase.auth.FirebaseAuth;

@@ -1,7 +1,6 @@
 package com.example.retroplay;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.retroplay.Viewmodel.RankingViewModel;
-import com.example.retroplay.clases.Juego;
+import com.example.retroplay.Model.Juego;
 import com.example.retroplay.databinding.FragmentRankingBinding;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.QueryDocumentSnapshot;

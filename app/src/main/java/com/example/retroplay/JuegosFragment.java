@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.retroplay.Viewmodel.JuegosViewModel;
-import com.example.retroplay.clases.Juego;
+import com.example.retroplay.Model.Juego;
 import com.example.retroplay.databinding.ViewholderJuegosBinding;
 
 import java.util.List;
@@ -114,7 +114,7 @@ public class JuegosFragment extends Fragment {
 
             // Listener para cambiar estado de favorito
             holder.binding.imagenEstrella.setOnClickListener(v -> {
-                viewModel.toggleFavorito(juego);
+                viewModel.alternarFavorito(juego);
                 actualizarIconoFavorito(holder.binding.imagenEstrella, !juego.isFavorito());
             });
 

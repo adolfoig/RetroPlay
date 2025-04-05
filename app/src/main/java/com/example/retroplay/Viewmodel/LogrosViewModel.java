@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.retroplay.LogrosFragment;
 import com.example.retroplay.Repository.LogrosRepository;
-import com.example.retroplay.clases.Logro;
+import com.example.retroplay.Model.Logro;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

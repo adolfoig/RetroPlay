@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.retroplay.RankingFragment;
 import com.example.retroplay.Repository.RankingRepository;
-import com.example.retroplay.clases.Juego;
+import com.example.retroplay.Model.Juego;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;

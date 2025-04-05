@@ -1,12 +1,8 @@
 package com.example.retroplay.Repository;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
-import android.widget.Toast;
-
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.retroplay.clases.Juego;
+import com.example.retroplay.Model.Juego;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;

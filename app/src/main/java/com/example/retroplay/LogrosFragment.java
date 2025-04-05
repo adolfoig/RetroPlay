@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.retroplay.Viewmodel.LogrosViewModel;
-import com.example.retroplay.clases.Logro;
+import com.example.retroplay.Model.Logro;
 import com.example.retroplay.databinding.FragmentLogrosBinding;
 import com.example.retroplay.databinding.ViewholderLogrosBinding;
 

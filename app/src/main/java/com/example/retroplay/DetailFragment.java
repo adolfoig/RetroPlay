@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.example.retroplay.clases.Juego;
+import com.example.retroplay.Model.Juego;
 import com.example.retroplay.databinding.FragmentDetailBinding;
 
 public class DetailFragment extends Fragment {
