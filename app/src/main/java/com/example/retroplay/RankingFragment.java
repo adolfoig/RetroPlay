@@ -13,32 +13,41 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.example.retroplay.Viewmodel.RankingViewModel;
 import com.example.retroplay.clases.Juego;
 import com.example.retroplay.databinding.FragmentRankingBinding;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class RankingFragment extends Fragment {
 
     private FragmentRankingBinding binding;
-    private FirebaseFirestore db;
-    private FirebaseAuth auth;
-    private String usuarioActualId;  // Almacena el id del usuario actual
+    private RankingViewModel viewModel;
     private List<Juego> listaJuegos = new ArrayList<>();
+
+    public interface JuegoLoadingCallback {
+        void onGamesLoaded(List<Juego> juegos, boolean isEmpty);
+        void onError(String message);
+    }
+
+    public interface ScoreLoadingCallback {
+        void onScoresLoaded(Task<QuerySnapshot> task);
+        void onError(String message);
+    }
+
+    public interface UserNameCallback {
+        void onUserNameLoaded(String nombreUsuario, int puntuacion, int filas, boolean esUsuarioActual);
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        db = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();  // Inicializar FirebaseAuth
-        usuarioActualId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
+        viewModel = new ViewModelProvider(this).get(RankingViewModel.class);
     }
 
     @Override
@@ -56,30 +65,22 @@ public class RankingFragment extends Fragment {
     }
 
     private void cargarJuegos() {
-        db.collection("Juegos")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        listaJuegos.clear();
-                        listaJuegos.add(new Juego());  // Añadir elemento por defecto
+        viewModel.cargarJuegos(new JuegoLoadingCallback() {
+            @Override
+            public void onGamesLoaded(List<Juego> juegos, boolean isEmpty) {
+                listaJuegos = juegos;
+                if (isEmpty) {
+                    binding.tvTituloJuego.setText("Ningún juego seleccionado");
+                    limpiarTablaPuntuaciones();
+                }
+                configurarSpinner();
+            }
 
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Juego juego = document.toObject(Juego.class);
-                            if (juego != null && !listaJuegos.contains(juego)) {
-                                listaJuegos.add(juego);
-                            }
-                        }
-
-                        if (listaJuegos.size() <= 1) {  // Si solo contiene el juego por defecto
-                            binding.tvTituloJuego.setText("Ningún juego seleccionado");
-                            limpiarTablaPuntuaciones();
-                        }
-
-                        configurarSpinner();
-                    } else {
-                        mostrarError("Error al cargar juegos");
-                    }
-                });
+            @Override
+            public void onError(String message) {
+                mostrarError(message);
+            }
+        });
     }
 
     private void configurarSpinner() {
@@ -107,13 +108,12 @@ public class RankingFragment extends Fragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.spinnerJuegos.setAdapter(adapter);
 
-        // Listener del spinner para manejar selección
         binding.spinnerJuegos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position == 0) {  // Si es el juego vacío
+                if (position == 0) {
                     binding.tvTituloJuego.setText("Ningún juego seleccionado");
-                    limpiarTablaPuntuaciones();  // Vaciar tabla
+                    limpiarTablaPuntuaciones();
                 } else {
                     Juego juegoSeleccionado = (Juego) parent.getItemAtPosition(position);
                     cargarPuntuaciones(juegoSeleccionado.getId());
@@ -132,41 +132,20 @@ public class RankingFragment extends Fragment {
             return;
         }
 
-        binding.tvTituloJuego.setText(obtenerNombreJuego(idJuego));
+        binding.tvTituloJuego.setText(viewModel.obtenerNombreJuego(idJuego));
         limpiarTablaPuntuaciones();
-        consultarPuntuacionesFirestore(idJuego);
-    }
 
-    private String obtenerNombreJuego(String idJuego) {
-        for (Juego juego : listaJuegos) {
-            if (juego != null && idJuego.equals(juego.getId())) {
-                return juego.getNombre();
+        viewModel.cargarPuntuaciones(idJuego, new ScoreLoadingCallback() {
+            @Override
+            public void onScoresLoaded(Task<QuerySnapshot> task) {
+                procesarResultadosPuntuaciones(task);
             }
-        }
-        return "Juego no encontrado";
-    }
 
-    private void limpiarTablaPuntuaciones() {
-        int childCount = binding.tablaPuntuaciones.getChildCount();
-        if (childCount > 1) {
-            binding.tablaPuntuaciones.removeViews(1, childCount - 1);
-        }
-    }
-
-    private void consultarPuntuacionesFirestore(String idJuego) {
-        db.collection("Puntuaciones")
-                .whereEqualTo("idJuego", idJuego)
-                // Mostrar de mayor a menor las puntuaciones
-                .orderBy("puntuacionMaxima", Query.Direction.DESCENDING)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        procesarResultadosPuntuaciones(task);
-                    } else {
-                        mostrarError("Error de conexión: " + task.getException().getMessage());
-                        Log.d("Index", task.getException().getMessage());
-                    }
-                });
+            @Override
+            public void onError(String message) {
+                mostrarError(message);
+            }
+        });
     }
 
     private void procesarResultadosPuntuaciones(Task<QuerySnapshot> task) {
@@ -181,32 +160,28 @@ public class RankingFragment extends Fragment {
             Long puntuacionMaxima = document.getLong("puntuacionMaxima");
             int puntuacion = puntuacionMaxima != null ? puntuacionMaxima.intValue() : 0;
 
-            obtenerNombreUsuario(idUsuario, puntuacion, filas);
+            viewModel.obtenerNombreUsuario(idUsuario, puntuacion, filas, new UserNameCallback() {
+                @Override
+                public void onUserNameLoaded(String nombreUsuario, int puntuacion, int filas, boolean esUsuarioActual) {
+                    agregarFilaTabla(nombreUsuario, puntuacion, filas, esUsuarioActual);
+                }
+            });
             filas++;
         }
     }
 
-    private void obtenerNombreUsuario(String idUsuario, int puntuacion, int filas) {
-        db.collection("Usuarios")
-                .document(idUsuario)
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    String nombreUsuario = documentSnapshot.getString("nombre");
-                    if (nombreUsuario == null || nombreUsuario.isEmpty()) {
-                        nombreUsuario = "Usuario de Google";
-                    }
-                    agregarFilaTabla(nombreUsuario, puntuacion, filas, idUsuario.equals(usuarioActualId));
-                })
-                .addOnFailureListener(e -> {
-                    agregarFilaTabla("Error al obtener nombre", puntuacion, filas, false);
-                });
+    private void limpiarTablaPuntuaciones() {
+        int childCount = binding.tablaPuntuaciones.getChildCount();
+        if (childCount > 1) {
+            binding.tablaPuntuaciones.removeViews(1, childCount - 1);
+        }
     }
 
     private void agregarFilaTabla(String nombreUsuario, int puntuacion, int filas, boolean esUsuarioActual) {
         TableRow row = new TableRow(requireContext());
 
         int backgroundColor = esUsuarioActual ?
-                ContextCompat.getColor(requireContext(), android.R.color.holo_blue_light) :  // Resaltar en azul claro
+                ContextCompat.getColor(requireContext(), android.R.color.holo_blue_light) :
                 filas % 2 == 0 ?
                         ContextCompat.getColor(requireContext(), android.R.color.white) :
                         ContextCompat.getColor(requireContext(), android.R.color.darker_gray);
@@ -215,7 +190,7 @@ public class RankingFragment extends Fragment {
         TextView tvUsuario = new TextView(requireContext());
         tvUsuario.setText(nombreUsuario);
         tvUsuario.setPadding(8, 8, 8, 8);
-        if (esUsuarioActual) tvUsuario.setTypeface(null, android.graphics.Typeface.BOLD);  // Negrita si es el usuario actual
+        if (esUsuarioActual) tvUsuario.setTypeface(null, android.graphics.Typeface.BOLD);
         row.addView(tvUsuario);
 
         TextView tvPuntuacion = new TextView(requireContext());

@@ -1,66 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="5dp"
-    android:layout_marginRight="10dp"
-    android:layout_marginLeft="10dp"
-    android:layout_marginBottom="5dp"
-    app:cardCornerRadius="10dp"
-    app:cardElevation="50dp">
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"
+    app:cardUseCompatPadding="true">
 
-    <LinearLayout
-        android:layout_width="171dp"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:padding="4dp">
 
-        <TextView
-            android:id="@+id/textNombreJuego"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="8dp"
-            android:text="prueba"
-            android:textSize="20sp" />
-
-        <!-- Nuevo LinearLayout horizontal con la estrella a la izquierda y el botón a la derecha -->
+        <!-- Game Image with proper scaling and size -->
         <ImageView
             android:id="@+id/imagenJuego"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_gravity="center"
-            android:layout_marginBottom="8dp" />
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:padding="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/pacman" />
 
-        <LinearLayout
-            android:layout_width="212dp"
+        <!-- Game Name -->
+        <TextView
+            android:id="@+id/textNombreJuego"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/imagenEstrella"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imagenJuego"
+            tools:text="Pacman" />
 
-            <Button
-                android:id="@+id/btnJugar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#4CAF50"
-                android:text="@string/jugar" />
+        <!-- Favorite Star Button -->
+        <ImageButton
+            android:id="@+id/imagenEstrella"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="centerInside"
+            app:layout_constraintBottom_toBottomOf="@id/textNombreJuego"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/textNombreJuego"
+            tools:src="@drawable/estrella" />
 
-            <!-- Espaciador para empujar el botón hacia la derecha -->
-            <ImageButton
-                android:id="@+id/imagenEstrella"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:scaleType="fitCenter"
-                android:src="@drawable/estrellablanca" />
-        </LinearLayout>
+        <!-- Play Button -->
+        <Button
+            android:id="@+id/btnJugar"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="#4CAF50"
+            android:text="@string/jugar"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textNombreJuego" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

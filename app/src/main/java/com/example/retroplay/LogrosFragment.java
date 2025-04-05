@@ -5,31 +5,30 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
+import com.example.retroplay.Viewmodel.LogrosViewModel;
 import com.example.retroplay.clases.Logro;
 import com.example.retroplay.databinding.FragmentLogrosBinding;
 import com.example.retroplay.databinding.ViewholderLogrosBinding;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class LogrosFragment extends Fragment {
     private FragmentLogrosBinding binding;
-    private List<Logro> listaLogros = new ArrayList<>();
+    private LogrosViewModel viewModel;
     private LogroAdapter logroAdapter;
+
+    public interface LogrosCallback {
+        void onLogrosLoaded(List<Logro> logros);
+        void onError(String message);
+    }
 
     @Nullable
     @Override
@@ -37,8 +36,10 @@ public class LogrosFragment extends Fragment {
         binding = FragmentLogrosBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
 
+        viewModel = new ViewModelProvider(this).get(LogrosViewModel.class);
+
         binding.recyclerViewLogros.setLayoutManager(new LinearLayoutManager(getContext()));
-        logroAdapter = new LogroAdapter(listaLogros);
+        logroAdapter = new LogroAdapter(new ArrayList<>());
         binding.recyclerViewLogros.setAdapter(logroAdapter);
 
         cargarLogrosDesdeFireBase();
@@ -47,57 +48,18 @@ public class LogrosFragment extends Fragment {
     }
 
     private void cargarLogrosDesdeFireBase() {
-        FirebaseFirestore.getInstance().collection("LogrosDisponibles")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        listaLogros.clear();
-                        for (DocumentSnapshot doc : task.getResult()) {
-                            Logro logro = doc.toObject(Logro.class);
-                            if (logro != null) {
-                                logro.setId(doc.getId());
-                                listaLogros.add(logro);
-                            }
-                        }
-                        ordenarLogrosPorPuntuacion();
-                        verificarLogrosObtenidos();
-                    } else {
-                        Toast.makeText(getContext(), "Error al cargar logros", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
+        viewModel.cargarLogrosDesdeFireBase(new LogrosCallback() {
+            @Override
+            public void onLogrosLoaded(List<Logro> logros) {
+                logroAdapter = new LogroAdapter(logros);
+                binding.recyclerViewLogros.setAdapter(logroAdapter);
+            }
 
-    private void ordenarLogrosPorPuntuacion() {
-        Collections.sort(listaLogros, (logro1, logro2) -> Integer.compare(logro1.getPuntuacion(), logro2.getPuntuacion()));
-    }
-
-    private void verificarLogrosObtenidos() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            Toast.makeText(getContext(), "Usuario no autenticado", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String userId = user.getUid();
-
-        db.collection("LogrosObtenidos")
-                .whereEqualTo("idUsuario", userId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        List<String> logrosObtenidosIds = new ArrayList<>();
-                        for (DocumentSnapshot doc : task.getResult()) {
-                            logrosObtenidosIds.add(doc.getString("idLogro"));
-                        }
-
-                        for (Logro logro : listaLogros) {
-                            logro.setObtenido(logrosObtenidosIds.contains(logro.getId()));
-                        }
-
-                        logroAdapter.notifyDataSetChanged();
-                    }
-                });
+            @Override
+            public void onError(String message) {
+                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private class LogroAdapter extends RecyclerView.Adapter<LogroAdapter.LogroViewHolder> {
