@@ -18,6 +18,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.retroplay.Registro.LoginFragment;
 import com.example.retroplay.databinding.ActivityMainBinding;
+import com.example.retroplay.databinding.NavHeaderBinding;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -25,6 +26,8 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     ActivityMainBinding binding;
+
+    NavHeaderBinding bindingHeader;
     private FirebaseAuth mAuth;
     NavController navController;
 
@@ -34,6 +37,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView((binding = ActivityMainBinding.inflate(getLayoutInflater())).getRoot());
 
+
+        // DA ERROR ESTO
+        /*bindingHeader.nombreUsuario.setText("HOla");
+        bindingHeader.emailUsuario.setText("DAD");*/
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -139,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             binding.drawerLayout.setDrawerLockMode(
                     shouldEnableDrawer ? DrawerLayout.LOCK_MODE_UNLOCKED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED
             );
+
 
             // Oculta o muestra la interfaz según el fragmento actual
             if (destinationId == R.id.loginFragment || destinationId == R.id.registroFragment || destinationId == R.id.jugarJuegoFragment) {
