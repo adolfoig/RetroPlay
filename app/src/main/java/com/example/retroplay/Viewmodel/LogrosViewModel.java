@@ -26,7 +26,7 @@ public class LogrosViewModel extends ViewModel {
                 listaLogros.clear();
                 for (DocumentSnapshot doc : task.getResult()) {
                     Logro logro = doc.toObject(Logro.class);
-                    if (logro != null) {
+                    if (logro != null && logro.getDescripcion() != null && !logro.getDescripcion().isEmpty()) {
                         logro.setId(doc.getId());
                         listaLogros.add(logro);
                     }

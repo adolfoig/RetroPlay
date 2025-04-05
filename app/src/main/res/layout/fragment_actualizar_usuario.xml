@@ -55,8 +55,29 @@
             app:hintTextColor="@color/gris_claro"
             android:inputType="textPersonName"
             android:textColor="@color/black"/>
+
     </com.google.android.material.textfield.TextInputLayout>
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:boxBackgroundMode="outline"
+        app:boxStrokeColor="@color/azul"
+        android:layout_marginBottom="10dp"
+        app:hintTextColor="@color/azul">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/textoEmail"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:background="@drawable/rounded_edittext_background"
+            android:hint="@string/correoElectronico"
+            app:hintTextColor="@color/gris_claro"
+            android:inputType="textPersonName"
+            android:textColor="@color/black"
+            android:enabled="false"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Contraseña -->
     <com.google.android.material.textfield.TextInputLayout

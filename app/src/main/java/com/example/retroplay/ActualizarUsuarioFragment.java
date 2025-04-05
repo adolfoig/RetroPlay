@@ -13,21 +13,20 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.retroplay.Repository.UsuarioRepository;
 import com.example.retroplay.Viewmodel.UsuarioViewModel;
 import com.example.retroplay.databinding.FragmentActualizarUsuarioBinding;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 public class ActualizarUsuarioFragment extends Fragment {
 
     private FragmentActualizarUsuarioBinding binding;
-    private FirebaseAuth mAuth;
     private UsuarioViewModel usuarioViewModel;
+    private Context appContext;
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        mAuth = FirebaseAuth.getInstance();
+        appContext = context.getApplicationContext();
     }
 
     @Override
@@ -48,79 +47,59 @@ public class ActualizarUsuarioFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         setupObservers();
-        cargarDatosUsuario();
-        binding.btnRegistrarUsuario.setOnClickListener(v -> actualizarUsuario());
+        loadUserData();
+
+        binding.btnRegistrarUsuario.setOnClickListener(v -> {
+            String newName = binding.textoNombre.getText().toString().trim();
+            String currentPassword = binding.textoPasswordAntigua.getText().toString().trim();
+            String newPassword = binding.textoPasswordNueva.getText().toString().trim();
+
+            usuarioViewModel.getUsuarioRepository().updateUser(currentPassword, newName, newPassword);
+        });
     }
 
     private void setupObservers() {
-        usuarioViewModel.getErrorMessage().observe(getViewLifecycleOwner(), message -> {
-            if (message != null) {
-                showToast(message);
-            }
-        });
+        UsuarioRepository usuarioRepository = usuarioViewModel.getUsuarioRepository(); // Cambiado a getUsuarioRepository
 
-        usuarioViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
-            binding.btnRegistrarUsuario.setEnabled(!isLoading);
-        });
+        usuarioRepository.getUserData().observe(getViewLifecycleOwner(), userData -> {
+            if (userData != null) {
+                // Actualizar nombre
+                binding.textoNombre.setText(userData.get("nombre"));
 
-        usuarioViewModel.getUpdateSuccess().observe(getViewLifecycleOwner(), success -> {
-            if (success) {
-                showToast("Datos actualizados correctamente");
-                cerrarSesion();
-            }
-        });
-    }
-
-    private void cargarDatosUsuario() {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            usuarioViewModel.getUserName(user.getUid()).observe(getViewLifecycleOwner(), nombre -> {
-                if (nombre != null) {
-                    binding.textoNombre.setText(nombre);
+                // Mostrar email (no editable)
+                String email = userData.get("email");
+                if (email != null) {
+                    binding.textoEmail.setText(email);
+                    binding.textoEmail.setEnabled(false); // Deshabilitar edición
                 }
-            });
-        }
+            }
+        });
+
+        usuarioRepository.getUserUpdateResult().observe(getViewLifecycleOwner(), result -> {
+            if (result != null) {
+                showToast(result);
+
+                if (result.equals("Datos actualizados correctamente")) {
+                    usuarioRepository.logout();
+                } else if (result.equals("logout_success")) {
+                    showToast("Sesión cerrada");
+                    goToLogin();
+                }
+            }
+        });
     }
 
-    private void actualizarUsuario() {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null) {
-            showToast("Usuario no autenticado");
-            return;
-        }
-
-        String nuevoNombre = binding.textoNombre.getText().toString().trim();
-        String passwordActual = binding.textoPasswordAntigua.getText().toString().trim();
-        String nuevaPassword = binding.textoPasswordNueva.getText().toString().trim();
-
-        if (nuevoNombre.isEmpty()) {
-            showToast("El nombre es obligatorio");
-            return;
-        }
-
-        if (passwordActual.isEmpty()) {
-            binding.textoPasswordAntigua.setError("Ingrese su contraseña actual");
-            binding.textoPasswordAntigua.requestFocus();
-            showToast("Debe ingresar su contraseña actual para realizar cambios");
-            return;
-        }
-
-        usuarioViewModel.updateUser(user.getUid(), user.getEmail(), passwordActual, nuevoNombre, nuevaPassword);
+    private void loadUserData() {
+        usuarioViewModel.getUsuarioRepository().loadUserData();
     }
 
     private void showToast(String message) {
-        if (isAdded() && getContext() != null) {
-            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        if (isAdded() && appContext != null) {
+            Toast.makeText(appContext, message, Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void cerrarSesion() {
-        usuarioViewModel.signOut();
-        Toast.makeText(getContext(), "Sesión cerrada", Toast.LENGTH_SHORT).show();
-        irAlLogin();
-    }
-
-    private void irAlLogin() {
+    private void goToLogin() {
         Intent intent = new Intent(getContext(), MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);

@@ -15,6 +15,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.retroplay.Viewmodel.FavoritosViewModel;
 import com.example.retroplay.Viewmodel.JuegosViewModel;
 import com.example.retroplay.Model.Juego;
 import com.example.retroplay.databinding.ViewholderJuegosBinding;
@@ -23,14 +24,16 @@ import java.util.List;
 
 public class JuegosFragment extends Fragment {
 
-    private JuegosViewModel viewModel;
+    private JuegosViewModel juegosViewModel;
+    private FavoritosViewModel favoritosViewModel;
     private JuegosAdapter adapter;
     private NavController navController;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewModel = new ViewModelProvider(this).get(JuegosViewModel.class);
+        juegosViewModel = new ViewModelProvider(this).get(JuegosViewModel.class);
+        favoritosViewModel = new ViewModelProvider(requireActivity()).get(FavoritosViewModel.class);
     }
 
     @Override
@@ -51,15 +54,30 @@ public class JuegosFragment extends Fragment {
     }
 
     private void observarViewModel() {
-        viewModel.getJuegos().observe(getViewLifecycleOwner(), juegos -> {
+        juegosViewModel.getJuegos().observe(getViewLifecycleOwner(), juegos -> {
             if (juegos != null) {
                 adapter.establecerLista(juegos);
             }
         });
 
-        viewModel.getMensajeError().observe(getViewLifecycleOwner(), mensaje -> {
+        favoritosViewModel.getErrorMessage().observe(getViewLifecycleOwner(), mensaje -> {
             if (mensaje != null) {
                 Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Añade este nuevo observer
+        favoritosViewModel.getFavoritoAgregado().observe(getViewLifecycleOwner(), mensaje -> {
+            if (mensaje != null) {
+                Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
+                favoritosViewModel.favoritoAgregado.setValue(null);
+            }
+        });
+
+        favoritosViewModel.getJuegoEliminado().observe(getViewLifecycleOwner(), mensaje -> {
+            if (mensaje != null) {
+                Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
+                favoritosViewModel.juegoEliminado.setValue(null);
             }
         });
     }
@@ -96,7 +114,6 @@ public class JuegosFragment extends Fragment {
             Juego juego = listaJuegos.get(position);
             holder.binding.textNombreJuego.setText(juego.getNombre());
 
-            // Configurar imagen del juego
             switch (juego.getId()) {
                 case "1":
                     holder.binding.imagenJuego.setImageResource(R.drawable.pacman);
@@ -109,12 +126,10 @@ public class JuegosFragment extends Fragment {
                     break;
             }
 
-            // Verificar y mostrar estado de favorito
             actualizarIconoFavorito(holder.binding.imagenEstrella, juego.isFavorito());
 
-            // Listener para cambiar estado de favorito
             holder.binding.imagenEstrella.setOnClickListener(v -> {
-                viewModel.alternarFavorito(juego);
+                favoritosViewModel.alternarFavorito(juego);
                 actualizarIconoFavorito(holder.binding.imagenEstrella, !juego.isFavorito());
             });
 
@@ -130,9 +145,8 @@ public class JuegosFragment extends Fragment {
         public void establecerLista(List<Juego> listaJuegos) {
             this.listaJuegos = listaJuegos;
 
-            // Verificar estado de favoritos para cada juego
             for (Juego juego : listaJuegos) {
-                viewModel.verificarFavorito(juego, esFavorito -> {
+                favoritosViewModel.verificarEstadoFavorito(juego, esFavorito -> {
                     juego.setFavorito(esFavorito);
                     notifyDataSetChanged();
                 });
@@ -147,9 +161,9 @@ public class JuegosFragment extends Fragment {
 
         private void actualizarIconoFavorito(ImageButton imagenEstrella, boolean esFavorito) {
             if (esFavorito) {
-                imagenEstrella.setImageResource(R.drawable.estrella); // Estrella llena/color
+                imagenEstrella.setImageResource(R.drawable.estrella);
             } else {
-                imagenEstrella.setImageResource(R.drawable.estrellablanca); // Estrella vacía
+                imagenEstrella.setImageResource(R.drawable.estrellablanca);
             }
         }
     }
