@@ -12,6 +12,7 @@ public class Usuario implements Serializable {
     private double puntuacionGlobal;
 
     public Usuario() {
+        // Vacio para FireStore
     }
 
     public Usuario(String id, String nombre, String email, String password, double puntuacionGlobal) {
