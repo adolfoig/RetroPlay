@@ -5,3 +5,7 @@
 5. Dentro de Android Studio ir a app/res/assets/flappy-bird-master/main-js y cambiar el cont ip con la ip de su equipo.
 6. Dentro de Android Studio ir a app/res/assets/pacman/pacman.js y cambiar el cont ip con la ip de su equipo.
 7. Ejecutar el programa.
+
+https://github.com/daleharvey/pacman/blob/master/pacman.js
+https://github.com/noanonoa/flappy-bird
+https://github.com/llop/classic-tetris-js
