@@ -21,12 +21,12 @@ public class LoginActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         if (savedInstanceState == null) {
-            loadFragment(new LoginFragment()); // Cargar LoginFragment por defecto
+            cargarFragment(new LoginFragment());
         }
     }
 
     // Método para cargar Fragments
-    private void loadFragment(Fragment fragment) {
+    private void cargarFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);

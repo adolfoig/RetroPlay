@@ -22,11 +22,11 @@ public class RegistroActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         if (savedInstanceState == null) {
-            loadFragment(new RegistroFragment()); // Cargar RegisterFragment por defecto
+            cargarFragment(new RegistroFragment());
         }
     }
 
-    private void loadFragment(Fragment fragment) {
+    private void cargarFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
