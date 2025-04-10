@@ -13,8 +13,9 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Elegir Juego:"
+        android:text="@string/elegirJuego"
         android:textSize="20sp"
+        android:textStyle="bold"
         android:textColor="@android:color/black"
         android:layout_marginBottom="8dp"/>
 
@@ -31,7 +32,7 @@
         android:id="@+id/tvTituloJuego"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ningun juego elegido"
+        android:text="@string/ningunJuego"
         android:layout_gravity="center"
         android:textSize="24sp"
         android:textColor="@android:color/black"
@@ -45,7 +46,7 @@
         android:layout_height="wrap_content"
         android:stretchColumns="*"
         android:shrinkColumns="*"
-        android:background="@android:color/white">
+        android:background="@drawable/rounded_corners"> <!-- Aquí aplicas el fondo redondeado -->
 
         <!-- Encabezados de la tabla -->
         <TableRow
@@ -57,7 +58,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="JUGADOR"
+                android:text="@string/jugador"
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:textStyle="bold"
@@ -67,7 +68,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="PUNTUACIÓN"
+                android:text="@string/puntuacion"
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
                 android:textStyle="bold"
@@ -101,10 +102,9 @@
                 android:padding="8dp"/>
         </TableRow>
 
-        <!-- Fila 2 - Jugador Carlos -->
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#EEEEEE"/>
-    </TableLayout>
+        </TableLayout>
 </LinearLayout>

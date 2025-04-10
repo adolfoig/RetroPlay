@@ -44,4 +44,12 @@
 
     <!-- Detalle fragment -->
     <string name="detalle" tools:ignore="ExtraTranslation,MissingTranslation">Detail</string>
+
+    <!-- Fragment Ranking -->
+    <string name="elegirJuego" tools:ignore="ExtraTranslation,MissingTranslation">Choose Game</string>
+    <string name="ningunJuego" tools:ignore="ExtraTranslation,MissingTranslation">No game chosen</string>
+    <string name="jugador" tools:ignore="ExtraTranslation,MissingTranslation">PLAYER</string>
+    <string name="puntuacion" tools:ignore="ExtraTranslation,MissingTranslation">SCORE</string>
+
+
 </resources>

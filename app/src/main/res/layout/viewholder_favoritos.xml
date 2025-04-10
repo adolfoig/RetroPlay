@@ -15,7 +15,6 @@
         android:background="@color/gris_claro2"
         android:padding="4dp">
 
-        <!-- Game Image with proper scaling and size -->
         <ImageView
             android:id="@+id/imagenJuego"
             android:layout_width="0dp"
@@ -28,7 +27,6 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/pacman" />
 
-        <!-- Game Name -->
         <TextView
             android:id="@+id/textNombreJuego"
             android:layout_width="0dp"
@@ -46,7 +44,6 @@
             app:layout_constraintTop_toBottomOf="@id/imagenJuego"
             tools:text="Pacman" />
 
-        <!-- Favorite Star Button -->
         <ImageButton
             android:id="@+id/imagenEstrella"
             android:layout_width="40dp"
@@ -59,7 +56,6 @@
             app:layout_constraintTop_toTopOf="@id/textNombreJuego"
             tools:src="@drawable/estrella" />
 
-        <!-- Play Button -->
         <Button
             android:id="@+id/btnJugar"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -74,6 +70,7 @@
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="14sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textNombreJuego" />
