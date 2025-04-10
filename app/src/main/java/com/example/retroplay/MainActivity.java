@@ -1,10 +1,14 @@
 package com.example.retroplay;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +20,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.bumptech.glide.Glide;
 import com.example.retroplay.Registro.LoginFragment;
 import com.example.retroplay.databinding.ActivityMainBinding;
 import com.example.retroplay.databinding.NavHeaderBinding;
@@ -27,7 +32,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     ActivityMainBinding binding;
 
-    NavHeaderBinding bindingHeader;
     private FirebaseAuth mAuth;
     NavController navController;
 
@@ -44,13 +48,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
 
-
         // Configura el NavController (usa la variable de clase)
         this.navController = ((NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment))
                 .getNavController();
 
+        // Si ya se logueo el usuario lleva al menu, si no al loguin
         if (currentUser == null) {
-            navController.navigate(R.id.loginFragment); // Usa la navegación del NavController
+            navController.navigate(R.id.loginFragment);
             ocultarInterfaz2();
         } else {
             irAlBottomMenu();
@@ -63,6 +67,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         )
                 .setOpenableLayout(binding.drawerLayout)
                 .build();
+
+        datosUsuarioHeaderDrawer();
 
         // Vincula el Toolbar y el BottomNavigationView
         NavigationUI.setupWithNavController(binding.toolbar, navController, appBarConfiguration);
@@ -119,7 +125,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
+    private void datosUsuarioHeaderDrawer() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null){
+            NavHeaderBinding headerBinding = NavHeaderBinding.bind(binding.navigationDrawer.getHeaderView(0));
 
+            headerBinding.nombreUsuario.setText(currentUser.getDisplayName());
+            headerBinding.emailUsuario.setText(currentUser.getEmail());
+        } else {
+            return;
+        }
+
+        /*if (currentUser.getPhotoUrl() != null) {
+            Glide.with(this)
+                    .load(currentUser.getPhotoUrl())
+                    .into(headerBinding.profileImage);
+        } else {
+            headerBinding.profileImage.setImageResource(R.drawable.logo);
+        }*/
+    }
 
     private void abrirFragment(Fragment fragment) {
         // Reemplazamos el fragmento actual con el nuevo fragmento
