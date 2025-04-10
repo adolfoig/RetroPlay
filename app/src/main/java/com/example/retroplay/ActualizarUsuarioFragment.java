@@ -21,12 +21,12 @@ public class ActualizarUsuarioFragment extends Fragment {
 
     private FragmentActualizarUsuarioBinding binding;
     private UsuarioViewModel usuarioViewModel;
-    private Context appContext;
+    private Context context;
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        appContext = context.getApplicationContext();
+        this.context = context.getApplicationContext();
     }
 
     @Override
@@ -46,22 +46,22 @@ public class ActualizarUsuarioFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setupObservers();
-        loadUserData();
+        mostrarNombreyEmail();
+        cargarDatosUsuario();
 
         binding.btnRegistrarUsuario.setOnClickListener(v -> {
-            String newName = binding.textoNombre.getText().toString().trim();
-            String currentPassword = binding.textoPasswordAntigua.getText().toString().trim();
-            String newPassword = binding.textoPasswordNueva.getText().toString().trim();
+            String nuevoNombre = binding.textoNombre.getText().toString().trim();
+            String contrasenaActual = binding.textoPasswordAntigua.getText().toString().trim();
+            String nuevaContrasena = binding.textoPasswordNueva.getText().toString().trim();
 
-            usuarioViewModel.getUsuarioRepository().updateUser(currentPassword, newName, newPassword);
+            usuarioViewModel.getUsuarioRepository().actualizarUsuario(contrasenaActual, nuevoNombre, nuevaContrasena);
         });
     }
 
-    private void setupObservers() {
+    private void mostrarNombreyEmail() {
         UsuarioRepository usuarioRepository = usuarioViewModel.getUsuarioRepository(); // Cambiado a getUsuarioRepository
 
-        usuarioRepository.getUserData().observe(getViewLifecycleOwner(), userData -> {
+        usuarioRepository.getDatosUsuarios().observe(getViewLifecycleOwner(), userData -> {
             if (userData != null) {
                 // Actualizar nombre
                 binding.textoNombre.setText(userData.get("nombre"));
@@ -75,31 +75,31 @@ public class ActualizarUsuarioFragment extends Fragment {
             }
         });
 
-        usuarioRepository.getUserUpdateResult().observe(getViewLifecycleOwner(), result -> {
+        usuarioRepository.getResultadoActualizacionUsuario().observe(getViewLifecycleOwner(), result -> {
             if (result != null) {
-                showToast(result);
+                mostrarToast(result);
 
                 if (result.equals("Datos actualizados correctamente")) {
-                    usuarioRepository.logout();
+                    usuarioRepository.cerrarSesion();
                 } else if (result.equals("logout_success")) {
-                    showToast("Sesión cerrada");
-                    goToLogin();
+                    mostrarToast("Sesión cerrada");
+                    irALogin();
                 }
             }
         });
     }
 
-    private void loadUserData() {
-        usuarioViewModel.getUsuarioRepository().loadUserData();
+    private void cargarDatosUsuario() {
+        usuarioViewModel.getUsuarioRepository().cargarDatosUsuario();
     }
 
-    private void showToast(String message) {
-        if (isAdded() && appContext != null) {
-            Toast.makeText(appContext, message, Toast.LENGTH_SHORT).show();
+    private void mostrarToast(String message) {
+        if (isAdded() && context != null) {
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void goToLogin() {
+    private void irALogin() {
         Intent intent = new Intent(getContext(), MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);

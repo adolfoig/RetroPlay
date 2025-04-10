@@ -19,141 +19,141 @@ public class UsuarioRepository {
     private final FirebaseAuth mAuth;
     private final FirebaseFirestore db;
 
-    private final MutableLiveData<Map<String, String>> userData = new MutableLiveData<>();
-    private final MutableLiveData<String> userUpdateResult = new MutableLiveData<>();
+    private final MutableLiveData<Map<String, String>> datosUsuario = new MutableLiveData<>();
+    private final MutableLiveData<String> resultadoActualizarUsuario = new MutableLiveData<>();
 
     public UsuarioRepository() {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
     }
 
-    public MutableLiveData<String> getUserUpdateResult() {
-        return userUpdateResult;
+    public MutableLiveData<String> getResultadoActualizacionUsuario() {
+        return resultadoActualizarUsuario;
     }
 
-    public MutableLiveData<Map<String, String>> getUserData() {
-        return userData;
+    public MutableLiveData<Map<String, String>> getDatosUsuarios() {
+        return datosUsuario;
     }
 
-    public void loadUserData() {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            String userEmail = user.getEmail(); // Obtenemos el email del usuario
+    public void cargarDatosUsuario() {
+        FirebaseUser usuario = mAuth.getCurrentUser();
+        if (usuario != null) {
+            String email = usuario.getEmail(); // Obtenemos el email del usuario
 
-            db.collection("Usuarios").document(user.getUid())
+            db.collection("Usuarios").document(usuario.getUid())
                     .get()
                     .addOnSuccessListener(documentSnapshot -> {
-                        Map<String, String> userInfo = new HashMap<>();
+                        Map<String, String> infoUsuario = new HashMap<>();
 
                         // Siempre guardamos el email
-                        userInfo.put("email", userEmail);
+                        infoUsuario.put("email", email);
 
                         if (documentSnapshot.exists()) {
                             String nombre = documentSnapshot.getString("nombre");
-                            userInfo.put("nombre", nombre != null ? nombre : user.getDisplayName());
+                            infoUsuario.put("nombre", nombre != null ? nombre : usuario.getDisplayName());
                         } else {
-                            userInfo.put("nombre", user.getDisplayName());
+                            infoUsuario.put("nombre", usuario.getDisplayName());
                         }
 
-                        userData.postValue(userInfo);
+                        datosUsuario.postValue(infoUsuario);
                     })
                     .addOnFailureListener(e -> {
                         Log.e(TAG, "Error al cargar datos del usuario", e);
-                        userData.postValue(null);
+                        datosUsuario.postValue(null);
                     });
         } else {
-            userData.postValue(null);
+            datosUsuario.postValue(null);
         }
     }
 
-    public void updateUser(String currentPassword, String newName, String newPassword) {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null) {
-            userUpdateResult.postValue("Usuario no autenticado");
+    public void actualizarUsuario(String contrasenaActual, String nuevoNombre, String nuevaContrasena) {
+        FirebaseUser usuario = mAuth.getCurrentUser();
+        if (usuario == null) {
+            resultadoActualizarUsuario.postValue("Usuario no autenticado");
             return;
         }
 
-        if (newName.isEmpty()) {
-            userUpdateResult.postValue("El nombre es obligatorio");
+        if (nuevoNombre.isEmpty()) {
+            resultadoActualizarUsuario.postValue("El nombre es obligatorio");
             return;
         }
 
-        if (currentPassword.isEmpty()) {
-            userUpdateResult.postValue("Debe ingresar su contraseña actual para realizar cambios");
+        if (contrasenaActual.isEmpty()) {
+            resultadoActualizarUsuario.postValue("Debe ingresar su contraseña actual para realizar cambios");
             return;
         }
 
         // Reautenticación del usuario
-        AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), currentPassword);
-        user.reauthenticate(credential)
+        AuthCredential authCredential = EmailAuthProvider.getCredential(usuario.getEmail(), contrasenaActual);
+        usuario.reauthenticate(authCredential)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        updateUserData(user, newName, newPassword);
+                        actualizarDatosUsuario(usuario, nuevoNombre, nuevaContrasena);
                     } else {
-                        userUpdateResult.postValue("La contraseña actual no es correcta");
+                        resultadoActualizarUsuario.postValue("La contraseña actual no es correcta");
                     }
                 });
     }
 
-    private void updateUserData(FirebaseUser user, String name, String newPassword) {
-        int totalOperations = 1; // actualización de nombre
-        if (!newPassword.isEmpty()) totalOperations++;
+    private void actualizarDatosUsuario(FirebaseUser usuario, String nombre, String nuevaContrasena) {
+        int totalOperations = 1;
+        if (!nuevaContrasena.isEmpty()) totalOperations++;
 
         final int[] completedOperations = {0};
 
-        // Actualizar Firestore (guardamos tanto nombre como email)
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("nombre", name);
-        userData.put("email", user.getEmail()); // Guardamos el email actual
+        // Actualiza usuario ,guarda tanto nombre como email
+        Map<String, Object> datosUsuario = new HashMap<>();
+        datosUsuario.put("nombre", nombre);
+        datosUsuario.put("email", usuario.getEmail());
 
         int finalTotalOperations2 = totalOperations;
-        db.collection("Usuarios").document(user.getUid())
-                .set(userData)
+        db.collection("Usuarios").document(usuario.getUid())
+                .set(datosUsuario)
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "Datos actualizados en Firestore");
-                    checkCompletion(completedOperations, finalTotalOperations2);
+                    comprobarActualizacion(completedOperations, finalTotalOperations2);
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error al actualizar datos en Firestore", e);
-                    userUpdateResult.postValue("Error al guardar datos");
+                    resultadoActualizarUsuario.postValue("Error al guardar datos");
                 });
 
         // Actualizar perfil de autenticación
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                .setDisplayName(name)
+                .setDisplayName(nombre)
                 .build();
 
         int finalTotalOperations1 = totalOperations;
-        user.updateProfile(profileUpdates)
+        usuario.updateProfile(profileUpdates)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Log.d(TAG, "Perfil de autenticación actualizado");
                     }
-                    checkCompletion(completedOperations, finalTotalOperations1);
+                    comprobarActualizacion(completedOperations, finalTotalOperations1);
                 });
 
         // Actualizar contraseña si se proporcionó
-        if (!newPassword.isEmpty()) {
+        if (!nuevaContrasena.isEmpty()) {
             int finalTotalOperations = totalOperations;
-            user.updatePassword(newPassword)
+            usuario.updatePassword(nuevaContrasena)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "Contraseña actualizada");
                         }
-                        checkCompletion(completedOperations, finalTotalOperations);
+                        comprobarActualizacion(completedOperations, finalTotalOperations);
                     });
         }
     }
 
-    private void checkCompletion(int[] completedOperations, int totalOperations) {
+    private void comprobarActualizacion(int[] completedOperations, int totalOperations) {
         completedOperations[0]++;
         if (completedOperations[0] == totalOperations) {
-            userUpdateResult.postValue("Datos actualizados correctamente");
+            resultadoActualizarUsuario.postValue("Datos actualizados correctamente");
         }
     }
 
-    public void logout() {
+    public void cerrarSesion() {
         mAuth.signOut();
-        userUpdateResult.postValue("logout_success");
+        resultadoActualizarUsuario.postValue("logout_success");
     }
 }
