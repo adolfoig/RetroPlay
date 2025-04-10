@@ -1,5 +1,6 @@
 package com.example.retroplay;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,6 +78,7 @@ public class LogrosFragment extends Fragment {
             return new LogroViewHolder(binding);
         }
 
+        @SuppressLint("ResourceAsColor")
         @Override
         public void onBindViewHolder(@NonNull LogroViewHolder holder, int position) {
             Logro logro = logros.get(position);
