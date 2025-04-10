@@ -4,11 +4,13 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -38,7 +40,9 @@ public class UsuarioRepository {
     public void cargarDatosUsuario() {
         FirebaseUser usuario = mAuth.getCurrentUser();
         if (usuario != null) {
-            String email = usuario.getEmail(); // Obtenemos el email del usuario
+
+            // Obtenemos el email del usuario
+            String email = usuario.getEmail();
 
             db.collection("Usuarios").document(usuario.getUid())
                     .get()
@@ -150,6 +154,10 @@ public class UsuarioRepository {
         if (completedOperations[0] == totalOperations) {
             resultadoActualizarUsuario.postValue("Datos actualizados correctamente");
         }
+    }
+
+    public Task<DocumentSnapshot> getUsuarioPorId(String userId) {
+        return db.collection("Usuarios").document(userId).get();
     }
 
     public void cerrarSesion() {

@@ -38,43 +38,57 @@
     </androidx.cardview.widget.CardView>
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/usernameInputLayout"
+        style="@style/MyOutlinedTextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:boxBackgroundMode="outline"
-        app:boxStrokeColor="@color/azul"
-        android:layout_marginBottom="10dp"
-        app:hintTextColor="@color/azul">
+        app:boxBackgroundColor="@color/blanco_medio"
+        app:boxStrokeColor="@color/black"
+        app:boxStrokeWidth="1dp"
+        app:boxStrokeWidthFocused="2dp"
+        app:boxCornerRadiusBottomEnd="10dp"
+        app:boxCornerRadiusBottomStart="10dp"
+        app:boxCornerRadiusTopEnd="10dp"
+        app:boxCornerRadiusTopStart="10dp"
+        android:textColorHint="@color/textoLoginRegister"
+        android:hint="@string/correoElectronico">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/emailEditText"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:background="@drawable/rounded_edittext_background"
-            android:hint="@string/correoElectronico"
-            android:textColorHint="@color/azul"
-            app:hintTextColor="@color/gris_claro"
+            android:layout_height="wrap_content"
             android:inputType="textEmailAddress"
-            android:textColor="@color/black"/>
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:padding="20dp"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/emailInputLayout"
+        style="@style/MyOutlinedTextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:boxBackgroundMode="outline"
-        app:boxStrokeColor="@color/azul"
-        android:layout_marginBottom="10dp"
-        app:hintTextColor="@color/azul">
+        app:boxBackgroundColor="@color/blanco_medio"
+        app:boxStrokeColor="@color/black"
+        app:boxStrokeWidth="1dp"
+        app:boxStrokeWidthFocused="2dp"
+        app:boxCornerRadiusBottomEnd="10dp"
+        app:boxCornerRadiusBottomStart="10dp"
+        app:boxCornerRadiusTopEnd="10dp"
+        app:boxCornerRadiusTopStart="10dp"
+        android:textColorHint="@color/textoLoginRegister"
+        android:hint="@string/contraseña">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/passwordEditText"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:background="@drawable/rounded_edittext_background"
-            android:hint="@string/contraseña"
-            android:textColorHint="@color/gris_claro"
-            app:hintTextColor="@color/azul"
-            android:inputType="textPassword"
-            android:textColor="@color/black"/>
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:padding="20dp"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
