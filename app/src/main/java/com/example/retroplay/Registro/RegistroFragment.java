@@ -9,9 +9,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.retroplay.R;
+import com.example.retroplay.databinding.FragmentRegistroBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -30,18 +28,15 @@ import java.util.Map;
 
 public class RegistroFragment extends Fragment {
 
+    private FragmentRegistroBinding binding;
     private static final int PICK_IMAGE_REQUEST = 1;
-
-    private EditText nameEditText, emailEditText, passwordEditText, confirmPasswordEditText;
-    private Button registerButton, selectImageButton;
-    private ImageView profileImageView;
     private FirebaseAuth mAuth;
     private FirebaseFirestore firestore;
-    private FirebaseStorage storage;
+    private FirebaseStorage firebaseStorage;
     private Uri imageUri;
 
     public RegistroFragment() {
-        // Constructor vacío requerido
+        // Constructor vacío para poder navegar
     }
 
     @SuppressLint({"MissingInflatedId", "ClickableViewAccessibility"})
@@ -49,33 +44,26 @@ public class RegistroFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Asegúrate de inflar la vista correctamente
-        View view = inflater.inflate(R.layout.fragment_registro, container, false);
-
-        // Asignar las vistas a los elementos del layout
-        nameEditText = view.findViewById(R.id.textoNombre);
-        emailEditText = view.findViewById(R.id.textoEmail);
-        passwordEditText = view.findViewById(R.id.textoPassword);
-        confirmPasswordEditText = view.findViewById(R.id.textoConfirmarPassword);
-        registerButton = view.findViewById(R.id.btnRegistrarUsuario);
-        selectImageButton = view.findViewById(R.id.btnSubirImagenPerfil);
-        profileImageView = view.findViewById(R.id.imagen);
+        binding = FragmentRegistroBinding.inflate(inflater, container, false);
+        View view = binding.getRoot();
 
         mAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
-        storage = FirebaseStorage.getInstance();
+        firebaseStorage = FirebaseStorage.getInstance();
 
-        // Acción para seleccionar imagen de perfil
-        selectImageButton.setOnClickListener(v -> openImageChooser());
+        // Seleccionar imagen de perfil
+        binding.btnSubirImagenPerfil.setOnClickListener(v -> openImageChooser());
 
-        // Acción para registrar usuario
-        registerButton.setOnClickListener(v -> registerUser());
+        // Registrar usuario
+        binding.btnRegistrarUsuario.setOnClickListener(v -> registrarUsuario());
 
         // Listener para cerrar el teclado cuando el usuario toque fuera de los campos de texto
         view.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 View currentFocus = getActivity().getCurrentFocus();
                 if (currentFocus != null) {
-                    currentFocus.clearFocus(); // Limpiar el foco
+                    currentFocus.clearFocus();
+
                     // Ocultar el teclado
                     android.view.inputmethod.InputMethodManager imm =
                             (android.view.inputmethod.InputMethodManager) getActivity().getSystemService(getContext().INPUT_METHOD_SERVICE);
@@ -87,7 +75,7 @@ public class RegistroFragment extends Fragment {
             return false;
         });
 
-        return view;
+        return binding.getRoot();
     }
 
     private void openImageChooser() {
@@ -103,18 +91,18 @@ public class RegistroFragment extends Fragment {
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK && data != null && data.getData() != null) {
             imageUri = data.getData();
-            profileImageView.setImageURI(imageUri);
+            binding.imagen.setImageURI(imageUri);
         }
     }
 
-    private void registerUser() {
-        String name = nameEditText.getText().toString().trim();
-        String email = emailEditText.getText().toString().trim();
-        String password = passwordEditText.getText().toString().trim();
-        String confirmPassword = confirmPasswordEditText.getText().toString().trim();
+    private void registrarUsuario() {
+        String nombre = binding.textoNombre.getText().toString().trim();
+        String email = binding.textoEmail.getText().toString().trim();
+        String password = binding.textoPassword.getText().toString().trim();
+        String confirmPassword = binding.textoConfirmarPassword.getText().toString().trim();
 
         // Validación de campos vacíos
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(confirmPassword)) {
+        if (TextUtils.isEmpty(nombre) || TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(confirmPassword)) {
             Toast.makeText(getActivity(), "Completa todos los campos", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -154,31 +142,31 @@ public class RegistroFragment extends Fragment {
                 });
     }
 
-    private void uploadProfileImage(FirebaseUser user) {
+    private void uploadProfileImage(FirebaseUser usuario) {
         if (imageUri != null) {
-            StorageReference fileReference = storage.getReference().child("profile_images/" + user.getUid() + ".jpg");
+            StorageReference fileReference = firebaseStorage.getReference().child("profile_images/" + usuario.getUid() + ".jpg");
 
             fileReference.putFile(imageUri).addOnSuccessListener(taskSnapshot -> {
                 fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
                     // Guardar la URL de la imagen de perfil en Firestore
-                    saveUserData(user, uri.toString());
+                    guardarDatosUsuario(usuario, uri.toString());
                 });
             }).addOnFailureListener(e -> {
                 Toast.makeText(getActivity(), "Error al cargar la imagen", Toast.LENGTH_SHORT).show();
             });
         } else {
-            saveUserData(user, null);
+            guardarDatosUsuario(usuario, null);
         }
     }
 
-    private void saveUserData(FirebaseUser user, String profileImageUrl) {
+    private void guardarDatosUsuario(FirebaseUser usuario, String profileImageUrl) {
         // Guardar los datos del usuario en Firestore
         Map<String, Object> userData = new HashMap<>();
-        userData.put("nombre", nameEditText.getText().toString().trim());
-        userData.put("email", emailEditText.getText().toString().trim());
+        userData.put("nombre", binding.textoNombre.getText().toString().trim());
+        userData.put("email", binding.textoEmail.getText().toString().trim());
         userData.put("profileImageUrl", profileImageUrl);
 
-        firestore.collection("Usuarios").document(user.getUid())
+        firestore.collection("Usuarios").document(usuario.getUid())
                 .set(userData)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(getActivity(), "Usuario registrado exitosamente", Toast.LENGTH_SHORT).show();
@@ -196,7 +184,7 @@ public class RegistroFragment extends Fragment {
         // Reemplazar el fragmento actual por el de login
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, loginFragment)
-                .addToBackStack(null) // Añadir a la pila de retroceso
+                .addToBackStack(null)
                 .commit();
     }
 }
