@@ -26,22 +26,13 @@
             app:defaultNavHost="true"
             app:navGraph="@navigation/bottom_menu_nav"/>
 
-        <com.google.android.material.bottomappbar.BottomAppBar
-            android:id="@+id/bottomAppBar"
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_nav_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:backgroundTint="@color/azul">
-
-            <com.google.android.material.bottomnavigation.BottomNavigationView
-                android:id="@+id/bottom_nav_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/azul"
-                app:menu="@menu/bottom_menu" />
-
-        </com.google.android.material.bottomappbar.BottomAppBar>
-
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/azul"
+            app:menu="@menu/bottom_menu" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.google.android.material.navigation.NavigationView

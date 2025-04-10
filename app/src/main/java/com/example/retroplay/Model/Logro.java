@@ -19,7 +19,7 @@ public class Logro implements Serializable {
         this.obtenido = obtenido;
     }
      public Logro() {
-
+        // Vacio para FireStore
      }
 
     public String getId() {

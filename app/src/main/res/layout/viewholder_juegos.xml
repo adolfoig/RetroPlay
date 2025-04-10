@@ -15,6 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
+        android:background="@color/gris_claro2"
         android:orientation="vertical">
 
         <TextView
@@ -46,9 +47,11 @@
 
             <Button
                 android:id="@+id/btnJugar"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#4CAF50"
+                android:textColor="@color/white"
                 android:text="@string/jugar" />
 
             <!-- Espaciador para empujar el botón hacia la derecha -->

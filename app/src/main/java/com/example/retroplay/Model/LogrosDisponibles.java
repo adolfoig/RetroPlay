@@ -6,7 +6,9 @@ public class LogrosDisponibles {
     private String descripcion;
     private int puntuacion;
 
-    public LogrosDisponibles(){}
+    public LogrosDisponibles(){
+        // Vacio para FireStore
+    }
 
     public LogrosDisponibles(String idJuego, String descripcion, int puntuacion){
         this.idJuego=idJuego;

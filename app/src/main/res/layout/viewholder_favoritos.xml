@@ -12,7 +12,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/gris_claro2"
         android:padding="4dp">
 
         <!-- Game Image with proper scaling and size -->
