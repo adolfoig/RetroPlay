@@ -16,8 +16,8 @@
         android:orientation="vertical"
         android:padding="16dp"
         android:background="@color/gris_claro2"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:layout_marginBottom="80dp">
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="70dp">
 
         <TextView
             android:id="@+id/textNombreJuego"

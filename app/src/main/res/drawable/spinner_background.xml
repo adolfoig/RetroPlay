@@ -1,17 +1,18 @@
-<?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
-        <shape android:shape="rectangle">
-            <!-- Bordes redondeados (elimina la duplicación) -->
-            <corners android:radius="10dp"/>
-
-            <!-- Color de fondo -->
-            <solid android:color="@color/white"/>
-
-            <!-- Borde color azul -->
-            <stroke
-                android:width="2dp"
-                android:color="@color/azul"/>
-        </shape>
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <corners android:radius="10dp"/>
+                    <solid android:color="@color/white"/>
+                    <stroke android:width="2dp" android:color="@color/azul"/>
+                </shape>
+            </item>
+            <!-- Flecha dropdown -->
+            <item android:gravity="end|center_vertical" android:right="8dp">
+                <bitmap android:src="@drawable/ic_arrow_drop_down"
+                    android:tint="@color/azul"/>
+            </item>
+        </layer-list>
     </item>
 </selector>

@@ -23,6 +23,9 @@ public class Juego implements Serializable {
         this.favorito = favorito;
     }
 
+    public Juego(String s, String seleccionaUnJuego) {
+    }
+
     // Getters y setters
     public String getId() {
         return id;

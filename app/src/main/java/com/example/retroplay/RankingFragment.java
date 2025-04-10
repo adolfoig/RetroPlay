@@ -84,6 +84,10 @@ public class RankingFragment extends Fragment {
     }
 
     private void configurarSpinner() {
+        List<Juego> listaConHint = new ArrayList<>();
+        listaConHint.add(new Juego("", "Selecciona un juego")); // Juego vacío con texto de hint
+        listaConHint.addAll(listaJuegos);
+
         ArrayAdapter<Juego> adapter = new ArrayAdapter<Juego>(
                 requireContext(),
                 R.layout.spinner_item_selected,
