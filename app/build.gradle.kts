@@ -43,6 +43,8 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.play.services.base)
     implementation(libs.navigation.fragment)
+    implementation(libs.lifecycle.livedata);
+    implementation(libs.lifecycle.viewmodel)
     implementation(libs.navigation.ui)
     implementation(libs.firebase.storage)
     implementation(libs.fragment)

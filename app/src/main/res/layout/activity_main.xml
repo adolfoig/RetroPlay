@@ -30,7 +30,7 @@
             android:id="@+id/bottom_nav_view"
             android:layout_width="match_parent"
             android:layout_gravity="bottom"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="80dp"
             android:background="@color/azul"
             app:menu="@menu/bottom_menu" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

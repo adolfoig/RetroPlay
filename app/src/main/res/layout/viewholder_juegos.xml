@@ -27,6 +27,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="8dp"
             android:text="prueba"
+            android:textStyle="bold"
             android:textSize="24sp" />
 
         <ImageView
@@ -52,6 +53,7 @@
                 android:layout_height="wrap_content"
                 android:backgroundTint="#4CAF50"
                 android:textColor="@color/white"
+                android:textStyle="bold"
                 android:text="@string/jugar" />
 
             <!-- Espaciador para empujar el botón hacia la derecha -->

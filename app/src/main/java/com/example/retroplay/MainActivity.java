@@ -1,6 +1,5 @@
 package com.example.retroplay;
 
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -69,27 +68,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationUI.setupWithNavController(binding.toolbar, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.bottomNavView, navController);
 
-
-        // Con este código no funciona el boton de la flecha para atrás
-        /*ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        binding.drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();*/
-
         NavigationView navigationView = findViewById(R.id.navigation_drawer);
         navigationView.setNavigationItemSelectedListener(this);
 
         setupNavListener();
-    }
-
-
-    private void mostrarLoginFragment() {
-        // Si el usuario no está autenticado, ocultamos la interfaz
-        ocultarInterfaz2();
-
-        // Reemplazamos el fragmento de Login
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.nav_host_fragment, new LoginFragment()) // Asegúrate de que el contenedor esté correctamente definido en el layout
-                .commit();
     }
 
     private void irAlBottomMenu() {
@@ -97,21 +79,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavController navController = ((NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)).getNavController();
         NavigationUI.setupWithNavController(binding.bottomNavView, navController);
         NavigationUI.setupWithNavController(binding.toolbar, navController);
-    }
-
-    private void ocultarInterfaz() {
-        binding.toolbar.setVisibility(View.GONE);
-
-
-        ViewGroup.LayoutParams toolbarParams = binding.toolbar.getLayoutParams();
-        toolbarParams.height = 0;
-        binding.toolbar.setLayoutParams(toolbarParams);
-        binding.toolbar.setVisibility(View.GONE);
-
-        ViewGroup.LayoutParams bottomNavParams = binding.bottomNavView.getLayoutParams();
-        bottomNavParams.height = 0;
-        binding.bottomNavView.setLayoutParams(bottomNavParams);
-        binding.bottomNavView.setVisibility(View.GONE);
     }
 
     private void ocultarInterfaz2() {
@@ -154,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
 
-    private void openFragment(Fragment fragment) {
+    private void abrirFragment(Fragment fragment) {
         // Reemplazamos el fragmento actual con el nuevo fragmento
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.nav_host_fragment, fragment)
@@ -165,14 +132,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.nav_actualizarUsuario) {
-            openFragment(new ActualizarUsuarioFragment());
+            abrirFragment(new ActualizarUsuarioFragment());
             ocultarBottomNavView();
         } else if (itemId == R.id.nav_cerrarSesion) {
-            openFragment(new CerrarSesionFragment());
+            abrirFragment(new CerrarSesionFragment());
             ocultarBottomNavView();
-        } else if(itemId == R.id.nav_juegosFragment){
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
         }
         binding.drawerLayout.closeDrawer(GravityCompat.START);
         return true;
