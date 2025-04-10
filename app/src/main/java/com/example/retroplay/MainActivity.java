@@ -6,9 +6,6 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,11 +13,11 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.bumptech.glide.Glide;
 import com.example.retroplay.Registro.LoginFragment;
 import com.example.retroplay.databinding.ActivityMainBinding;
 import com.example.retroplay.databinding.NavHeaderBinding;
@@ -31,7 +28,6 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     ActivityMainBinding binding;
-
     private FirebaseAuth mAuth;
     NavController navController;
 
@@ -41,20 +37,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView((binding = ActivityMainBinding.inflate(getLayoutInflater())).getRoot());
 
-        // Bloquear el giro de pantalla
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
+        // Bloquear giro de pantalla
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Configura el NavController (usa la variable de clase)
         this.navController = ((NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment))
                 .getNavController();
 
-        // Si ya se logueo el usuario lleva al menu, si no al loguin
         if (currentUser == null) {
-            navController.navigate(R.id.loginFragment);
+            navController.navigate(R.id.loginFragment); // Usa la navegación del NavController
             ocultarInterfaz2();
         } else {
             irAlBottomMenu();
@@ -74,10 +69,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationUI.setupWithNavController(binding.toolbar, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.bottomNavView, navController);
 
+
+        // Con este código no funciona el boton de la flecha para atrás
+        /*ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        binding.drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();*/
+
         NavigationView navigationView = findViewById(R.id.navigation_drawer);
         navigationView.setNavigationItemSelectedListener(this);
 
         setupNavListener();
+    }
+
+
+    private void mostrarLoginFragment() {
+        // Si el usuario no está autenticado, ocultamos la interfaz
+        ocultarInterfaz2();
+
+        // Reemplazamos el fragmento de Login
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.nav_host_fragment, new LoginFragment()) // Asegúrate de que el contenedor esté correctamente definido en el layout
+                .commit();
     }
 
     private void irAlBottomMenu() {
@@ -85,6 +97,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavController navController = ((NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)).getNavController();
         NavigationUI.setupWithNavController(binding.bottomNavView, navController);
         NavigationUI.setupWithNavController(binding.toolbar, navController);
+    }
+
+    private void ocultarInterfaz() {
+        binding.toolbar.setVisibility(View.GONE);
+
+
+        ViewGroup.LayoutParams toolbarParams = binding.toolbar.getLayoutParams();
+        toolbarParams.height = 0;
+        binding.toolbar.setLayoutParams(toolbarParams);
+        binding.toolbar.setVisibility(View.GONE);
+
+        ViewGroup.LayoutParams bottomNavParams = binding.bottomNavView.getLayoutParams();
+        bottomNavParams.height = 0;
+        binding.bottomNavView.setLayoutParams(bottomNavParams);
+        binding.bottomNavView.setVisibility(View.GONE);
     }
 
     private void ocultarInterfaz2() {
@@ -97,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Mostramos el Toolbar y BottomNavigation
         binding.bottomNavView.setVisibility(View.VISIBLE);
         binding.toolbar.setVisibility(View.VISIBLE);
+
     }
 
     private void ocultarBottomNavView(){
@@ -115,7 +143,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     shouldEnableDrawer ? DrawerLayout.LOCK_MODE_UNLOCKED : DrawerLayout.LOCK_MODE_LOCKED_CLOSED
             );
 
-
             // Oculta o muestra la interfaz según el fragmento actual
             if (destinationId == R.id.loginFragment || destinationId == R.id.registroFragment || destinationId == R.id.jugarJuegoFragment) {
                 ocultarInterfaz2();
@@ -123,6 +150,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 mostrarInterfaz2(); // Muestra la interfaz por defecto en otros fragmentos
             }
         });
+    }
+
+
+
+    private void openFragment(Fragment fragment) {
+        // Reemplazamos el fragmento actual con el nuevo fragmento
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.nav_host_fragment, fragment)
+                .commit();
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        binding.drawerLayout.closeDrawer(GravityCompat.START);
+
+        // Usamos post para asegurar que la navegación ocurra después de cerrar el drawer
+        binding.getRoot().post(() -> {
+            if (itemId == R.id.nav_actualizarUsuario) {
+                navController.navigate(R.id.actualizarUsuarioFragment);
+                ocultarBottomNavView();
+            } else if (itemId == R.id.nav_cerrarSesion) {
+                mAuth.signOut();
+                navController.navigate(R.id.cerrarSesionFragment);
+                ocultarBottomNavView();
+            }
+        });
+
+        return true;
     }
 
     private void datosUsuarioHeaderDrawer() {
@@ -143,27 +199,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             headerBinding.profileImage.setImageResource(R.drawable.logo);
         }*/
-    }
-
-    private void abrirFragment(Fragment fragment) {
-        // Reemplazamos el fragmento actual con el nuevo fragmento
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.nav_host_fragment, fragment)
-                .commit();
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int itemId = item.getItemId();
-        if (itemId == R.id.nav_actualizarUsuario) {
-            abrirFragment(new ActualizarUsuarioFragment());
-            ocultarBottomNavView();
-        } else if (itemId == R.id.nav_cerrarSesion) {
-            abrirFragment(new CerrarSesionFragment());
-            ocultarBottomNavView();
-        }
-        binding.drawerLayout.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     @Override

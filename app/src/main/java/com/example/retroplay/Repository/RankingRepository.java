@@ -24,10 +24,10 @@ public class RankingRepository {
         return db.collection("Juegos").get();
     }
 
-    public Task<QuerySnapshot> cargarPuntuaciones(String gameId) {
+    public Task<QuerySnapshot> cargarPuntuaciones(String idJuego) {
         return db.collection("Puntuaciones")
-                .whereEqualTo("idJuego", gameId)
-                .orderBy("puntuacionMaxima", Query.Direction.DESCENDING)
+                .whereEqualTo("idJuego", idJuego)
+                .orderBy("puntuacionMaxima", Query.Direction.DESCENDING) // <- Orden descendente
                 .get();
     }
 

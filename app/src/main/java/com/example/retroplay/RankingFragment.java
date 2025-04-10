@@ -1,5 +1,6 @@
 package com.example.retroplay;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -83,23 +84,25 @@ public class RankingFragment extends Fragment {
     }
 
     private void configurarSpinner() {
-        ArrayAdapter<Juego> adapter = new ArrayAdapter<Juego>(requireContext(),
-                android.R.layout.simple_spinner_item, listaJuegos) {
+        ArrayAdapter<Juego> adapter = new ArrayAdapter<Juego>(
+                requireContext(),
+                R.layout.spinner_item_selected,
+                listaJuegos) {
+
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View view = super.getView(position, convertView, parent);
-                if (view instanceof TextView) {
-                    ((TextView) view).setText(listaJuegos.get(position).getNombre());
-                }
+                TextView textView = view.findViewById(android.R.id.text1);
+                textView.setText(listaJuegos.get(position).getNombre());
                 return view;
             }
 
             @Override
             public View getDropDownView(int position, View convertView, ViewGroup parent) {
                 View view = super.getDropDownView(position, convertView, parent);
-                if (view instanceof TextView) {
-                    ((TextView) view).setText(listaJuegos.get(position).getNombre());
-                }
+                TextView textView = view.findViewById(android.R.id.text1);
+                textView.setText(listaJuegos.get(position).getNombre());
+                textView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
                 return view;
             }
         };
@@ -153,19 +156,19 @@ public class RankingFragment extends Fragment {
             return;
         }
 
-        int filas = 0;
+        int posicion = 1; // Contador para la posición en el ranking
         for (QueryDocumentSnapshot document : task.getResult()) {
             String idUsuario = document.getString("idUsuario");
             Long puntuacionMaxima = document.getLong("puntuacionMaxima");
             int puntuacion = puntuacionMaxima != null ? puntuacionMaxima.intValue() : 0;
 
-            viewModel.obtenerNombreUsuario(idUsuario, puntuacion, filas, new UserNameCallback() {
+            viewModel.obtenerNombreUsuario(idUsuario, puntuacion, posicion, new UserNameCallback() {
                 @Override
-                public void onUserNameLoaded(String nombreUsuario, int puntuacion, int filas, boolean esUsuarioActual) {
-                    agregarFilaTabla(nombreUsuario, puntuacion, filas, esUsuarioActual);
+                public void onUserNameLoaded(String nombreUsuario, int puntuacion, int posicion, boolean esUsuarioActual) {
+                    agregarFilaTabla(nombreUsuario, puntuacion, posicion, esUsuarioActual);
                 }
             });
-            filas++;
+            posicion++;
         }
     }
 
@@ -176,22 +179,31 @@ public class RankingFragment extends Fragment {
         }
     }
 
-    private void agregarFilaTabla(String nombreUsuario, int puntuacion, int filas, boolean esUsuarioActual) {
+    private void agregarFilaTabla(String nombreUsuario, int puntuacion, int posicion, boolean esUsuarioActual) {
         TableRow row = new TableRow(requireContext());
 
+        // Fondo según posición y usuario actual
         int backgroundColor = esUsuarioActual ?
-                ContextCompat.getColor(requireContext(), android.R.color.holo_blue_light) :
-                filas % 2 == 0 ?
+                ContextCompat.getColor(requireContext(), R.color.ranking) :
+                posicion % 2 == 0 ?
                         ContextCompat.getColor(requireContext(), android.R.color.white) :
                         ContextCompat.getColor(requireContext(), android.R.color.darker_gray);
         row.setBackgroundColor(backgroundColor);
 
+        // TextView para la posición
+        TextView tvPosicion = new TextView(requireContext());
+        tvPosicion.setText(String.valueOf(posicion));
+        tvPosicion.setPadding(8, 8, 8, 8);
+        row.addView(tvPosicion);
+
+        // TextView para el nombre
         TextView tvUsuario = new TextView(requireContext());
         tvUsuario.setText(nombreUsuario);
         tvUsuario.setPadding(8, 8, 8, 8);
-        if (esUsuarioActual) tvUsuario.setTypeface(null, android.graphics.Typeface.BOLD);
+        if (esUsuarioActual) tvUsuario.setTypeface(null, Typeface.BOLD);
         row.addView(tvUsuario);
 
+        // TextView para la puntuación
         TextView tvPuntuacion = new TextView(requireContext());
         tvPuntuacion.setText(String.valueOf(puntuacion));
         tvPuntuacion.setPadding(8, 8, 8, 8);

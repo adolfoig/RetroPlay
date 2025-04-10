@@ -8,6 +8,7 @@ import com.example.retroplay.RankingFragment;
 import com.example.retroplay.Repository.RankingRepository;
 import com.example.retroplay.Model.Juego;
 import com.example.retroplay.Repository.UsuarioRepository;
+
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +63,7 @@ public class RankingViewModel extends ViewModel {
     }
 
     public void obtenerNombreUsuario(String idUsuario, int puntuacion, int filas, RankingFragment.UserNameCallback callback) {
-        usuarioRepository.getUsuarioPorId(idUsuario).addOnSuccessListener(documentSnapshot -> {
+        rankingRepository.getUsuarioPorId(idUsuario).addOnSuccessListener(documentSnapshot -> {
             String nombreUsuario = documentSnapshot.getString("nombre");
             if (nombreUsuario == null || nombreUsuario.isEmpty()) {
                 nombreUsuario = "Usuario de Google";

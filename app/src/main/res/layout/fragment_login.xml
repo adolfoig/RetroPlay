@@ -38,20 +38,15 @@
     </androidx.cardview.widget.CardView>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/usernameInputLayout"
         style="@style/MyOutlinedTextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:boxBackgroundMode="outline"
-        app:boxBackgroundColor="@color/blanco_medio"
-        app:boxStrokeColor="@color/black"
-        app:boxStrokeWidth="1dp"
-        app:boxStrokeWidthFocused="2dp"
-        app:boxCornerRadiusBottomEnd="10dp"
-        app:boxCornerRadiusBottomStart="10dp"
-        app:boxCornerRadiusTopEnd="10dp"
-        app:boxCornerRadiusTopStart="10dp"
+        app:boxStrokeColor="@color/borde_gris"
+        android:layout_marginBottom="10dp"
+        app:hintTextColor="@color/azul"
+        app:cursorColor="@color/azul"
         android:textColorHint="@color/textoLoginRegister"
+        app:boxBackgroundColor="@color/gris"
         android:hint="@string/correoElectronico">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -59,36 +54,35 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textEmailAddress"
+            android:textColorHint="@color/azul"
             android:textColor="@android:color/black"
             android:textSize="14sp"
-            android:padding="20dp"/>
+            android:padding="20dp"
+            android:textCursorDrawable="@drawable/cursor_azul" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/emailInputLayout"
         style="@style/MyOutlinedTextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:boxBackgroundMode="outline"
-        app:boxBackgroundColor="@color/blanco_medio"
-        app:boxStrokeColor="@color/black"
-        app:boxStrokeWidth="1dp"
-        app:boxStrokeWidthFocused="2dp"
-        app:boxCornerRadiusBottomEnd="10dp"
-        app:boxCornerRadiusBottomStart="10dp"
-        app:boxCornerRadiusTopEnd="10dp"
-        app:boxCornerRadiusTopStart="10dp"
+        app:boxStrokeColor="@color/borde_gris"
+        android:layout_marginBottom="10dp"
+        app:hintTextColor="@color/azul"
         android:textColorHint="@color/textoLoginRegister"
+        app:boxBackgroundColor="@color/gris"
         android:hint="@string/contraseña">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/passwordEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textEmailAddress"
+            app:cursorColor="@color/azul"
+            android:inputType="textPassword"
+            android:textColorHint="@color/azul"
             android:textColor="@android:color/black"
             android:textSize="14sp"
-            android:padding="20dp"/>
+            android:padding="20dp"
+            android:textCursorDrawable="@drawable/cursor_azul"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton

@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_marginTop="?attr/actionBarSize"
     android:padding="16dp"
@@ -14,6 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/elegirJuego"
+        android:layout_gravity="center"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
@@ -24,8 +26,11 @@
         android:id="@+id/spinnerJuegos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:background="@android:drawable/btn_dropdown"/>
+        style="@style/CustomSpinner"
+        android:spinnerMode="dropdown"
+        android:dropDownWidth="match_parent"
+        android:dropDownVerticalOffset="4dp"
+        android:layout_marginBottom="24dp"/>
 
     <!-- Título del juego seleccionado -->
     <TextView
@@ -58,8 +63,19 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:text="@string/posicion"
+                android:textSize="14sp"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                android:padding="8dp"/>
+
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="@string/jugador"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 android:textColor="@android:color/black"
                 android:textStyle="bold"
                 android:padding="8dp"/>
@@ -69,7 +85,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/puntuacion"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 android:textColor="@android:color/black"
                 android:textStyle="bold"
                 android:padding="8dp"/>
@@ -80,6 +96,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/white">
+
+            <TextView
+                android:id="@+id/posicion"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="1"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:padding="8dp"/>
 
             <TextView
                 android:id="@+id/nombreJugador"
@@ -106,5 +132,5 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#EEEEEE"/>
-        </TableLayout>
+    </TableLayout>
 </LinearLayout>

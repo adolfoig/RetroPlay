@@ -52,7 +52,7 @@
             android:layout_height="55dp"
             android:background="@drawable/rounded_edittext_background"
             android:hint="@string/nombreUsuario"
-            app:hintTextColor="@color/gris_claro"
+            app:hintTextColor="@color/gris_claro3"
             android:inputType="textPersonName"
             android:textColor="@color/black"/>
 
@@ -72,7 +72,7 @@
             android:layout_height="55dp"
             android:background="@drawable/rounded_edittext_background"
             android:hint="@string/correoElectronico"
-            app:hintTextColor="@color/gris_claro"
+            app:hintTextColor="@color/gris_claro3"
             android:inputType="textPersonName"
             android:textColor="@color/black"
             android:enabled="false"/>
@@ -94,7 +94,7 @@
             android:layout_height="55dp"
             android:background="@drawable/rounded_edittext_background"
             android:hint="@string/passwordAntigua"
-            app:hintTextColor="@color/gris_claro"
+            app:hintTextColor="@color/gris_claro3"
             android:inputType="textPassword"
             android:textColor="@color/black"/>
     </com.google.android.material.textfield.TextInputLayout>
@@ -114,7 +114,7 @@
             android:layout_height="55dp"
             android:background="@drawable/rounded_edittext_background"
             android:hint="@string/passwordNueva"
-            app:hintTextColor="@color/gris_claro"
+            app:hintTextColor="@color/gris_claro3"
             android:inputType="textPassword"
             android:textColor="@color/black"/>
     </com.google.android.material.textfield.TextInputLayout>

@@ -8,14 +8,16 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="primaryColor">#6200EE</color>
-    <color name="gris_medio_oscuro">#424242</color> <!-- Gris medio oscuro -->
-    <color name="azul">#2196F3</color> <!-- Azul -->
-    <color name="blanco_medio">#6B6868</color> <!-- Fondo medio blanco para los campos -->
-    <color name="gris_claro">#9E9E9E</color> <!-- Color gris claro para los hints -->
-    <color name="gris_claro2">#C7C7C7</color>
+    <color name="gris_medio_oscuro">#424242</color>
+    <color name="azul">#2196F3</color>
+    <color name="gris">#6B6868</color>
+    <color name="gris_claro2">#D9D9D9</color>
+    <color name="gris_claro3">#9E9E9E</color>
     <color name="verde">#4CAF50</color>
-    <color name="amarillo">#F0E973</color>
-    <color name="azulTetris">#73A9F0</color>
-    <color name="verdeFlappyBird">#73F077</color>
+    <color name="amarillo">#F0EED8</color>
+    <color name="azulTetris">#DBE6F2</color>
+    <color name="verdeFlappyBird">#DAEFDA</color>
     <color name="textoLoginRegister">#434343</color>
+    <color name="borde_gris">#313131</color>
+    <color name="ranking">#A8F26D</color>
 </resources>

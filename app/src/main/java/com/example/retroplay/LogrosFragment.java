@@ -84,12 +84,12 @@ public class LogrosFragment extends Fragment {
             Logro logro = logros.get(position);
             holder.binding.textoDescipcion.setText(logro.getDescripcion());
 
-            if(logro.getDescripcion().contains("PACMAN")){
-                holder.binding.getRoot().setBackgroundColor(R.color.amarillo);
-            } else if(logro.getDescripcion().contains("TETRIS")){
-                holder.binding.getRoot().setBackgroundColor(R.color.azulTetris);
-            } else if(logro.getDescripcion().contains("FLAPPY BIRD")){
-                holder.binding.getRoot().setBackgroundColor(R.color.verdeFlappyBird);
+            if (logro.getDescripcion().contains("PACMAN")) {
+                holder.binding.getRoot().setBackgroundResource(R.drawable.logro_pacman);
+            } else if (logro.getDescripcion().contains("TETRIS")) {
+                holder.binding.getRoot().setBackgroundResource(R.drawable.logro_tetris);
+            } else if (logro.getDescripcion().contains("FLAPPY BIRD")) {
+                holder.binding.getRoot().setBackgroundResource(R.drawable.logro_flappybird);
             }
 
             if (logro.isObtenido()) {

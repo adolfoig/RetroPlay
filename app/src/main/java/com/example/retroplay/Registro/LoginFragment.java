@@ -29,6 +29,10 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginFragment extends Fragment {
 
@@ -42,6 +46,7 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflamos la vista y configuramos el binding
         binding = FragmentLoginBinding.inflate(inflater, container, false);
+        View view = binding.getRoot();
 
         // Inicializar FirebaseAuth
         mAuth = FirebaseAuth.getInstance();
@@ -59,12 +64,18 @@ public class LoginFragment extends Fragment {
         binding.registerTextView.setOnClickListener(v -> irRegistroActivity());
 
         // Listener para cerrar el teclado cuando el usuario toque fuera del campo de texto
-        binding.getRoot().setOnTouchListener((v, event) -> {
+        view.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 View currentFocus = getActivity().getCurrentFocus();
                 if (currentFocus != null) {
-                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
+                    currentFocus.clearFocus();
+
+                    // Ocultar el teclado
+                    android.view.inputmethod.InputMethodManager imm =
+                            (android.view.inputmethod.InputMethodManager) getActivity().getSystemService(getContext().INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
+                    }
                 }
             }
             return false;
@@ -117,14 +128,50 @@ public class LoginFragment extends Fragment {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(getActivity(), task -> {
                     if (task.isSuccessful()) {
-                        Log.d("GoogleSignIn", "Inicio de sesión con Google exitoso");
-                        Toast.makeText(getActivity(), "Inicio de sesión con Google exitoso", Toast.LENGTH_SHORT).show();
-                        irAMain();
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            // Verificar si es un nuevo usuario (primer inicio de sesión)
+                            if (task.getResult().getAdditionalUserInfo().isNewUser()) {
+                                registrarUsuarioEnFirestore(user, cuenta.getDisplayName());
+                            }
+                            Toast.makeText(getActivity(), "Inicio de sesión con Google exitoso", Toast.LENGTH_SHORT).show();
+                            irAMain();
+                        }
                     } else {
                         Log.e("GoogleSignIn", "Error en firebaseAuthWithGoogle", task.getException());
                         Toast.makeText(getActivity(), "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private void registrarUsuarioEnFirestore(FirebaseUser user, String displayName) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Obtener el email del usuario
+        String email = user.getEmail();
+
+        // Si no hay nombre, extraer la parte antes del @ del email
+        String nombreUsuario;
+        if (displayName != null && !displayName.isEmpty()) {
+            nombreUsuario = displayName; // Usar el nombre de Google si existe
+        } else {
+            // Extraer la parte antes del @ (si el email es válido)
+            nombreUsuario = (email != null && email.contains("@"))
+                    ? email.substring(0, email.indexOf("@"))
+                    : "Usuario Google";
+        }
+
+        // Crear el mapa de datos para Firestore
+        Map<String, Object> usuario = new HashMap<>();
+        usuario.put("email", email);
+        usuario.put("nombre", nombreUsuario); // Nombre personalizado o parte del email
+
+        // Registrar/actualizar en Firestore
+        db.collection("Usuarios")
+                .document(user.getUid())
+                .set(usuario)
+                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Usuario registrado con Google"))
+                .addOnFailureListener(e -> Log.e("Firestore", "Error al registrar usuario", e));
     }
 
     private void irAMain() {

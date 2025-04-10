@@ -50,6 +50,8 @@
     <string name="ningunJuego" tools:ignore="ExtraTranslation,MissingTranslation">No game chosen</string>
     <string name="jugador" tools:ignore="ExtraTranslation,MissingTranslation">PLAYER</string>
     <string name="puntuacion" tools:ignore="ExtraTranslation,MissingTranslation">SCORE</string>
+    <string name="posicion" tools:ignore="ExtraTranslation,MissingTranslation">POSITION</string>
+
 
 
 </resources>
