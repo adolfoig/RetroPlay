@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:layout_gravity="center"
     android:layout_margin="5dp"
+    android:background="@color/gris_medio_oscuro"
     app:cardElevation="5dp">
 
     <LinearLayout
@@ -14,6 +15,7 @@
         android:gravity="center"
         android:orientation="vertical"
         android:padding="16dp"
+        android:background="@color/gris_claro2"
         android:layout_marginTop="?attr/actionBarSize"
         android:layout_marginBottom="80dp">
 

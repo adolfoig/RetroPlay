@@ -1,6 +1,7 @@
 package com.example.retroplay;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,10 +38,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView((binding = ActivityMainBinding.inflate(getLayoutInflater())).getRoot());
 
-
-        // DA ERROR ESTO
-        /*bindingHeader.nombreUsuario.setText("HOla");
-        bindingHeader.emailUsuario.setText("DAD");*/
+        // Bloquear el giro de pantalla
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -119,20 +118,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Ocultamos el Toolbar y BottomNavigation
         binding.bottomNavView.setVisibility(View.GONE);
         binding.toolbar.setVisibility(View.GONE);
-        binding.bottomAppBar.setVisibility(View.GONE);
     }
 
     void mostrarInterfaz2() {
         // Mostramos el Toolbar y BottomNavigation
         binding.bottomNavView.setVisibility(View.VISIBLE);
         binding.toolbar.setVisibility(View.VISIBLE);
-        binding.bottomAppBar.setVisibility(View.VISIBLE);
-
     }
 
     private void ocultarBottomNavView(){
         binding.bottomNavView.setVisibility(View.GONE);
-        binding.bottomAppBar.setVisibility(View.GONE);
     }
 
     // Método para ver si estás en el fragment jugarJuegos, login o registro y ocultar el menú
