@@ -17,4 +17,5 @@
     <color name="amarillo">#F0E973</color>
     <color name="azulTetris">#73A9F0</color>
     <color name="verdeFlappyBird">#73F077</color>
+    <color name="textoLoginRegister">#434343</color>
 </resources>

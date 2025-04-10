@@ -2,20 +2,17 @@ package com.example.retroplay.Repository;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.QuerySnapshot;
-import java.util.ArrayList;
-import java.util.List;
 
 public class LogrosRepository {
     private final FirebaseFirestore db;
-    private final FirebaseAuth auth;
+    private final FirebaseAuth firebaseAuth;
 
     public LogrosRepository() {
         db = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
     }
 
     public Task<QuerySnapshot> getLogrosDisponibles() {
@@ -28,7 +25,7 @@ public class LogrosRepository {
                 .get();
     }
 
-    public FirebaseUser getCurrentUser() {
-        return auth.getCurrentUser();
+    public FirebaseUser getUsuarioActual() {
+        return firebaseAuth.getCurrentUser();
     }
 }

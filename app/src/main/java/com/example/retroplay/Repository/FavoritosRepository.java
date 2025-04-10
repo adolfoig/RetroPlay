@@ -20,14 +20,15 @@ import java.util.Map;
 public class FavoritosRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
+    FirebaseUser usuario = auth.getCurrentUser();
+
     private final MutableLiveData<List<Juego>> favoritosLiveData = new MutableLiveData<>();
 
     public void cargarFavoritos() {
-        FirebaseUser user = auth.getCurrentUser();
-        if (user == null) return;
+        if (usuario == null) return;
 
         db.collection("Favoritos")
-                .whereEqualTo("idUsuario", user.getUid())
+                .whereEqualTo("idUsuario", usuario.getUid())
                 .addSnapshotListener((value, error) -> {
                     if (error != null || value == null) return;
 
@@ -62,10 +63,9 @@ public class FavoritosRepository {
     }
 
     public void agregarFavorito(String idJuego, RepositoryCallback<Void> callback) {
-        FirebaseUser user = auth.getCurrentUser();
-        if (user != null) {
+        if (usuario != null) {
             Map<String, Object> favorito = new HashMap<>();
-            favorito.put("idUsuario", user.getUid());
+            favorito.put("idUsuario", usuario.getUid());
             favorito.put("idJuego", idJuego);
 
             db.collection("Favoritos")
@@ -79,10 +79,9 @@ public class FavoritosRepository {
     }
 
     public void eliminarFavorito(String idJuego, RepositoryCallback<Void> callback) {
-        FirebaseUser user = auth.getCurrentUser();
-        if (user != null) {
+        if (usuario != null) {
             db.collection("Favoritos")
-                    .whereEqualTo("idUsuario", user.getUid())
+                    .whereEqualTo("idUsuario", usuario.getUid())
                     .whereEqualTo("idJuego", idJuego)
                     .get()
                     .addOnCompleteListener(task -> {
@@ -114,14 +113,13 @@ public class FavoritosRepository {
     }
 
     public void verificarEstadoFavorito(Juego juego, RepositoryCallback<Boolean> callback) {
-        FirebaseUser user = auth.getCurrentUser();
-        if (user == null) {
+        if (usuario == null) {
             if (callback != null) callback.onComplete(false);
             return;
         }
 
         db.collection("Favoritos")
-                .whereEqualTo("idUsuario", user.getUid())
+                .whereEqualTo("idUsuario", usuario.getUid())
                 .whereEqualTo("idJuego", juego.getId())
                 .get()
                 .addOnCompleteListener(task -> {

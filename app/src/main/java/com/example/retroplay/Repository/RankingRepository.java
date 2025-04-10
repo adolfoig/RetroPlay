@@ -9,29 +9,29 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 public class RankingRepository {
     private final FirebaseFirestore db;
-    private final FirebaseAuth auth;
+    private final FirebaseAuth firebaseAuth;
 
     public RankingRepository() {
         db = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
     }
 
-    public String getCurrentUserId() {
-        return auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
+    public String getIdusuarioActual() {
+        return firebaseAuth.getCurrentUser() != null ? firebaseAuth.getCurrentUser().getUid() : null;
     }
 
-    public Task<QuerySnapshot> loadGames() {
+    public Task<QuerySnapshot> cargarJuegos() {
         return db.collection("Juegos").get();
     }
 
-    public Task<QuerySnapshot> loadScores(String gameId) {
+    public Task<QuerySnapshot> cargarPuntuaciones(String gameId) {
         return db.collection("Puntuaciones")
                 .whereEqualTo("idJuego", gameId)
                 .orderBy("puntuacionMaxima", Query.Direction.DESCENDING)
                 .get();
     }
 
-    public Task<DocumentSnapshot> getUserName(String userId) {
+    public Task<DocumentSnapshot> getUsuarioPorId(String userId) {
         return db.collection("Usuarios").document(userId).get();
     }
 }

@@ -44,7 +44,7 @@ public class LogrosViewModel extends ViewModel {
     }
 
     private void verificarLogrosObtenidos(LogrosFragment.LogrosCallback callback) {
-        FirebaseUser user = repository.getCurrentUser();
+        FirebaseUser user = repository.getUsuarioActual();
         if (user == null) {
             callback.onError("Usuario no autenticado");
             return;
