@@ -18,6 +18,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.bumptech.glide.Glide;
 import com.example.retroplay.Registro.LoginFragment;
 import com.example.retroplay.databinding.ActivityMainBinding;
 import com.example.retroplay.databinding.NavHeaderBinding;
@@ -28,6 +29,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     ActivityMainBinding binding;
+    NavHeaderBinding headerBinding;
     private FirebaseAuth mAuth;
     NavController navController;
 
@@ -36,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView((binding = ActivityMainBinding.inflate(getLayoutInflater())).getRoot());
+
+        headerBinding = NavHeaderBinding.bind(binding.navigationDrawer.getHeaderView(0));
 
 
         mAuth = FirebaseAuth.getInstance();
@@ -152,8 +156,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-
-
     private void openFragment(Fragment fragment) {
         // Reemplazamos el fragmento actual con el nuevo fragmento
         getSupportFragmentManager().beginTransaction()
@@ -184,7 +186,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void datosUsuarioHeaderDrawer() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null){
-            NavHeaderBinding headerBinding = NavHeaderBinding.bind(binding.navigationDrawer.getHeaderView(0));
 
             headerBinding.nombreUsuario.setText(currentUser.getDisplayName());
             headerBinding.emailUsuario.setText(currentUser.getEmail());
@@ -192,13 +193,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return;
         }
 
-        /*if (currentUser.getPhotoUrl() != null) {
+        if (currentUser.getPhotoUrl() != null) {
             Glide.with(this)
                     .load(currentUser.getPhotoUrl())
-                    .into(headerBinding.profileImage);
+                    .into(headerBinding.imageView);
         } else {
-            headerBinding.profileImage.setImageResource(R.drawable.logo);
-        }*/
+            headerBinding.imageView.setImageResource(R.drawable.logo);
+        }
     }
 
     @Override

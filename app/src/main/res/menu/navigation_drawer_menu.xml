@@ -8,12 +8,14 @@
 
         <item
             android:id="@+id/nav_actualizarUsuario"
+            android:icon="@drawable/actualizarusuario"
             android:title="Actualizar usuario">
         </item>
 
 
         <item
             android:id="@+id/nav_cerrarSesion"
+            android:icon="@drawable/cerrarsesion"
             android:title="Cerrar sesión">
         </item>
     </group>

@@ -27,7 +27,7 @@ public class LogrosFragment extends Fragment {
     private LogroAdapter logroAdapter;
 
     public interface LogrosCallback {
-        void onLogrosLoaded(List<Logro> logros);
+        void onLogrosCargados(List<Logro> logros);
         void onError(String message);
     }
 
@@ -51,7 +51,7 @@ public class LogrosFragment extends Fragment {
     private void cargarLogrosDesdeFireBase() {
         viewModel.cargarLogrosDesdeFireBase(new LogrosCallback() {
             @Override
-            public void onLogrosLoaded(List<Logro> logros) {
+            public void onLogrosCargados(List<Logro> logros) {
                 logroAdapter = new LogroAdapter(logros);
                 binding.recyclerViewLogros.setAdapter(logroAdapter);
             }

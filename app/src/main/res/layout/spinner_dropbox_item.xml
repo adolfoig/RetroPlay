@@ -6,6 +6,5 @@
     android:textSize="16sp"
     android:textColor="@color/azul"
     android:padding="16dp"
-    android:text="Elige un juego:"
     android:background="@color/white"
     android:ellipsize="marquee"/>
