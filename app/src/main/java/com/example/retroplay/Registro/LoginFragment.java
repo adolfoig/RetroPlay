@@ -14,7 +14,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.retroplay.MainActivity;
@@ -26,7 +25,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -46,6 +44,7 @@ public class LoginFragment extends Fragment {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Inflamos la vista y configuramos el binding
         binding = FragmentLoginBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
 
@@ -64,13 +63,16 @@ public class LoginFragment extends Fragment {
         // Evento para abrir el fragmento de registro
         binding.registerTextView.setOnClickListener(v -> irRegistroActivity());
 
-        // Listener para cerrar el teclado
+        // Listener para cerrar el teclado cuando el usuario toque fuera del campo de texto
         view.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                View currentFocus = requireActivity().getCurrentFocus();
+                View currentFocus = getActivity().getCurrentFocus();
                 if (currentFocus != null) {
                     currentFocus.clearFocus();
-                    InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                    // Ocultar el teclado
+                    android.view.inputmethod.InputMethodManager imm =
+                            (android.view.inputmethod.InputMethodManager) getActivity().getSystemService(getContext().INPUT_METHOD_SERVICE);
                     if (imm != null) {
                         imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
                     }
@@ -79,116 +81,31 @@ public class LoginFragment extends Fragment {
             return false;
         });
 
-        return view;
+        return binding.getRoot(); // Retornamos la vista inflada
     }
 
     private void configurarClienteGoogleSignIn() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestIdToken(getString(R.string.default_web_client_id)) // Usa tu Web client ID
                 .requestEmail()
                 .build();
 
-        googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso);
+        googleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
     }
 
     private void inicializarLauncherGoogleSignIn() {
         googleSignInLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    if (result.getResultCode() == requireActivity().RESULT_OK) {
+                    if (result.getResultCode() == getActivity().RESULT_OK) {
                         Intent data = result.getData();
                         Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-                        manejarResultadoGoogleSignIn(task);
+                        gestionarResultadoSignIn(task);
                     } else {
-                        Toast.makeText(requireContext(), "Error en inicio de sesión con Google", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Error en el inicio de sesión con Google", Toast.LENGTH_SHORT).show();
                     }
                 }
         );
-    }
-
-    private void manejarResultadoGoogleSignIn(Task<GoogleSignInAccount> task) {
-        try {
-            GoogleSignInAccount account = task.getResult(ApiException.class);
-            if (account != null && account.getIdToken() != null) {
-                Log.d(TAG, "Autenticación exitosa con Google, ID Token obtenido");
-                firebaseAuthWithGoogle(account);
-            } else {
-                Log.w(TAG, "Autenticación fallida: cuenta o token nulo");
-                mostrarErrorAutenticacion("Cuenta de Google no válida");
-            }
-        } catch (ApiException e) {
-            String errorMsg = obtenerMensajeError(e.getStatusCode());
-            Log.e(TAG, "Error en autenticación Google: " + errorMsg, e);
-            mostrarErrorAutenticacion(errorMsg);
-        }
-    }
-
-    private String obtenerMensajeError(int statusCode) {
-        switch (statusCode) {
-            case 10:
-                return "Cuenta deshabilitada";
-            case 12500:
-                return "Configuración incorrecta. Verifica:\n1. SHA-1 en Firebase\n2. Web Client ID\n3. google-services.json";
-            case 12501:
-                return "El usuario canceló el inicio de sesión";
-            case 7:
-                return "Error de conexión";
-            default:
-                return "Error desconocido (Código: " + statusCode + ")";
-        }
-    }
-
-    private void mostrarErrorAutenticacion(String mensaje) {
-        if (getView() != null) {
-            Snackbar.make(getView(), mensaje, Snackbar.LENGTH_LONG)
-                    .setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.verde))
-                    .show();
-        }
-    }
-
-    // Añade esta constante en la clase
-    private static final String TAG = "GoogleSignIn";
-
-    private void firebaseAuthWithGoogle(GoogleSignInAccount cuenta) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(cuenta.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(requireActivity(), task -> {
-                    if (task.isSuccessful()) {
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        if (user != null) {
-                            if (task.getResult().getAdditionalUserInfo() != null &&
-                                    task.getResult().getAdditionalUserInfo().isNewUser()) {
-                                registrarUsuarioEnFirestore(user, cuenta.getDisplayName());
-                            }
-                            Toast.makeText(requireContext(), "Inicio de sesión con Google exitoso", Toast.LENGTH_SHORT).show();
-                            irAMain();
-                        }
-                    } else {
-                        Log.e("GoogleSignIn", "Error en firebaseAuthWithGoogle", task.getException());
-                        Toast.makeText(requireContext(), "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-    private void registrarUsuarioEnFirestore(FirebaseUser user, String displayName) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String email = user.getEmail();
-
-        String nombreUsuario = (displayName != null && !displayName.isEmpty()) ?
-                displayName :
-                (email != null && email.contains("@") ?
-                        email.substring(0, email.indexOf("@")) :
-                        "Usuario Google");
-
-        Map<String, Object> usuario = new HashMap<>();
-        usuario.put("email", email);
-        usuario.put("nombre", nombreUsuario);
-
-        db.collection("Usuarios")
-                .document(user.getUid())
-                .set(usuario)
-                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Usuario registrado con Google"))
-                .addOnFailureListener(e -> Log.e("Firestore", "Error al registrar usuario", e));
     }
 
     private void signInWithGoogle() {
@@ -196,40 +113,101 @@ public class LoginFragment extends Fragment {
         googleSignInLauncher.launch(intent);
     }
 
+    private void gestionarResultadoSignIn(Task<GoogleSignInAccount> task) {
+        try {
+            GoogleSignInAccount cuenta = task.getResult(ApiException.class);
+            firebaseAuthWithGoogle(cuenta);
+        } catch (ApiException e) {
+            Log.e("GoogleSignIn", "Error al iniciar sesión con Google: " + e.getStatusCode() + " - " + e.getMessage());
+            Toast.makeText(getActivity(), "Error en el inicio de sesión con Google: " + e.getStatusCode(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount cuenta) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(cuenta.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(getActivity(), task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            // Verificar si es un nuevo usuario (primer inicio de sesión)
+                            if (task.getResult().getAdditionalUserInfo().isNewUser()) {
+                                registrarUsuarioEnFirestore(user, cuenta.getDisplayName());
+                            }
+                            Toast.makeText(getActivity(), "Inicio de sesión con Google exitoso", Toast.LENGTH_SHORT).show();
+                            irAMain();
+                        }
+                    } else {
+                        Log.e("GoogleSignIn", "Error en firebaseAuthWithGoogle", task.getException());
+                        Toast.makeText(getActivity(), "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void registrarUsuarioEnFirestore(FirebaseUser user, String displayName) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Obtener el email del usuario
+        String email = user.getEmail();
+
+        // Si no hay nombre, extraer la parte antes del @ del email
+        String nombreUsuario;
+        if (displayName != null && !displayName.isEmpty()) {
+            nombreUsuario = displayName; // Usar el nombre de Google si existe
+        } else {
+            // Extraer la parte antes del @ (si el email es válido)
+            nombreUsuario = (email != null && email.contains("@"))
+                    ? email.substring(0, email.indexOf("@"))
+                    : "Usuario Google";
+        }
+
+        // Crear el mapa de datos para Firestore
+        Map<String, Object> usuario = new HashMap<>();
+        usuario.put("email", email);
+        usuario.put("nombre", nombreUsuario); // Nombre personalizado o parte del email
+
+        // Registrar/actualizar en Firestore
+        db.collection("Usuarios")
+                .document(user.getUid())
+                .set(usuario)
+                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Usuario registrado con Google"))
+                .addOnFailureListener(e -> Log.e("Firestore", "Error al registrar usuario", e));
+    }
+
     private void irAMain() {
-        Intent intent = new Intent(requireActivity(), MainActivity.class);
+        Intent intent = new Intent(getActivity(), MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
-        requireActivity().finish();
+        getActivity().finish();
     }
 
     private void loginUsuario() {
         String email = binding.emailEditText.getText().toString().trim();
         String contrasena = binding.passwordEditText.getText().toString().trim();
 
+        // Validación de campos vacíos
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty(contrasena)) {
-            Toast.makeText(requireContext(), "Completa todos los campos", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Completa todos los campos", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (!email.contains("@")) {
-            Toast.makeText(requireContext(), "El correo debe contener un @", Toast.LENGTH_SHORT).show();
-            return;
+        if(!email.contains("@")){
+            Toast.makeText(getActivity(), "El correo tiene que contener un @", Toast.LENGTH_SHORT).show();
         }
 
         mAuth.signInWithEmailAndPassword(email, contrasena)
-                .addOnCompleteListener(requireActivity(), task -> {
+                .addOnCompleteListener(getActivity(), task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser usuario = mAuth.getCurrentUser();
-                        Toast.makeText(requireContext(), "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Inicio de sesión exitoso: " + usuario.getEmail(), Toast.LENGTH_SHORT).show();
                         irAMain();
                     } else {
-                        Toast.makeText(requireContext(), "Login incorrecto", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Login incorrecto ", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
     private void irRegistroActivity() {
-        Intent intent = new Intent(requireActivity(), RegistroActivity.class);
+        Intent intent = new Intent(getActivity(), RegistroActivity.class);
         startActivity(intent);
     }
 }
