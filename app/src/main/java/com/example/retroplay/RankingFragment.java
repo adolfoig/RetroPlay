@@ -1,6 +1,7 @@
 package com.example.retroplay;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -93,15 +94,14 @@ public class RankingFragment extends Fragment {
     }
 
     private void configurarSpinner() {
-
         Context context = getContext();
-        if (context == null){
+        if (context == null) {
             return;
         }
 
         ArrayAdapter<Juego> adapter = new ArrayAdapter<Juego>(
                 context,
-                R.layout.spinner_item_selected,
+                R.layout.spinner_item_selected,  // Layout para el item seleccionado
                 listaJuegos) {
 
             @Override
@@ -109,25 +109,41 @@ public class RankingFragment extends Fragment {
                 View view = super.getView(position, convertView, parent);
                 TextView textView = view.findViewById(android.R.id.text1);
                 textView.setText(listaJuegos.get(position).getNombre());
+                textView.setTextColor(ContextCompat.getColor(getContext(), R.color.borde_gris));
                 return view;
             }
 
             @Override
             public View getDropDownView(int position, View convertView, ViewGroup parent) {
                 View view = super.getDropDownView(position, convertView, parent);
+                if (view == null) {
+                    view = LayoutInflater.from(getContext()).inflate(
+                            R.layout.spinner_dropbox_item, parent, false);
+                }
                 TextView textView = view.findViewById(android.R.id.text1);
                 textView.setText(listaJuegos.get(position).getNombre());
-                textView.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.white));
+                textView.setTextColor(ContextCompat.getColor(getContext(), R.color.borde_gris));
+                // Fondo transparente para que se vea el gris_claro3 del popupBackground
+                textView.setBackgroundColor(Color.TRANSPARENT);
                 return view;
             }
         };
 
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Usa tu layout personalizado para los items del dropdown
+        adapter.setDropDownViewResource(R.layout.spinner_dropbox_item);
+
         binding.spinnerJuegos.setAdapter(adapter);
 
         binding.spinnerJuegos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (view != null) {
+                    TextView textView = view.findViewById(android.R.id.text1);
+                    if (textView != null) {
+                        textView.setTextColor(ContextCompat.getColor(getContext(), R.color.borde_gris));
+                    }
+                }
+
                 if (position == 0) {
                     binding.tvTituloJuego.setText("Ningún juego seleccionado");
                     limpiarTablaPuntuaciones();

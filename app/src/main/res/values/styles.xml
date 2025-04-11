@@ -8,24 +8,20 @@
     </style>
 
     <style name="CustomSpinner" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
-    <item name="android:background">@drawable/spinner_background</item>
-    <item name="android:textColor">@color/azul</item>
-    <item name="android:padding">12dp</item>
-    <item name="android:textSize">16sp</item>
-    <!-- Flecha dropdown -->
-    <item name="materialThemeOverlay">@style/SpinnerThemeOverlay</item>
-</style>
+        <!-- Estilo base -->
+        <item name="android:background">@drawable/spinner_background</item>
+        <item name="android:textColor">@color/borde_gris</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:padding">12dp</item>
 
-    <style name="SpinnerThemeOverlay" parent="">
-        <item name="popupMenuStyle">@style/PopupMenuStyle</item>
-    </style>
+        <!-- Configuración del dropdown -->
+        <item name="android:popupBackground">@drawable/spinner_dropdown_background</item>
+        <item name="android:dropDownSelector">@drawable/spinner_dropdown_selector</item>
+        <item name="android:dropDownVerticalOffset">4dp</item>
+        <item name="android:dropDownWidth">match_parent</item>
 
-    <style name="PopupMenuStyle" parent="Widget.MaterialComponents.PopupMenu">
-        <item name="android:popupBackground">@color/white</item>
-    </style>
-
-    <style name="TextAppearance.Spinner" parent="TextAppearance.MaterialComponents.Body1">
-        <item name="android:textColor">@color/azul</item>
+        <!-- Elimina esta línea ya que puede causar conflicto -->
+        <!-- <item name="materialThemeOverlay">@style/SpinnerThemeOverlay</item> -->
     </style>
 
 
@@ -39,7 +35,7 @@
 
     <style name="TableHeaderStyle">
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/gris_claro2</item>
+        <item name="android:textColor">@color/borde_gris</item>
         <item name="android:textStyle">bold</item>
         <item name="android:padding">8dp</item>
         <item name="android:background">@color/gris</item>
