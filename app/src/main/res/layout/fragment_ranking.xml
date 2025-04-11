@@ -51,45 +51,52 @@
         android:background="@drawable/rounded_corners">
 
     <!-- Fila de encabezado -->
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="80dp">  <!-- Fila con más altura -->
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textColor="@color/gris_claro2"
-            android:textSize="14dp"
-            android:layout_gravity="center"
-            android:textAlignment="center"
-            android:text="@string/posicion" />
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="39dp">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textColor="@color/gris_claro2"
-            android:textSize="14dp"
-            android:layout_gravity="center"
-            android:textAlignment="center"
-            android:text="@string/jugador" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:text="@string/posicion"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="14dp"
+                android:textStyle="bold" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textColor="@color/gris_claro2"
-            android:textSize="14dp"
-            android:layout_gravity="center"
-            android:textAlignment="center"
-            android:text="@string/puntuacion" />
-    </TableRow>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:text="@string/jugador"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:text="@string/puntuacion"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="14dp"
+                android:textStyle="bold" />
+        </TableRow>
 
     <!-- Fila de datos -->
     <TableRow
         android:id="@+id/tableRow"
         android:layout_width="match_parent"
-        android:layout_height="80dp">  <!-- Fila con más altura -->
+        android:layout_height="80dp">
         <TextView
             android:id="@+id/posicion"
             android:layout_width="0dp"
