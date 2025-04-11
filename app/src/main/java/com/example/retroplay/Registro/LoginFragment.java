@@ -14,6 +14,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.retroplay.MainActivity;
@@ -25,6 +26,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -107,16 +109,45 @@ public class LoginFragment extends Fragment {
     private void manejarResultadoGoogleSignIn(Task<GoogleSignInAccount> task) {
         try {
             GoogleSignInAccount account = task.getResult(ApiException.class);
-            if (account != null) {
+            if (account != null && account.getIdToken() != null) {
+                Log.d(TAG, "Autenticación exitosa con Google, ID Token obtenido");
                 firebaseAuthWithGoogle(account);
             } else {
-                Toast.makeText(requireContext(), "Error: Cuenta de Google no válida", Toast.LENGTH_SHORT).show();
+                Log.w(TAG, "Autenticación fallida: cuenta o token nulo");
+                mostrarErrorAutenticacion("Cuenta de Google no válida");
             }
         } catch (ApiException e) {
-            Log.e("GoogleSignIn", "Error al iniciar sesión con Google", e);
-            Toast.makeText(requireContext(), "Error al autenticar con Google: " + e.getStatusCode(), Toast.LENGTH_SHORT).show();
+            String errorMsg = obtenerMensajeError(e.getStatusCode());
+            Log.e(TAG, "Error en autenticación Google: " + errorMsg, e);
+            mostrarErrorAutenticacion(errorMsg);
         }
     }
+
+    private String obtenerMensajeError(int statusCode) {
+        switch (statusCode) {
+            case 10:
+                return "Cuenta deshabilitada";
+            case 12500:
+                return "Configuración incorrecta. Verifica:\n1. SHA-1 en Firebase\n2. Web Client ID\n3. google-services.json";
+            case 12501:
+                return "El usuario canceló el inicio de sesión";
+            case 7:
+                return "Error de conexión";
+            default:
+                return "Error desconocido (Código: " + statusCode + ")";
+        }
+    }
+
+    private void mostrarErrorAutenticacion(String mensaje) {
+        if (getView() != null) {
+            Snackbar.make(getView(), mensaje, Snackbar.LENGTH_LONG)
+                    .setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.verde))
+                    .show();
+        }
+    }
+
+    // Añade esta constante en la clase
+    private static final String TAG = "GoogleSignIn";
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount cuenta) {
         AuthCredential credential = GoogleAuthProvider.getCredential(cuenta.getIdToken(), null);
