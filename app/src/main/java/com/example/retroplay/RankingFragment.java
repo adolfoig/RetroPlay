@@ -1,6 +1,8 @@
 package com.example.retroplay;
 
+import android.content.Context;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,6 +70,11 @@ public class RankingFragment extends Fragment {
         viewModel.cargarJuegos(new JuegoLoadingCallback() {
             @Override
             public void onGamesLoaded(List<Juego> juegos, boolean isEmpty) {
+
+                if (!isAdded() || getContext() == null) {
+                    return;
+                }
+
                 listaJuegos = juegos;
                 if (isEmpty) {
                     binding.tvTituloJuego.setText("Ningún juego seleccionado");
@@ -78,18 +85,22 @@ public class RankingFragment extends Fragment {
 
             @Override
             public void onError(String message) {
-                mostrarError(message);
+                if (isAdded() && getContext() != null) {
+                    mostrarError(message);
+                }
             }
         });
     }
 
     private void configurarSpinner() {
-        List<Juego> listaConHint = new ArrayList<>();
-        listaConHint.add(new Juego("", "Selecciona un juego")); // Juego vacío con texto de hint
-        listaConHint.addAll(listaJuegos);
+
+        Context context = getContext();
+        if (context == null){
+            return;
+        }
 
         ArrayAdapter<Juego> adapter = new ArrayAdapter<Juego>(
-                requireContext(),
+                context,
                 R.layout.spinner_item_selected,
                 listaJuegos) {
 
@@ -184,33 +195,33 @@ public class RankingFragment extends Fragment {
     }
 
     private void agregarFilaTabla(String nombreUsuario, int puntuacion, int posicion, boolean esUsuarioActual) {
+
         TableRow row = new TableRow(requireContext());
+        int backgroundDrawable;
 
-        // Fondo según posición y usuario actual
-        int backgroundColor = esUsuarioActual ?
-                ContextCompat.getColor(requireContext(), R.color.ranking) :
-                posicion % 2 == 0 ?
-                        ContextCompat.getColor(requireContext(), android.R.color.white) :
-                        ContextCompat.getColor(requireContext(), android.R.color.darker_gray);
-        row.setBackgroundColor(backgroundColor);
+        if (esUsuarioActual) {
+            backgroundDrawable = R.drawable.filas_usuario_actual;
+        } else {
+            backgroundDrawable = posicion % 2 == 0 ? R.drawable.filas_blancas : R.drawable.filas_grises;
+        }
 
-        // TextView para la posición
+        Drawable roundedBackground = ContextCompat.getDrawable(requireContext(), backgroundDrawable);
+        row.setBackground(roundedBackground);
+
         TextView tvPosicion = new TextView(requireContext());
         tvPosicion.setText(String.valueOf(posicion));
-        tvPosicion.setPadding(8, 8, 8, 8);
+        tvPosicion.setPadding(16, 16, 16, 16);
         row.addView(tvPosicion);
 
-        // TextView para el nombre
         TextView tvUsuario = new TextView(requireContext());
         tvUsuario.setText(nombreUsuario);
-        tvUsuario.setPadding(8, 8, 8, 8);
+        tvUsuario.setPadding(16, 16, 16, 16);
         if (esUsuarioActual) tvUsuario.setTypeface(null, Typeface.BOLD);
         row.addView(tvUsuario);
 
-        // TextView para la puntuación
         TextView tvPuntuacion = new TextView(requireContext());
         tvPuntuacion.setText(String.valueOf(puntuacion));
-        tvPuntuacion.setPadding(8, 8, 8, 8);
+        tvPuntuacion.setPadding(16, 16, 16, 16);
         row.addView(tvPuntuacion);
 
         binding.tablaPuntuaciones.addView(row);

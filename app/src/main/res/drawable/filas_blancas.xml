@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <solid android:color="#FFFFFF"/> <!-- Reemplaza #FF0000 con el color que desees -->
+
+    <stroke
+        android:width="1dp"
+        android:color="#000000"/> <!-- Borde opcional -->
+
+    <corners android:radius="10dp"/> <!-- Radio de las esquinas -->
+</shape>

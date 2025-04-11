@@ -18,7 +18,7 @@
         android:layout_gravity="center"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:textColor="@android:color/black"
+        android:textColor="@color/gris_claro2"
         android:layout_marginBottom="8dp"/>
 
     <!-- Spinner para seleccionar juego -->
@@ -40,7 +40,7 @@
         android:text="@string/ningunJuego"
         android:layout_gravity="center"
         android:textSize="24sp"
-        android:textColor="@android:color/black"
+        android:textColor="@color/gris_claro2"
         android:textStyle="bold"
         android:layout_marginBottom="16dp"/>
 
@@ -51,86 +51,74 @@
         android:layout_height="wrap_content"
         android:stretchColumns="*"
         android:shrinkColumns="*"
-        android:background="@drawable/rounded_corners"> <!-- Aquí aplicas el fondo redondeado -->
+        android:background="@drawable/rounded_corners">
 
-        <!-- Encabezados de la tabla -->
-        <TableRow
-            android:layout_width="match_parent"
+    <!-- Fila de encabezado -->
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="80dp">  <!-- Fila con más altura -->
+        <TextView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="#DDDDDD">
+            android:layout_weight="1"
+            android:textColor="@color/gris_claro2"
+            android:textSize="14dp"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:text="@string/posicion" />
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/posicion"
-                android:textSize="14sp"
-                android:textColor="@android:color/black"
-                android:textStyle="bold"
-                android:padding="8dp"/>
-
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/jugador"
-                android:textSize="14sp"
-                android:textColor="@android:color/black"
-                android:textStyle="bold"
-                android:padding="8dp"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/puntuacion"
-                android:textSize="14sp"
-                android:textColor="@android:color/black"
-                android:textStyle="bold"
-                android:padding="8dp"/>
-        </TableRow>
-
-        <TableRow
-            android:id="@+id/tableRow"
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@android:color/white">
+            android:layout_weight="1"
+            android:textColor="@color/gris_claro2"
+            android:textSize="14dp"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:text="@string/jugador" />
 
-            <TextView
-                android:id="@+id/posicion"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="1"
-                android:textSize="16sp"
-                android:textColor="@android:color/black"
-                android:padding="8dp"/>
-
-            <TextView
-                android:id="@+id/nombreJugador"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Ejemplo"
-                android:textSize="16sp"
-                android:textColor="@android:color/black"
-                android:padding="8dp"/>
-
-            <TextView
-                android:id="@+id/puntuacionJugador"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="170"
-                android:textSize="16sp"
-                android:textColor="@android:color/black"
-                android:padding="8dp"/>
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="#EEEEEE"/>
-    </TableLayout>
+            android:layout_weight="1"
+            android:textColor="@color/gris_claro2"
+            android:textSize="14dp"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:text="@string/puntuacion" />
+    </TableRow>
+
+    <!-- Fila de datos -->
+    <TableRow
+        android:id="@+id/tableRow"
+        android:layout_width="match_parent"
+        android:layout_height="80dp">  <!-- Fila con más altura -->
+        <TextView
+            android:id="@+id/posicion"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:padding="16dp" />  <!-- Más padding -->
+
+        <TextView
+            android:id="@+id/nombreJugador"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:padding="16dp" />
+
+        <TextView
+            android:id="@+id/puntuacionJugador"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:padding="16dp" />
+    </TableRow>
+</TableLayout>
 </LinearLayout>
