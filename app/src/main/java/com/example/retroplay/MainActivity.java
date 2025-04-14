@@ -13,7 +13,6 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
-import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -53,12 +52,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .getNavController();
 
         if (currentUser == null) {
-            navController.navigate(R.id.loginFragment); // Usa la navegación del NavController
-            ocultarInterfaz2();
+            ocultarInterfaz();
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.nav_host_fragment, new LoginFragment()) // Asegúrate de que el contenedor esté correctamente definido en el layout
+                    .commit();
         } else {
             irAlBottomMenu();
         }
-
 
         // Configura el AppBarConfiguration con los fragments deseados
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -73,11 +74,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationUI.setupWithNavController(binding.toolbar, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.bottomNavView, navController);
 
-
-        // Con este código no funciona el boton de la flecha para atrás
-        /*ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        binding.drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();*/
 
         NavigationView navigationView = findViewById(R.id.navigation_drawer);
         navigationView.setNavigationItemSelectedListener(this);
