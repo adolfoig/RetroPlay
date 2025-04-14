@@ -76,4 +76,7 @@ dependencies {
     // OkHttp para manejo avanzado de solicitudes HTTP
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
+
+    implementation ("com.google.android.gms:play-services-auth:20.7.0")
+    implementation ("com.google.firebase:firebase-auth:22.3.0")
 }
