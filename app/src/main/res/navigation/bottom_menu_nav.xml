@@ -75,7 +75,11 @@
         android:id="@+id/cerrarSesionFragment"
         android:name="com.example.retroplay.CerrarSesionFragment"
         android:label="@string/cerrarsesion"
-        tools:layout="@layout/fragment_cerrar_sesion" />
+        tools:layout="@layout/fragment_cerrar_sesion" >
+        <action
+            android:id="@+id/action_cerrarSesionFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
     <fragment
         android:id="@+id/actualizarUsuarioFragment"
         android:name="com.example.retroplay.ActualizarUsuarioFragment"

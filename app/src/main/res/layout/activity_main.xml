@@ -29,9 +29,10 @@
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_nav_view"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:layout_height="80dp"
-            android:background="@color/azul"
+            android:background="@drawable/menu_bottom_nav"
+            android:elevation="8dp"
             app:menu="@menu/bottom_menu" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

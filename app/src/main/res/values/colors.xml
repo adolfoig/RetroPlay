@@ -21,4 +21,6 @@
     <color name="borde_gris">#313131</color>
     <color name="ranking">#A8F26D</color>
     <color name="gris4">#474747</color>
+    <color name="transparente">#80000000</color>
+
 </resources>

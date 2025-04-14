@@ -37,13 +37,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
         setContentView((binding = ActivityMainBinding.inflate(getLayoutInflater())).getRoot());
 
         headerBinding = NavHeaderBinding.bind(binding.navigationDrawer.getHeaderView(0));
 
-
-        mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
 
         // Bloquear giro de pantalla
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         binding.bottomNavView.setVisibility(View.GONE);
     }
 
-    private void ocultarInterfaz2() {
+    void ocultarInterfaz2() {
         // Ocultamos el Toolbar y BottomNavigation
         binding.bottomNavView.setVisibility(View.GONE);
         binding.toolbar.setVisibility(View.GONE);
@@ -174,7 +174,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 navController.navigate(R.id.actualizarUsuarioFragment);
                 ocultarBottomNavView();
             } else if (itemId == R.id.nav_cerrarSesion) {
-                mAuth.signOut();
                 navController.navigate(R.id.cerrarSesionFragment);
                 ocultarBottomNavView();
             }

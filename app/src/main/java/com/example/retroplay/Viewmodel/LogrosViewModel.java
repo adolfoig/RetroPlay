@@ -1,5 +1,7 @@
 package com.example.retroplay.Viewmodel;
 
+import android.widget.Toast;
+
 import androidx.lifecycle.ViewModel;
 
 import com.example.retroplay.LogrosFragment;
@@ -46,6 +48,14 @@ public class LogrosViewModel extends ViewModel {
     private void verificarLogrosObtenidos(LogrosFragment.LogrosCallback callback) {
         FirebaseUser user = repository.getUsuarioActual();
 
+        // Add null check for user
+        if (user == null) {
+            for (Logro logro : listaLogros) {
+                logro.setObtenido(false);
+            }
+            callback.onLogrosCargados(listaLogros);
+            return;
+        }
 
         repository.getLogrosObtenidos(user.getUid()).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -59,6 +69,9 @@ public class LogrosViewModel extends ViewModel {
                 }
 
                 callback.onLogrosCargados(listaLogros);
+            } else {
+                // Handle error case
+                callback.onError("Error al verificar logros obtenidos");
             }
         });
     }

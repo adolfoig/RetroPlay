@@ -6,6 +6,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavOptions;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +32,7 @@ public class CerrarSesionFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
 
 
-        // Como cierrar sesion va al Login
+        // Como cierra sesion va al Login
         binding.btnSi.setOnClickListener(v -> cerrarSesion());
 
         // Como no se cierra sesion lleva al JuegosFragment
@@ -45,7 +47,7 @@ public class CerrarSesionFragment extends Fragment {
         irAMain();
     }
 
-    private void irAMain(){
+    private void irAMain() {
         Intent intent = new Intent(getContext(), MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
