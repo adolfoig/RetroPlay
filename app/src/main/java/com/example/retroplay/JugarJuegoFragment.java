@@ -43,7 +43,7 @@ public class JugarJuegoFragment extends Fragment {
     String idJuego;
     private ExecutorService executorService;
     private FirebaseFirestore firestore;
-    private final String IP = "192.168.1.43";  // Dirección IP del servidor
+    private final String IP = "172.25.0.1";  // Dirección IP del servidor
     private final int PUERTO = 3000;  // Puerto del servidor
     private final String URL = "http://" + IP + ":" + PUERTO + "/score";  // Crear la URL
 
@@ -99,7 +99,7 @@ public class JugarJuegoFragment extends Fragment {
             gameWebView.destroy();
 
             if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).mostrarInterfaz2();
+                ((MainActivity) getActivity()).mostrarToolBar();
             }
 
             Log.d("Puntuación", "onDestroy ejecutado");

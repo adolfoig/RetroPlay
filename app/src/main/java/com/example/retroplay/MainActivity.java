@@ -126,6 +126,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         binding.toolbar.setVisibility(View.VISIBLE);
 
     }
+    void mostrarToolBar() {
+        // Mostramos el Toolbar y BottomNavigation
+        binding.toolbar.setVisibility(View.VISIBLE);
+
+    }
 
     private void ocultarBottomNavView(){
         binding.bottomNavView.setVisibility(View.GONE);
@@ -146,7 +151,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             // Oculta o muestra la interfaz según el fragmento actual
             if (destinationId == R.id.loginFragment || destinationId == R.id.registroFragment || destinationId == R.id.jugarJuegoFragment) {
                 ocultarInterfaz2();
-            } else {
+            } else if(destinationId == R.id.detailFragment){
+                ocultarBottomNavView();
+            }
+            else {
                 mostrarInterfaz2(); // Muestra la interfaz por defecto en otros fragmentos
             }
         });

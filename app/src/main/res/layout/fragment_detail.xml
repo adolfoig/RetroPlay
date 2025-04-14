@@ -9,59 +9,42 @@
     android:background="@color/gris_medio_oscuro"
     app:cardElevation="5dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:background="@color/gris_claro2"
-        android:layout_marginTop="50dp"
-        android:layout_marginBottom="70dp">
-
-        <TextView
-            android:id="@+id/textNombreJuego"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="8dp"
-            android:text="prueba"
-            android:textSize="24sp" />
-
-        <ImageView
-            android:id="@+id/imagenJuego"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_marginBottom="20dp" />
-
-        <TextView
-            android:id="@+id/textoDescipcion"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:text="Descripcion" />
+        android:background="@color/gris_claro2">
 
         <LinearLayout
+            android:id="@+id/contentLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingHorizontal="20dp">
+            android:layout_above="@id/btnJugar"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:gravity="center">
 
-            <Button
-                android:id="@+id/btnJugar"
-                android:layout_width="155dp"
-                android:layout_height="90dp"
-                android:backgroundTint="@color/verde"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:textColor="@color/white"
-                android:text="@string/jugar" />
+            <TextView
+                android:id="@+id/textNombreJuego"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="8dp"
+                android:text="prueba"
+                android:textStyle="bold"
+                android:textSize="24sp" />
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="107dp"
-                android:layout_weight="1" />
+            <ImageView
+                android:id="@+id/imagenJuego"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_marginBottom="20dp" />
+
+            <TextView
+                android:id="@+id/textoDescipcion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:text="Descripcion" />
 
             <ImageButton
                 android:id="@+id/imagenEstrella"
@@ -69,10 +52,20 @@
                 android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:scaleType="fitCenter"
-                android:src="@drawable/estrellablanca" />
-
+                android:layout_gravity="center"
+                android:src="@drawable/estrellablanca"
+                android:justificationMode="inter_word"/>
         </LinearLayout>
 
+        <Button
+            android:id="@+id/btnJugar"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_alignParentBottom="true"
+            android:backgroundTint="@color/verde"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:textColor="@color/white"
+            android:text="@string/jugar" />
 
-    </LinearLayout>
+    </RelativeLayout>
 </androidx.cardview.widget.CardView>
