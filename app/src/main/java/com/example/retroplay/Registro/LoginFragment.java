@@ -86,6 +86,7 @@ public class LoginFragment extends Fragment {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id)) // Usa tu Web client ID
                 .requestEmail()
+                //.setAccountName(null)
                 .build();
 
         googleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
@@ -122,8 +123,10 @@ public class LoginFragment extends Fragment {
     }
 
     private void signInWithGoogle() {
-        Intent intent = googleSignInClient.getSignInIntent();
-        googleSignInLauncher.launch(intent);
+        googleSignInClient.signOut().addOnCompleteListener(task -> {
+            Intent signInIntent = googleSignInClient.getSignInIntent();
+            googleSignInLauncher.launch(signInIntent);
+        });
     }
 
     private void gestionarResultadoSignIn(Task<GoogleSignInAccount> task) {
