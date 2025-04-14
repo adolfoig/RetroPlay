@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -51,6 +52,11 @@ public class DetailFragment extends Fragment {
 
         actualizarIconoFavorito(binding.imagenEstrella, juego.isFavorito());
 
+        favoritosViewModel.verificarEstadoFavorito(juego, esFavorito -> {
+            juego.setFavorito(esFavorito);
+            actualizarIconoFavorito(binding.imagenEstrella, esFavorito);
+        });
+
         binding.imagenEstrella.setOnClickListener(v -> {
             favoritosViewModel.alternarFavorito(juego);
             actualizarIconoFavorito(binding.imagenEstrella, !juego.isFavorito());
@@ -61,20 +67,36 @@ public class DetailFragment extends Fragment {
         if(juego !=null){
             binding.textNombreJuego.setText(juego.getNombre());
 
+            int colorAmarillo = ContextCompat.getColor(requireContext(), R.color.amarillo2);
+            int colorVerde = ContextCompat.getColor(requireContext(), R.color.verde);
+            int colorAzul = ContextCompat.getColor(requireContext(), R.color.azul);
+
             switch (juego.getId()) {
                 case "1":
                     binding.imagenJuego.setImageResource(R.drawable.pacman);
+                    binding.textNombreJuego.setTextColor(colorAmarillo);
+                    binding.textoDescripcion.setTextColor(colorAmarillo);
+                    binding.textNombreJuego.setShadowLayer(25f, 0f, 20f,
+                            ContextCompat.getColor(requireContext(), R.color.amarillo2));
                     break;
                 case "2":
                     binding.imagenJuego.setImageResource(R.drawable.tetris);
+                    binding.textNombreJuego.setTextColor(colorAzul);
+                    binding.textoDescripcion.setTextColor(colorAzul);
+                    binding.textNombreJuego.setShadowLayer(25f, 0f, 20f,
+                            ContextCompat.getColor(requireContext(), R.color.azul));
                     break;
                 case "3":
                     binding.imagenJuego.setImageResource(R.drawable.flappybird);
+                    binding.textNombreJuego.setTextColor(colorVerde);
+                    binding.textoDescripcion.setTextColor(colorVerde);
+                    binding.textNombreJuego.setShadowLayer(25f, 0f, 20f,
+                            ContextCompat.getColor(requireContext(), R.color.verde));
+
                     break;
             }
-            binding.textoDescipcion.setText(juego.getDescripcion());
+            binding.textoDescripcion.setText(juego.getDescripcion());
 
-            // Hacer un repository para lo de juegos favoritos, lo puedo reutilizar en el favoritos fragment y en este
         }else{
             navController.popBackStack();
             Toast.makeText(getContext(), "Error al cargar el juego.", Toast.LENGTH_SHORT).show();
@@ -92,8 +114,8 @@ public class DetailFragment extends Fragment {
     private void navegarAWebView(String idJuego) {
         Bundle bundle = new Bundle();
         bundle.putString("idJuego", idJuego);
-        // Pasamos la URL del juego
-        navController.navigate(R.id.action_detailFragment_to_jugarJuegoFragment, bundle); // Navegar al fragmento con el WebView
+
+        navController.navigate(R.id.action_detailFragment_to_jugarJuegoFragment, bundle);
     }
 
 }

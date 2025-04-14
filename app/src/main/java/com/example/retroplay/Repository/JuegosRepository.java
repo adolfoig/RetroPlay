@@ -87,6 +87,7 @@ public class JuegosRepository {
                 }
                 return result.toString();
             }
+
         } catch (Exception e) {
             Log.e("Error", "Error al obtener puntuación: " + e.getMessage());
         } finally {
