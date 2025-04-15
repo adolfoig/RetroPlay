@@ -9,18 +9,19 @@ public class Usuario implements Serializable {
     private String nombre;
     private String email;
     private String password;
-    private double puntuacionGlobal;
+    private String urlImagen;
+
 
     public Usuario() {
         // Vacio para FireStore
     }
 
-    public Usuario(String id, String nombre, String email, String password, double puntuacionGlobal) {
+    public Usuario(String id, String nombre, String email, String password, String urlImagen) {
         this.id = id;
         this.nombre = nombre;
         this.email = email;
         this.password = password;
-        this.puntuacionGlobal = puntuacionGlobal;
+        this.urlImagen= urlImagen;
     }
 
 
@@ -57,25 +58,24 @@ public class Usuario implements Serializable {
         this.password = password;
     }
 
-    public double getPuntuacionGlobal() {
-        return puntuacionGlobal;
+    public String getUrlImagen() {
+        return urlImagen;
     }
 
-    public void setPuntuacionGlobal(double puntuacionGlobal) {
-        this.puntuacionGlobal = puntuacionGlobal;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Usuario usuario = (Usuario) o;
-        return id == usuario.id && Double.compare(puntuacionGlobal, usuario.puntuacionGlobal) == 0 && Objects.equals(nombre, usuario.nombre) && Objects.equals(email, usuario.email) && Objects.equals(password, usuario.password);
+    public void setUrlImagen(String urlImagen) {
+        this.urlImagen = urlImagen;
     }
 
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Usuario usuario = (Usuario) o;
+        return Objects.equals(id, usuario.id);
     }
 
     @Override
@@ -85,7 +85,6 @@ public class Usuario implements Serializable {
                 ", nombre='" + nombre + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
-                ", puntuacionGlobal=" + puntuacionGlobal +
                 '}';
     }
 }
