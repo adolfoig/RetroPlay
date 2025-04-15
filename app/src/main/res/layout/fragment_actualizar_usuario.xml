@@ -72,7 +72,7 @@
         app:hintTextColor="@color/azul"
         android:textColorHint="@color/textoLoginRegister"
         app:boxBackgroundColor="@color/gris"
-        android:hint="@string/nombreUsuario">
+        android:hint="@string/correoElectronico">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textoEmail"
@@ -97,7 +97,7 @@
         app:hintTextColor="@color/azul"
         android:textColorHint="@color/textoLoginRegister"
         app:boxBackgroundColor="@color/gris"
-        android:hint="@string/nombreUsuario">
+        android:hint="@string/contraseña">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textoPasswordAntigua"
@@ -122,7 +122,7 @@
         app:hintTextColor="@color/azul"
         android:textColorHint="@color/textoLoginRegister"
         app:boxBackgroundColor="@color/gris"
-        android:hint="@string/nombreUsuario">
+        android:hint="@string/passwordNueva">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textoPasswordNueva"
@@ -153,7 +153,7 @@
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/fotoPerfil"
+        android:text="@string/cambiarImagen"
         app:strokeColor="@color/azul"
         app:strokeWidth="1dp"
         android:textColor="@color/azul"

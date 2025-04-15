@@ -42,6 +42,15 @@ public class UsuarioViewModel extends ViewModel {
         usuarioRepository.actualizarUsuario(contrasenaActual, nuevoNombre, nuevaContrasena);
     }
 
+    public void  actualizarUsuarioConImagen(String contrasenaActual, String nuevoNombre, String nuevaContrasena){
+        usuarioRepository.actualizarUsuarioConImagen(contrasenaActual,nuevoNombre,nuevaContrasena);
+    }
+
+    // Asegúrate de que este método esté correctamente implementado
+    public void guardarDatosUsuario(String userId, String nombre, String email, String profileImageUrl) {
+        usuarioRepository.guardarDatosUsuarioFirestore(userId, nombre, email, profileImageUrl);
+    }
+
     public void registrarUsuario(String nombre, String email, String password, String profileImageUrl) {
         usuarioRepository.registrarUsuarioFirebase(email, password);
 
@@ -62,9 +71,6 @@ public class UsuarioViewModel extends ViewModel {
         });
     }
 
-    public void guardarDatosUsuario(String userId, String nombre, String email, String profileImageUrl) {
-        usuarioRepository.guardarDatosUsuarioFirestore(userId, nombre, email, profileImageUrl);
-    }
 
     public void cerrarSesion() {
         usuarioRepository.cerrarSesion();

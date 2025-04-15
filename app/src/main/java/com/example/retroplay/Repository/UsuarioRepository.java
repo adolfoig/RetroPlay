@@ -110,27 +110,42 @@ public class UsuarioRepository {
                 });
     }
 
+    public void actualizarUsuarioConImagen(String contrasenaActual, String nuevoNombre, String nuevaContrasena) {
+        FirebaseUser usuario = mAuth.getCurrentUser();
+        if (usuario == null) {
+            resultadoActualizarUsuario.postValue("Usuario no autenticado");
+            return;
+        }
+
+        if (nuevoNombre.isEmpty()) {
+            resultadoActualizarUsuario.postValue("El nombre es obligatorio");
+            return;
+        }
+
+        if (contrasenaActual.isEmpty()) {
+            resultadoActualizarUsuario.postValue("Debe ingresar su contraseña actual para realizar cambios");
+            return;
+        }
+
+        AuthCredential authCredential = EmailAuthProvider.getCredential(usuario.getEmail(), contrasenaActual);
+        usuario.reauthenticate(authCredential)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        actualizarDatosUsuario(usuario, nuevoNombre, nuevaContrasena);
+                    } else {
+                        resultadoActualizarUsuario.postValue("La contraseña actual no es correcta");
+                    }
+                });
+    }
+
+    // Modifica el método actualizarDatosUsuario para que no actualice Firestore
     private void actualizarDatosUsuario(FirebaseUser usuario, String nombre, String nuevaContrasena) {
         int totalOperations = 1;
         if (!nuevaContrasena.isEmpty()) totalOperations++;
 
         final int[] completedOperations = {0};
 
-        Map<String, Object> datosUsuario = new HashMap<>();
-        datosUsuario.put("nombre", nombre);
-        datosUsuario.put("email", usuario.getEmail());
-
-        int finalTotalOperations2 = totalOperations;
-        db.collection("Usuarios").document(usuario.getUid())
-                .set(datosUsuario)
-                .addOnSuccessListener(aVoid -> {
-                    Log.d(TAG, "Datos actualizados en Firestore");
-                    comprobarActualizacion(completedOperations, finalTotalOperations2);
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error al actualizar datos en Firestore", e);
-                    resultadoActualizarUsuario.postValue("Error al guardar datos");
-                });
+        // Elimina la parte de Firestore de este método, ya que lo manejaremos aparte
 
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                 .setDisplayName(nombre)
@@ -190,11 +205,8 @@ public class UsuarioRepository {
 
         db.collection("Usuarios").document(userId)
                 .set(userData)
-                .addOnSuccessListener(aVoid -> registroExitoso.postValue(true))
-                .addOnFailureListener(e -> {
-                    errorRegistro.postValue("Error al guardar datos: " + e.getMessage());
-                    Log.e(TAG, "Error al guardar datos", e);
-                });
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Datos actualizados en Firestore"))
+                .addOnFailureListener(e -> Log.e(TAG, "Error al actualizar Firestore", e));
     }
 
     public Task<DocumentSnapshot> getUsuarioPorId(String userId) {
