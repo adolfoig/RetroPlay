@@ -13,7 +13,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.retroplay.Repository.UsuarioRepository;
 import com.example.retroplay.Viewmodel.UsuarioViewModel;
 import com.example.retroplay.databinding.FragmentActualizarUsuarioBinding;
 
@@ -46,7 +45,7 @@ public class ActualizarUsuarioFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mostrarNombreyEmail();
+        setupObservers();
         cargarDatosUsuario();
 
         binding.btnRegistrarUsuario.setOnClickListener(v -> {
@@ -54,20 +53,19 @@ public class ActualizarUsuarioFragment extends Fragment {
             String contrasenaActual = binding.textoPasswordAntigua.getText().toString().trim();
             String nuevaContrasena = binding.textoPasswordNueva.getText().toString().trim();
 
-            usuarioViewModel.getUsuarioRepository().actualizarUsuario(contrasenaActual, nuevoNombre, nuevaContrasena);
+            usuarioViewModel.actualizarUsuario(contrasenaActual, nuevoNombre, nuevaContrasena);
         });
     }
 
-    private void mostrarNombreyEmail() {
-        UsuarioRepository usuarioRepository = usuarioViewModel.getUsuarioRepository(); // Cambiado a getUsuarioRepository
-
-        usuarioRepository.getDatosUsuarios().observe(getViewLifecycleOwner(), userData -> {
+    private void setupObservers() {
+        // Observador para los datos del usuario
+        usuarioViewModel.getDatosUsuario().observe(getViewLifecycleOwner(), userData -> {
             if (userData != null) {
                 // Actualizar nombre
-                binding.textoNombre.setText(userData.get("nombre"));
+                binding.textoNombre.setText(usuarioViewModel.getUserName(userData));
 
                 // Mostrar email (no editable)
-                String email = userData.get("email");
+                String email = usuarioViewModel.getUserEmail(userData);
                 if (email != null) {
                     binding.textoEmail.setText(email);
                     binding.textoEmail.setEnabled(false); // Deshabilitar edición
@@ -75,13 +73,16 @@ public class ActualizarUsuarioFragment extends Fragment {
             }
         });
 
-        usuarioRepository.getResultadoActualizacionUsuario().observe(getViewLifecycleOwner(), result -> {
+        // Observador para resultados de actualización
+        usuarioViewModel.getResultadoActualizacion().observe(getViewLifecycleOwner(), result -> {
             if (result != null) {
                 mostrarToast(result);
 
                 if (result.equals("Datos actualizados correctamente")) {
-                    usuarioRepository.cerrarSesion();
+                    // Si se actualizó correctamente, cerrar sesión
+                    usuarioViewModel.cerrarSesion();
                 } else if (result.equals("logout_success")) {
+                    // Si se cerró sesión, ir al login
                     mostrarToast("Sesión cerrada");
                     irALogin();
                 }
@@ -90,7 +91,7 @@ public class ActualizarUsuarioFragment extends Fragment {
     }
 
     private void cargarDatosUsuario() {
-        usuarioViewModel.getUsuarioRepository().cargarDatosUsuario();
+        usuarioViewModel.cargarDatosUsuario();
     }
 
     private void mostrarToast(String message) {

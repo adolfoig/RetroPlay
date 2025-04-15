@@ -4,6 +4,7 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.retroplay.Model.Usuario;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
@@ -23,40 +24,51 @@ public class UsuarioRepository {
 
     private final MutableLiveData<Map<String, String>> datosUsuario = new MutableLiveData<>();
     private final MutableLiveData<String> resultadoActualizarUsuario = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> registroExitoso = new MutableLiveData<>();
+    private final MutableLiveData<String> errorRegistro = new MutableLiveData<>();
 
     public UsuarioRepository() {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
     }
 
+    // Métodos para LiveData
+    public MutableLiveData<Map<String, String>> getDatosUsuario() {
+        return datosUsuario;
+    }
+
     public MutableLiveData<String> getResultadoActualizacionUsuario() {
         return resultadoActualizarUsuario;
     }
 
-    public MutableLiveData<Map<String, String>> getDatosUsuarios() {
-        return datosUsuario;
+    public MutableLiveData<Boolean> getRegistroExitoso() {
+        return registroExitoso;
     }
 
+    public MutableLiveData<String> getErrorRegistro() {
+        return errorRegistro;
+    }
+
+    // Métodos de autenticación existentes
     public void cargarDatosUsuario() {
         FirebaseUser usuario = mAuth.getCurrentUser();
         if (usuario != null) {
-
-            // Obtenemos el email del usuario
             String email = usuario.getEmail();
 
             db.collection("Usuarios").document(usuario.getUid())
                     .get()
                     .addOnSuccessListener(documentSnapshot -> {
                         Map<String, String> infoUsuario = new HashMap<>();
-
-                        // Siempre guardamos el email
                         infoUsuario.put("email", email);
 
                         if (documentSnapshot.exists()) {
                             String nombre = documentSnapshot.getString("nombre");
+                            String urlImagen = documentSnapshot.getString("UrlImagenPerfil");
                             infoUsuario.put("nombre", nombre != null ? nombre : usuario.getDisplayName());
+                            infoUsuario.put("urlImagen", urlImagen != null ? urlImagen : "");
                         } else {
                             infoUsuario.put("nombre", usuario.getDisplayName());
+                            infoUsuario.put("urlImagen", "");
                         }
 
                         datosUsuario.postValue(infoUsuario);
@@ -87,7 +99,6 @@ public class UsuarioRepository {
             return;
         }
 
-        // Reautenticación del usuario
         AuthCredential authCredential = EmailAuthProvider.getCredential(usuario.getEmail(), contrasenaActual);
         usuario.reauthenticate(authCredential)
                 .addOnCompleteListener(task -> {
@@ -105,7 +116,6 @@ public class UsuarioRepository {
 
         final int[] completedOperations = {0};
 
-        // Actualiza usuario ,guarda tanto nombre como email
         Map<String, Object> datosUsuario = new HashMap<>();
         datosUsuario.put("nombre", nombre);
         datosUsuario.put("email", usuario.getEmail());
@@ -122,7 +132,6 @@ public class UsuarioRepository {
                     resultadoActualizarUsuario.postValue("Error al guardar datos");
                 });
 
-        // Actualizar perfil de autenticación
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                 .setDisplayName(nombre)
                 .build();
@@ -136,7 +145,6 @@ public class UsuarioRepository {
                     comprobarActualizacion(completedOperations, finalTotalOperations1);
                 });
 
-        // Actualizar contraseña si se proporcionó
         if (!nuevaContrasena.isEmpty()) {
             int finalTotalOperations = totalOperations;
             usuario.updatePassword(nuevaContrasena)
@@ -154,6 +162,39 @@ public class UsuarioRepository {
         if (completedOperations[0] == totalOperations) {
             resultadoActualizarUsuario.postValue("Datos actualizados correctamente");
         }
+    }
+
+    // Nuevos métodos para el registro
+    public void registrarUsuarioFirebase(String email, String password) {
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            // Solo notificamos éxito en Auth, Firestore se manejará después
+                            registroExitoso.postValue(true);
+                        } else {
+                            errorRegistro.postValue("Error: usuario no autenticado");
+                        }
+                    } else {
+                        errorRegistro.postValue("Error: " + task.getException().getMessage());
+                    }
+                });
+    }
+
+    public void guardarDatosUsuarioFirestore(String userId, String nombre, String email, String profileImageUrl) {
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("nombre", nombre);
+        userData.put("email", email);
+        userData.put("UrlImagenPerfil", profileImageUrl);
+
+        db.collection("Usuarios").document(userId)
+                .set(userData)
+                .addOnSuccessListener(aVoid -> registroExitoso.postValue(true))
+                .addOnFailureListener(e -> {
+                    errorRegistro.postValue("Error al guardar datos: " + e.getMessage());
+                    Log.e(TAG, "Error al guardar datos", e);
+                });
     }
 
     public Task<DocumentSnapshot> getUsuarioPorId(String userId) {
