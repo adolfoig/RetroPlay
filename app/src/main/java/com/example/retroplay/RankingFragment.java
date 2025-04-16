@@ -123,7 +123,6 @@ public class RankingFragment extends Fragment {
                 TextView textView = view.findViewById(android.R.id.text1);
                 textView.setText(listaJuegos.get(position).getNombre());
                 textView.setTextColor(ContextCompat.getColor(getContext(), R.color.borde_gris));
-                // Fondo transparente para que se vea el gris_claro3 del popupBackground
                 textView.setBackgroundColor(Color.TRANSPARENT);
                 return view;
             }

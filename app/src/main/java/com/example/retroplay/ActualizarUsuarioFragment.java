@@ -131,7 +131,7 @@ public class ActualizarUsuarioFragment extends Fragment {
 
             if (imageUri != null) {
                 // Generar nombre único para la imagen
-                String nombreImagen = "profile_" + System.currentTimeMillis() + ".jpg";
+                String nombreImagen = obtenerNombreArchivo(currentImageUrl)+ ".jpg";
                 uploadImageAndUpdateUser(nombreImagen, contrasenaActual, nuevoNombre, email,
                         TextUtils.isEmpty(nuevaContrasena) ? null : nuevaContrasena);
             } else {
@@ -152,7 +152,7 @@ public class ActualizarUsuarioFragment extends Fragment {
             // Usar ImageUtils para convertir URI a File
             File imageFile = ImageUtils.getFileFromUri(requireContext(), imageUri);
 
-            uploadImage(imageFile).observe(getViewLifecycleOwner(), nuevaUrl -> {
+            uploadImage(imageFile, nombreImagen).observe(getViewLifecycleOwner(), nuevaUrl -> {
                 if (nuevaUrl != null) {
                     // Eliminar imagen anterior si existe
                     if (currentImageUrl != null && !currentImageUrl.isEmpty()) {
@@ -249,20 +249,23 @@ public class ActualizarUsuarioFragment extends Fragment {
         return resultLiveData;
     }
 
-    public LiveData<String> uploadImage(File imageFile) {
+    public LiveData<String> uploadImage(File imageFile, String customFileName) {
         // LiveData en el que devolveremos la URL pública de la imagen generada
         MutableLiveData<String> liveDataUrl = new MutableLiveData<>();
-
-        // Crear el cuerpo de la petición para enviar a Supabase (en él se envía el fichero)
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), imageFile);
-        MultipartBody.Part body = MultipartBody.Part.createFormData("file", imageFile.getName(), requestFile);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("file", customFileName, requestFile);
 
         // Llamada a la API de Supabase
         // Param 1: Tu API KEY (Autenticación)
         // Param 2: nombre de tu bucket
         // Param 3: nombre con el que se creará el fichero en Supabase
         // Param 4: cuerpo de la petición (imagen)
-        Call<Void> call = supabaseStorageApi.uploadImage("Bearer " + SUPABASE_AUTH_TOKEN, BUCKET_NAME, imageFile.getName(), body);
+        Call<Void> call = supabaseStorageApi.uploadImage(
+                "Bearer " + SUPABASE_AUTH_TOKEN,
+                BUCKET_NAME,
+                customFileName,
+                body
+        );;
 
         // Enviamos la petición
         call.enqueue(new Callback<Void>() {
