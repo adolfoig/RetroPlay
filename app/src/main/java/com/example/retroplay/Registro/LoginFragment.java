@@ -96,24 +96,39 @@ public class LoginFragment extends Fragment {
         googleSignInLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
+                    Log.d("GoogleSignIn", "Resultado recibido del intent de Google Sign-In");
+                    Log.d("GoogleSignIn", "ResultCode: " + result.getResultCode());
+
+                    Intent data = result.getData();
+                    if (data != null) {
+                        Log.d("GoogleSignIn", "Intent data: " + data.toString());
+                        Bundle extras = data.getExtras();
+                        if (extras != null) {
+                            for (String key : extras.keySet()) {
+                                Log.d("GoogleSignIn", "Extra [" + key + "]: " + extras.get(key));
+                            }
+                        }
+                    }
+
                     if (result.getResultCode() == getActivity().RESULT_OK) {
-                        Intent data = result.getData();
                         try {
                             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
                             if (task.isSuccessful()) {
+                                Log.d("GoogleSignIn", "Cuenta obtenida correctamente del intent");
                                 gestionarResultadoSignIn(task);
                             } else {
-                                Log.e("GoogleSignIn", "Error: " + task.getException());
+                                Exception e = task.getException();
+                                Log.e("GoogleSignIn", "Fallo en getSignedInAccountFromIntent", e);
                                 Toast.makeText(getActivity(), "Error al obtener cuenta de Google", Toast.LENGTH_SHORT).show();
                             }
                         } catch (Exception e) {
-                            Log.e("GoogleSignIn", "Excepción: " + e.getMessage());
+                            Log.e("GoogleSignIn", "Excepción procesando el intent: " + e.getMessage(), e);
                             Toast.makeText(getActivity(), "Error al procesar el resultado", Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         String errorMsg = "Código de resultado: " + result.getResultCode();
-                        if (result.getData() != null) {
-                            errorMsg += ", Extras: " + result.getData().getExtras();
+                        if (data != null && data.getExtras() != null) {
+                            errorMsg += ", Extras: " + data.getExtras().toString();
                         }
                         Log.e("GoogleSignIn", errorMsg);
                         Toast.makeText(getActivity(), "Error en el inicio de sesión: " + errorMsg, Toast.LENGTH_LONG).show();
@@ -121,6 +136,7 @@ public class LoginFragment extends Fragment {
                 }
         );
     }
+
 
     private void signInWithGoogle() {
         googleSignInClient.signOut().addOnCompleteListener(task -> {
@@ -132,12 +148,14 @@ public class LoginFragment extends Fragment {
     private void gestionarResultadoSignIn(Task<GoogleSignInAccount> task) {
         try {
             GoogleSignInAccount cuenta = task.getResult(ApiException.class);
+            Log.d("GoogleSignIn", "Inicio de sesión con Google exitoso. Usuario: " + cuenta.getEmail());
             firebaseAuthWithGoogle(cuenta);
         } catch (ApiException e) {
-            Log.e("GoogleSignIn", "Error al iniciar sesión con Google: " + e.getStatusCode() + " - " + e.getMessage());
+            Log.e("GoogleSignIn", "Error al iniciar sesión con Google. Código: " + e.getStatusCode(), e);
             Toast.makeText(getActivity(), "Error en el inicio de sesión con Google: " + e.getStatusCode(), Toast.LENGTH_SHORT).show();
         }
     }
+
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount cuenta) {
         AuthCredential credential = GoogleAuthProvider.getCredential(cuenta.getIdToken(), null);

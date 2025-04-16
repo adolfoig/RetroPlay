@@ -86,4 +86,7 @@ dependencies {
 
     implementation (libs.play.services.auth.v2070)
     implementation (libs.com.google.firebase.firebase.auth)
+
+    implementation(libs.play.services.auth.v2100)
+
 }
