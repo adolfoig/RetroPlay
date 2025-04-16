@@ -14,57 +14,76 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.retroplay.R;
+import com.example.retroplay.Supebase.SupabaseClient;
+import com.example.retroplay.Supebase.SupabaseStorageApi;
+import com.example.retroplay.Utils.ImageUtils;
+import com.example.retroplay.Viewmodel.UsuarioViewModel;
 import com.example.retroplay.databinding.FragmentRegistroBinding;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RegistroFragment extends Fragment {
 
     private FragmentRegistroBinding binding;
     private static final int PICK_IMAGE_REQUEST = 1;
-    private FirebaseAuth mAuth;
-    private FirebaseFirestore firestore;
-    private FirebaseStorage firebaseStorage;
+    private UsuarioViewModel usuarioViewModel;
     private Uri imageUri;
+    private static final String SUPABASE_AUTH_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImplcWh5empqd215YnZtbGl4aW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ2OTc0MjgsImV4cCI6MjA2MDI3MzQyOH0.04H44bmAJpwZo2wLQ92FghRse4KLSOLQJd9OICJJVvo";
+    private static final String BUCKET_NAME = "imagenes";
 
     public RegistroFragment() {
-        // Constructor vacío para poder navegar
+        // Constructor vacío
     }
 
     @SuppressLint({"MissingInflatedId", "ClickableViewAccessibility"})
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Asegúrate de inflar la vista correctamente
         binding = FragmentRegistroBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
 
-        mAuth = FirebaseAuth.getInstance();
-        firestore = FirebaseFirestore.getInstance();
-        firebaseStorage = FirebaseStorage.getInstance();
+        usuarioViewModel = new ViewModelProvider(this).get(UsuarioViewModel.class);
 
-        // Seleccionar imagen de perfil
         binding.btnSubirImagenPerfil.setOnClickListener(v -> openImageChooser());
-
-        // Registrar usuario
         binding.btnRegistrarUsuario.setOnClickListener(v -> registrarUsuario());
 
-        // Listener para cerrar el teclado cuando el usuario toque fuera de los campos de texto
+        usuarioViewModel.getRegistroExitoso().observe(getViewLifecycleOwner(), exito -> {
+            if (exito) {
+                Toast.makeText(getActivity(), "Usuario registrado exitosamente", Toast.LENGTH_SHORT).show();
+
+                // Navegar al LoginFragment
+                if (getActivity() != null) {
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, new LoginFragment())
+                            .addToBackStack(null)
+                            .commit();
+                }
+            }
+        });
+
+        usuarioViewModel.getErrorRegistro().observe(getViewLifecycleOwner(), error -> {
+            if (error != null) {
+                Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
+            }
+        });
+
         view.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 View currentFocus = getActivity().getCurrentFocus();
                 if (currentFocus != null) {
                     currentFocus.clearFocus();
-
-                    // Ocultar el teclado
                     android.view.inputmethod.InputMethodManager imm =
                             (android.view.inputmethod.InputMethodManager) getActivity().getSystemService(getContext().INPUT_METHOD_SERVICE);
                     if (imm != null) {
@@ -79,7 +98,6 @@ public class RegistroFragment extends Fragment {
     }
 
     private void openImageChooser() {
-        // Abrir el selector de imágenes
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
@@ -101,90 +119,62 @@ public class RegistroFragment extends Fragment {
         String password = binding.textoPassword.getText().toString().trim();
         String confirmPassword = binding.textoConfirmarPassword.getText().toString().trim();
 
-        // Validación de campos vacíos
         if (TextUtils.isEmpty(nombre) || TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(confirmPassword)) {
             Toast.makeText(getActivity(), "Completa todos los campos", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Validar el formato del correo electrónico
         if (!email.contains("@")) {
             Toast.makeText(getActivity(), "Correo electrónico inválido", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Verificar si las contraseñas coinciden
         if (!password.equals(confirmPassword)) {
             Toast.makeText(getActivity(), "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Verificar la longitud de la contraseña
         if (password.length() < 6) {
             Toast.makeText(getActivity(), "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Crear usuario con Firebase Authentication
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(getActivity(), task -> {
-                    if (task.isSuccessful()) {
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        if (user == null) {
-                            Toast.makeText(getActivity(), "Error: usuario no autenticado", Toast.LENGTH_SHORT).show();
-                            return;
-                        } else {
-                            uploadProfileImage(user);
-                        }
-                    } else {
-                        Toast.makeText(getActivity(), "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-    private void uploadProfileImage(FirebaseUser usuario) {
         if (imageUri != null) {
-            StorageReference fileReference = firebaseStorage.getReference().child("profile_images/" + usuario.getUid() + ".jpg");
-
-            fileReference.putFile(imageUri).addOnSuccessListener(taskSnapshot -> {
-                fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
-                    // Guardar la URL de la imagen de perfil en Firestore
-                    guardarDatosUsuario(usuario, uri.toString());
-                });
-            }).addOnFailureListener(e -> {
-                Toast.makeText(getActivity(), "Error al cargar la imagen", Toast.LENGTH_SHORT).show();
-            });
+            uploadProfileImageToSupabase(nombre, email, password);
         } else {
-            guardarDatosUsuario(usuario, null);
+            usuarioViewModel.registrarUsuario(nombre, email, password, null);
         }
     }
 
-    private void guardarDatosUsuario(FirebaseUser usuario, String profileImageUrl) {
-        // Guardar los datos del usuario en Firestore
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("nombre", binding.textoNombre.getText().toString().trim());
-        userData.put("email", binding.textoEmail.getText().toString().trim());
-        userData.put("profileImageUrl", profileImageUrl);
+    private void uploadProfileImageToSupabase(String nombre, String email, String password) {
+        try {
+            File imageFile = ImageUtils.getFileFromUri(requireContext(), imageUri);
+            String fileName = email.hashCode() + ".jpg"; // Usamos hash del email como nombre temporal
 
-        firestore.collection("Usuarios").document(usuario.getUid())
-                .set(userData)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getActivity(), "Usuario registrado exitosamente", Toast.LENGTH_SHORT).show();
-                    getActivity().finish(); // Cerrar actividad después del registro
-                    irLoginFragment();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getActivity(), "Error al guardar datos: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
-    }
+            RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), imageFile);
+            MultipartBody.Part body = MultipartBody.Part.createFormData("file", fileName, requestFile);
 
-    private void irLoginFragment() {
-        LoginFragment loginFragment = new LoginFragment();
+            SupabaseStorageApi api = SupabaseClient.getClient().create(SupabaseStorageApi.class);
+            Call<Void> call = api.uploadImage(SUPABASE_AUTH_TOKEN, BUCKET_NAME, fileName, body);
 
-        // Reemplazar el fragmento actual por el de login
-        getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, loginFragment)
-                .addToBackStack(null)
-                .commit();
+            call.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.isSuccessful()) {
+                        String imageUrl = SupabaseClient.BASE_URL + "/storage/v1/object/public/" + BUCKET_NAME + "/" + fileName;
+                        // Pasar todos los parámetros al ViewModel
+                        usuarioViewModel.registrarUsuario(nombre, email, password, imageUrl);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Toast.makeText(getActivity(), "Error de conexión: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        } catch (IOException e) {
+            Toast.makeText(getActivity(), "Error al procesar la imagen", Toast.LENGTH_SHORT).show();
+        }
     }
 }

@@ -4,29 +4,50 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.retroplay.Repository.JuegosRepository;
 import com.example.retroplay.Model.Juego;
+import com.example.retroplay.Repository.JuegosRepository;
 
 import java.util.List;
 
 public class JuegosViewModel extends ViewModel {
-    private final JuegosRepository juegosRepository = new JuegosRepository();
-    private final MutableLiveData<String> mensajeError = new MutableLiveData<>();
-    private final MutableLiveData<List<Juego>> juegos = new MutableLiveData<>();
+    private final JuegosRepository repository = new JuegosRepository();
+    private final MutableLiveData<List<Juego>> juegosLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Integer> scoreLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> saveScoreLiveData = new MutableLiveData<>();
+    private final MutableLiveData<String> errorLiveData = new MutableLiveData<>();
 
-
+    // Métodos existentes para juegos
     public LiveData<List<Juego>> getJuegos() {
-        if (juegos.getValue() == null) {
-            cargarJuegos();
+        if (juegosLiveData.getValue() == null) {
+            loadJuegos();
         }
-        return juegos;
+        return juegosLiveData;
     }
 
-    public LiveData<String> getMensajeError() {
-        return mensajeError;
+    private void loadJuegos() {
+        repository.getJuegos().observeForever(juegosLiveData::setValue);
     }
 
-    private void cargarJuegos() {
-        juegosRepository.getJuegos().observeForever(juegos::setValue);
+    // Nuevos métodos para puntuaciones
+    public void fetchScore(String gameId) {
+        repository.fetchScore(gameId, scoreLiveData, errorLiveData);
+    }
+
+    public LiveData<Integer> getScore() {
+        return scoreLiveData;
+    }
+
+    public LiveData<Boolean> getSaveScoreResult() {
+        return saveScoreLiveData;
+    }
+
+    public LiveData<String> getError() {
+        return errorLiveData;
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        repository.cleanup();
     }
 }

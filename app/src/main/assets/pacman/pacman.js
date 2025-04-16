@@ -1,19 +1,5 @@
-
-
-/*jslint browser: true, undef: true, eqeqeq: true, nomen: true, white: true */
-/*global window: false, document: false */
-
-/*
- * fix looped audio
- * add fruits + levels
- * fix what happens when a ghost is eaten (should go back to base)
- * do proper ghost mechanics (blinky/wimpy etc)
- */
-
-
-
 // Definir variables para la IP, puerto y el score
-const ip = '192.168.1.43';
+const ip = '172.25.0.1';
 const puerto = '3000';
 
 let finalScore = 0;

@@ -1,7 +1,6 @@
 package com.example.retroplay.Registro;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -10,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -88,6 +86,7 @@ public class LoginFragment extends Fragment {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id)) // Usa tu Web client ID
                 .requestEmail()
+                //.setAccountName(null)
                 .build();
 
         googleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
@@ -99,18 +98,35 @@ public class LoginFragment extends Fragment {
                 result -> {
                     if (result.getResultCode() == getActivity().RESULT_OK) {
                         Intent data = result.getData();
-                        Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-                        gestionarResultadoSignIn(task);
+                        try {
+                            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                            if (task.isSuccessful()) {
+                                gestionarResultadoSignIn(task);
+                            } else {
+                                Log.e("GoogleSignIn", "Error: " + task.getException());
+                                Toast.makeText(getActivity(), "Error al obtener cuenta de Google", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (Exception e) {
+                            Log.e("GoogleSignIn", "Excepción: " + e.getMessage());
+                            Toast.makeText(getActivity(), "Error al procesar el resultado", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
-                        Toast.makeText(getActivity(), "Error en el inicio de sesión con Google", Toast.LENGTH_SHORT).show();
+                        String errorMsg = "Código de resultado: " + result.getResultCode();
+                        if (result.getData() != null) {
+                            errorMsg += ", Extras: " + result.getData().getExtras();
+                        }
+                        Log.e("GoogleSignIn", errorMsg);
+                        Toast.makeText(getActivity(), "Error en el inicio de sesión: " + errorMsg, Toast.LENGTH_LONG).show();
                     }
                 }
         );
     }
 
     private void signInWithGoogle() {
-        Intent intent = googleSignInClient.getSignInIntent();
-        googleSignInLauncher.launch(intent);
+        googleSignInClient.signOut().addOnCompleteListener(task -> {
+            Intent signInIntent = googleSignInClient.getSignInIntent();
+            googleSignInLauncher.launch(signInIntent);
+        });
     }
 
     private void gestionarResultadoSignIn(Task<GoogleSignInAccount> task) {

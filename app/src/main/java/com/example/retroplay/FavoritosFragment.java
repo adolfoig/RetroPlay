@@ -55,12 +55,6 @@ public class FavoritosFragment extends Fragment {
     private void setupRecyclerView() {
         binding.recyclerViewFavoritos.setLayoutManager(new GridLayoutManager(requireContext(), 2));
 
-        DefaultItemAnimator animator = new DefaultItemAnimator();
-        animator.setAddDuration(200);
-        animator.setRemoveDuration(200);
-        animator.setChangeDuration(150);
-        binding.recyclerViewFavoritos.setItemAnimator(animator);
-
         adapter = new FavoritosAdapter();
         binding.recyclerViewFavoritos.setAdapter(adapter);
     }
@@ -97,14 +91,14 @@ public class FavoritosFragment extends Fragment {
         viewModel.getJuegoEliminado().observe(getViewLifecycleOwner(), message -> {
             if (message != null) {
                 Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
-                viewModel.juegoEliminado.setValue(null); // Resetear el valor
+                viewModel.juegoEliminado.setValue(null);
             }
         });
 
         viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
             if (error != null) {
                 Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show();
-                viewModel.errorMessage.setValue(null); // Resetear el valor
+                viewModel.errorMessage.setValue(null);
             }
         });
     }
@@ -192,7 +186,7 @@ public class FavoritosFragment extends Fragment {
     private void navegarAWebView(String idJuego) {
         Bundle bundle = new Bundle();
         bundle.putString("idJuego", idJuego);
-        navController.navigate(R.id.action_favoritosFragment_to_jugarJuegoFragment, bundle);
+        navController.navigate(R.id.action_favoritosFragment_to_detailFragment, bundle);
     }
 
     @Override

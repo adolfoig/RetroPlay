@@ -82,7 +82,7 @@ public class LogrosFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull LogroViewHolder holder, int position) {
             Logro logro = logros.get(position);
-            holder.binding.textoDescipcion.setText(logro.getDescripcion());
+            holder.binding.textoDescripcion.setText(logro.getDescripcion());
 
             if (logro.getDescripcion().contains("PACMAN")) {
                 holder.binding.getRoot().setBackgroundResource(R.drawable.logro_pacman);

@@ -3,6 +3,7 @@ package com.example.retroplay;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,8 @@ import com.example.retroplay.databinding.NavHeaderBinding;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -37,11 +40,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         setContentView((binding = ActivityMainBinding.inflate(getLayoutInflater())).getRoot());
 
         headerBinding = NavHeaderBinding.bind(binding.navigationDrawer.getHeaderView(0));
+
 
 
         // Bloquear giro de pantalla
@@ -126,6 +131,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         binding.toolbar.setVisibility(View.VISIBLE);
 
     }
+    void mostrarToolBar() {
+        // Mostramos el Toolbar y BottomNavigation
+        binding.toolbar.setVisibility(View.VISIBLE);
+
+    }
 
     private void ocultarBottomNavView(){
         binding.bottomNavView.setVisibility(View.GONE);
@@ -146,7 +156,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             // Oculta o muestra la interfaz según el fragmento actual
             if (destinationId == R.id.loginFragment || destinationId == R.id.registroFragment || destinationId == R.id.jugarJuegoFragment) {
                 ocultarInterfaz2();
-            } else {
+            } else if(destinationId == R.id.detailFragment){
+                ocultarBottomNavView();
+            }
+            else {
                 mostrarInterfaz2(); // Muestra la interfaz por defecto en otros fragmentos
             }
         });
@@ -179,22 +192,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void datosUsuarioHeaderDrawer() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null){
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) return;
 
-            headerBinding.nombreUsuario.setText(currentUser.getDisplayName());
-            headerBinding.emailUsuario.setText(currentUser.getEmail());
-        } else {
-            return;
-        }
+        // Configurar valores por defecto
+        headerBinding.nombreUsuario.setText("Usuario");
+        headerBinding.emailUsuario.setText(user.getEmail());
+        headerBinding.imageView.setImageResource(R.drawable.logo);
 
-        if (currentUser.getPhotoUrl() != null) {
-            Glide.with(this)
-                    .load(currentUser.getPhotoUrl())
-                    .into(headerBinding.imageView);
-        } else {
-            headerBinding.imageView.setImageResource(R.drawable.logo);
-        }
+        // Obtener datos del usuario desde Firestore
+        FirebaseFirestore.getInstance()
+                .collection("Usuarios")
+                .document(user.getUid())
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        DocumentSnapshot doc = task.getResult();
+
+                        // Actualizar nombre si existe
+                        if (doc.contains("nombre")) {
+                            headerBinding.nombreUsuario.setText(doc.getString("nombre"));
+                        }
+
+                        // Cargar imagen si existe
+                        if (doc.contains("UrlImagenPerfil")) {
+                            String imageUrl = doc.getString("UrlImagenPerfil");
+                            if (imageUrl != null && !imageUrl.isEmpty()) {
+                                Glide.with(this)
+                                        .load(imageUrl)
+                                        .circleCrop() // Esta línea hace la imagen redonda
+                                        .placeholder(R.drawable.logo)
+                                        .error(R.drawable.logo)
+                                        .into(headerBinding.imageView);
+                            }
+                        }
+                    }
+                });
     }
 
     @Override
