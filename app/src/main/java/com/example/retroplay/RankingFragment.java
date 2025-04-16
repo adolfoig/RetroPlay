@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.retroplay.Model.Puntuacion;
 import com.example.retroplay.Viewmodel.RankingViewModel;
 import com.example.retroplay.Model.Juego;
 import com.example.retroplay.databinding.FragmentRankingBinding;
@@ -25,6 +26,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class RankingFragment extends Fragment {
@@ -186,19 +188,26 @@ public class RankingFragment extends Fragment {
             return;
         }
 
-        int posicion = 1; // Contador para la posición en el ranking
+        List<Puntuacion> puntuaciones = new ArrayList<>();
         for (QueryDocumentSnapshot document : task.getResult()) {
             String idUsuario = document.getString("idUsuario");
             Long puntuacionMaxima = document.getLong("puntuacionMaxima");
             int puntuacion = puntuacionMaxima != null ? puntuacionMaxima.intValue() : 0;
+            puntuaciones.add(new Puntuacion(idUsuario, puntuacion));
+        }
 
-            viewModel.obtenerNombreUsuario(idUsuario, puntuacion, posicion, new UserNameCallback() {
+        Collections.sort(puntuaciones, (p1, p2) -> p2.getPuntuacion() - p1.getPuntuacion());
+
+        for (int i = 0; i < puntuaciones.size(); i++) {
+            final int posicion = i + 1;
+            Puntuacion p = puntuaciones.get(i);
+
+            viewModel.obtenerNombreUsuario(p.getIdUsuario(), p.getPuntuacion(), posicion, new UserNameCallback() {
                 @Override
                 public void onUserNameLoaded(String nombreUsuario, int puntuacion, int posicion, boolean esUsuarioActual) {
                     agregarFilaTabla(nombreUsuario, puntuacion, posicion, esUsuarioActual);
                 }
             });
-            posicion++;
         }
     }
 
