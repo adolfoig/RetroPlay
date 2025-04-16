@@ -91,7 +91,13 @@ public class UsuarioRepository {
             return;
         }
 
-        // Validaciones mejoradas con TextUtils
+        // Validar que la nueva contraseña no sea igual a la actual
+        if (!TextUtils.isEmpty(nuevaContrasena) && nuevaContrasena.equals(contrasenaActual)) {
+            resultadoActualizarUsuario.postValue("La nueva contraseña no puede ser igual a la actual");
+            return;
+        }
+
+        // Resto de validaciones...
         if (TextUtils.isEmpty(nuevoNombre)) {
             resultadoActualizarUsuario.postValue("El nombre es obligatorio");
             return;
@@ -126,7 +132,7 @@ public class UsuarioRepository {
                             actualizarPerfilCompleto(usuario, nuevoNombre, nuevaContrasena, urlImagenPerfil);
                         }
                     } else {
-                        resultadoActualizarUsuario.postValue("La contraseña actual no es correcta");
+                        resultadoActualizarUsuario.postValue("Contraseña actual incorrecta");
                     }
                 });
     }
@@ -173,10 +179,10 @@ public class UsuarioRepository {
                 .update(updates)
                 .addOnSuccessListener(aVoid -> {
                     resultadoActualizarUsuario.postValue("Datos actualizados correctamente");
-                    cargarDatosUsuario(); // Refrescar datos
+                    cargarDatosUsuario();
                 })
                 .addOnFailureListener(e -> {
-                    resultadoActualizarUsuario.postValue("Error al actualizar Firestore: " + e.getMessage());
+                    resultadoActualizarUsuario.postValue("Error al guardar datos: " + e.getMessage());
                 });
     }
     private void comprobarActualizacion(int[] completedOperations, int totalOperations) {

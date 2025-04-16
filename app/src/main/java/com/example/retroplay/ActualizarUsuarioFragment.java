@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.example.retroplay.Supebase.SupabaseStorageApi;
+import com.example.retroplay.Utils.ImageUtils;
 import com.example.retroplay.Viewmodel.UsuarioViewModel;
 import com.example.retroplay.databinding.FragmentActualizarUsuarioBinding;
 
@@ -88,6 +89,22 @@ public class ActualizarUsuarioFragment extends Fragment {
         setupObservers();
         cargarDatosUsuario();
 
+        usuarioViewModel.getResultadoActualizacion().observe(getViewLifecycleOwner(), resultado -> {
+            if (resultado != null) {
+                if (resultado.equals("Datos actualizados correctamente")) {
+                    mostrarToast("Perfil actualizado correctamente");
+                    usuarioViewModel.cerrarSesion();
+                    irALogin();
+                } else if (resultado.equals("Contraseña actual incorrecta")) {
+                    mostrarToast("La contraseña actual es incorrecta");
+                } else if (resultado.equals("La nueva contraseña no puede ser igual a la actual")) {
+                    mostrarToast("La nueva contraseña debe ser diferente a la actual");
+                } else if (resultado.startsWith("Error")) {
+                    mostrarToast(resultado);
+                }
+            }
+        });
+
         binding.btnSubirImagenPerfil.setOnClickListener(v -> openImageChooser());
 
         binding.btnRegistrarUsuario.setOnClickListener(v -> {
@@ -113,6 +130,7 @@ public class ActualizarUsuarioFragment extends Fragment {
             }
 
             if (imageUri != null) {
+                // Generar nombre único para la imagen
                 String nombreImagen = "profile_" + System.currentTimeMillis() + ".jpg";
                 uploadImageAndUpdateUser(nombreImagen, contrasenaActual, nuevoNombre, email,
                         TextUtils.isEmpty(nuevaContrasena) ? null : nuevaContrasena);
@@ -124,16 +142,6 @@ public class ActualizarUsuarioFragment extends Fragment {
                         TextUtils.isEmpty(nuevaContrasena) ? null : nuevaContrasena,
                         currentImageUrl
                 );
-
-                usuarioViewModel.getResultadoActualizacion().observe(getViewLifecycleOwner(), resultado -> {
-                    if (resultado != null && resultado.equals("Datos actualizados correctamente")) {
-                        mostrarToast("Perfil actualizado correctamente");
-                        usuarioViewModel.cerrarSesion();
-                        irALogin();
-                    } else if (resultado != null && resultado.startsWith("Error")) {
-                        mostrarToast(resultado);
-                    }
-                });
             }
         });
     }
@@ -141,17 +149,8 @@ public class ActualizarUsuarioFragment extends Fragment {
     private void uploadImageAndUpdateUser(String nombreImagen, String contrasenaActual,
                                           String nuevoNombre, String email, String nuevaContrasena) {
         try {
-            // Convertir URI a File de manera segura
-            InputStream inputStream = requireContext().getContentResolver().openInputStream(imageUri);
-            File imageFile = new File(requireContext().getCacheDir(), nombreImagen);
-            FileOutputStream outputStream = new FileOutputStream(imageFile);
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = inputStream.read(buffer)) > 0) {
-                outputStream.write(buffer, 0, length);
-            }
-            outputStream.close();
-            inputStream.close();
+            // Usar ImageUtils para convertir URI a File
+            File imageFile = ImageUtils.getFileFromUri(requireContext(), imageUri);
 
             uploadImage(imageFile).observe(getViewLifecycleOwner(), nuevaUrl -> {
                 if (nuevaUrl != null) {
@@ -168,17 +167,6 @@ public class ActualizarUsuarioFragment extends Fragment {
                             nuevaContrasena,
                             nuevaUrl
                     );
-
-                    // Observar el resultado de la actualización
-                    usuarioViewModel.getResultadoActualizacion().observe(getViewLifecycleOwner(), resultado -> {
-                        if (resultado != null && resultado.equals("Datos actualizados correctamente")) {
-                            mostrarToast("Perfil actualizado correctamente");
-                            usuarioViewModel.cerrarSesion();
-                            irALogin();
-                        } else if (resultado != null && resultado.startsWith("Error")) {
-                            mostrarToast(resultado);
-                        }
-                    });
                 } else {
                     mostrarToast("Error al subir la imagen");
                 }
@@ -234,14 +222,12 @@ public class ActualizarUsuarioFragment extends Fragment {
     public LiveData<Boolean> deleteImage(String fileUrl) {
         MutableLiveData<Boolean> resultLiveData = new MutableLiveData<>();
 
-        // Extraer el nombre del archivo de la URL pública
         String fileName = obtenerNombreArchivo(fileUrl);
         if (fileName == null) {
             resultLiveData.postValue(false);
             return resultLiveData;
         }
 
-        // Llamada a la API de Supabase para eliminar la imagen
         Call<Void> call = supabaseStorageApi.deleteImage("Bearer " + SUPABASE_AUTH_TOKEN, BUCKET_NAME, fileName);
 
         call.enqueue(new Callback<Void>() {
@@ -305,7 +291,6 @@ public class ActualizarUsuarioFragment extends Fragment {
         return liveDataUrl;
     }
 
-    // Método auxiliar para extraer el nombre del archivo de la URL pública
     private String obtenerNombreArchivo(String fileUrl) {
         try {
             Uri uri = Uri.parse(fileUrl);
