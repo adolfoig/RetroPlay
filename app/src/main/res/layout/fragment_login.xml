@@ -68,6 +68,7 @@
         app:boxStrokeColor="@color/borde_gris"
         android:layout_marginBottom="10dp"
         app:hintTextColor="@color/azul"
+        app:cursorColor="@color/azul"
         android:textColorHint="@color/textoLoginRegister"
         app:boxBackgroundColor="@color/gris"
         android:hint="@string/contraseña">
