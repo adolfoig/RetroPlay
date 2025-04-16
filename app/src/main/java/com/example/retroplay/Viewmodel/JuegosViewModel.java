@@ -1,5 +1,9 @@
 package com.example.retroplay.Viewmodel;
 
+import android.app.Application;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -9,12 +13,16 @@ import com.example.retroplay.Repository.JuegosRepository;
 
 import java.util.List;
 
-public class JuegosViewModel extends ViewModel {
+public class JuegosViewModel extends AndroidViewModel {
     private final JuegosRepository repository = new JuegosRepository();
     private final MutableLiveData<List<Juego>> juegosLiveData = new MutableLiveData<>();
     private final MutableLiveData<Integer> scoreLiveData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> saveScoreLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> errorLiveData = new MutableLiveData<>();
+
+    public JuegosViewModel(@NonNull Application application) {
+        super(application);
+    }
 
     // Métodos existentes para juegos
     public LiveData<List<Juego>> getJuegos() {

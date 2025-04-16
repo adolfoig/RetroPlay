@@ -80,7 +80,7 @@ public class RankingFragment extends Fragment {
 
                 listaJuegos = juegos;
                 if (isEmpty) {
-                    binding.tvTituloJuego.setText("Ningún juego seleccionado");
+                    binding.tvTituloJuego.setText(R.string.ningunJuego);
                     limpiarTablaPuntuaciones();
                 }
                 configurarSpinner();
@@ -101,10 +101,7 @@ public class RankingFragment extends Fragment {
             return;
         }
 
-        ArrayAdapter<Juego> adapter = new ArrayAdapter<Juego>(
-                context,
-                R.layout.spinner_item_selected,  // Layout para el item seleccionado
-                listaJuegos) {
+        ArrayAdapter<Juego> adapter = new ArrayAdapter<Juego>(context, R.layout.spinner_item_selected, listaJuegos) {
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
@@ -130,7 +127,6 @@ public class RankingFragment extends Fragment {
             }
         };
 
-        // Usa tu layout personalizado para los items del dropdown
         adapter.setDropDownViewResource(R.layout.spinner_dropbox_item);
 
         binding.spinnerJuegos.setAdapter(adapter);

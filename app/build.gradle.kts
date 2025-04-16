@@ -33,10 +33,17 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+        isCoreLibraryDesugaringEnabled = true
+
+
     }
 }
 
 dependencies {
+
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -53,30 +60,30 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
 
     // RecyclerView
-    implementation("androidx.recyclerview:recyclerview:1.2.1")
+    implementation(libs.recyclerview)
 
     // Glide (una sola versión)
-    implementation("com.github.bumptech.glide:glide:4.15.1")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")
+    implementation(libs.glide)
+    annotationProcessor(libs.compiler)
 
     // Firebase BoM (Bill of Materials para gestionar versiones automáticamente)
-    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
+    implementation(platform(libs.firebase.bom))
 
     // Dependencias de Firebase
-    implementation("com.google.firebase:firebase-firestore")
-    implementation("com.google.firebase:firebase-auth")
+    implementation(libs.google.firebase.firestore)
+    implementation(libs.google.firebase.auth)
 
     // Google Sign-In (Fuera de BOM, ya que no es parte de Firebase)
-    implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation(libs.play.services.auth)
 
     // Retrofit para realizar peticiones HTTP
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 
     // OkHttp para manejo avanzado de solicitudes HTTP
-    implementation("com.squareup.okhttp3:okhttp:4.9.3")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
 
-    implementation ("com.google.android.gms:play-services-auth:20.7.0")
-    implementation ("com.google.firebase:firebase-auth:22.3.0")
+    implementation (libs.play.services.auth.v2070)
+    implementation (libs.com.google.firebase.firebase.auth)
 }
