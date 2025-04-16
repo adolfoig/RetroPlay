@@ -38,12 +38,20 @@ public class UsuarioViewModel extends ViewModel {
         usuarioRepository.cargarDatosUsuario();
     }
 
-    public void actualizarUsuario(String contrasenaActual, String nuevoNombre, String nuevaContrasena) {
-        usuarioRepository.actualizarUsuario(contrasenaActual, nuevoNombre, nuevaContrasena);
+    public void actualizarUsuario(String contrasenaActual, String nuevoNombre,
+                                  String email, String nuevaContrasena, String urlImagenPerfil) {
+        usuarioRepository.actualizarUsuario(
+                contrasenaActual,
+                nuevoNombre,
+                email,
+                nuevaContrasena,
+                urlImagenPerfil
+        );
     }
 
-    public void  actualizarUsuarioConImagen(String contrasenaActual, String nuevoNombre, String nuevaContrasena){
-        usuarioRepository.actualizarUsuarioConImagen(contrasenaActual,nuevoNombre,nuevaContrasena);
+    // Añadir observador para cambios en el resultado
+    public LiveData<String> observeUpdateResult() {
+        return usuarioRepository.getResultadoActualizacionUsuario();
     }
 
     // Asegúrate de que este método esté correctamente implementado

@@ -1,5 +1,6 @@
 package com.example.retroplay.Repository;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
@@ -82,20 +83,27 @@ public class UsuarioRepository {
         }
     }
 
-    public void actualizarUsuario(String contrasenaActual, String nuevoNombre, String nuevaContrasena) {
+    public void actualizarUsuario(String contrasenaActual, String nuevoNombre,
+                                  String nuevoEmail, String nuevaContrasena, String urlImagenPerfil) {
         FirebaseUser usuario = mAuth.getCurrentUser();
         if (usuario == null) {
             resultadoActualizarUsuario.postValue("Usuario no autenticado");
             return;
         }
 
-        if (nuevoNombre.isEmpty()) {
+        // Validaciones mejoradas con TextUtils
+        if (TextUtils.isEmpty(nuevoNombre)) {
             resultadoActualizarUsuario.postValue("El nombre es obligatorio");
             return;
         }
 
-        if (contrasenaActual.isEmpty()) {
-            resultadoActualizarUsuario.postValue("Debe ingresar su contraseña actual para realizar cambios");
+        if (TextUtils.isEmpty(nuevoEmail)) {
+            resultadoActualizarUsuario.postValue("El email es obligatorio");
+            return;
+        }
+
+        if (TextUtils.isEmpty(contrasenaActual)) {
+            resultadoActualizarUsuario.postValue("Debe ingresar su contraseña actual");
             return;
         }
 
@@ -103,75 +111,74 @@ public class UsuarioRepository {
         usuario.reauthenticate(authCredential)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        actualizarDatosUsuario(usuario, nuevoNombre, nuevaContrasena);
+                        // Actualizar email si cambió
+                        if (!usuario.getEmail().equals(nuevoEmail)) {
+                            usuario.updateEmail(nuevoEmail)
+                                    .addOnCompleteListener(emailTask -> {
+                                        if (emailTask.isSuccessful()) {
+                                            actualizarPerfilCompleto(usuario, nuevoNombre, nuevaContrasena, urlImagenPerfil);
+                                        } else {
+                                            resultadoActualizarUsuario.postValue("Error al actualizar email: " +
+                                                    emailTask.getException().getMessage());
+                                        }
+                                    });
+                        } else {
+                            actualizarPerfilCompleto(usuario, nuevoNombre, nuevaContrasena, urlImagenPerfil);
+                        }
                     } else {
                         resultadoActualizarUsuario.postValue("La contraseña actual no es correcta");
                     }
                 });
     }
 
-    public void actualizarUsuarioConImagen(String contrasenaActual, String nuevoNombre, String nuevaContrasena) {
-        FirebaseUser usuario = mAuth.getCurrentUser();
-        if (usuario == null) {
-            resultadoActualizarUsuario.postValue("Usuario no autenticado");
-            return;
-        }
-
-        if (nuevoNombre.isEmpty()) {
-            resultadoActualizarUsuario.postValue("El nombre es obligatorio");
-            return;
-        }
-
-        if (contrasenaActual.isEmpty()) {
-            resultadoActualizarUsuario.postValue("Debe ingresar su contraseña actual para realizar cambios");
-            return;
-        }
-
-        AuthCredential authCredential = EmailAuthProvider.getCredential(usuario.getEmail(), contrasenaActual);
-        usuario.reauthenticate(authCredential)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        actualizarDatosUsuario(usuario, nuevoNombre, nuevaContrasena);
-                    } else {
-                        resultadoActualizarUsuario.postValue("La contraseña actual no es correcta");
-                    }
-                });
-    }
-
-    // Modifica el método actualizarDatosUsuario para que no actualice Firestore
-    private void actualizarDatosUsuario(FirebaseUser usuario, String nombre, String nuevaContrasena) {
-        int totalOperations = 1;
-        if (!nuevaContrasena.isEmpty()) totalOperations++;
-
-        final int[] completedOperations = {0};
-
-        // Elimina la parte de Firestore de este método, ya que lo manejaremos aparte
-
+    private void actualizarPerfilCompleto(FirebaseUser usuario, String nuevoNombre,
+                                          String nuevaContrasena, String urlImagenPerfil) {
+        // Actualizar nombre en Firebase Auth
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                .setDisplayName(nombre)
+                .setDisplayName(nuevoNombre)
                 .build();
 
-        int finalTotalOperations1 = totalOperations;
         usuario.updateProfile(profileUpdates)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Log.d(TAG, "Perfil de autenticación actualizado");
-                    }
-                    comprobarActualizacion(completedOperations, finalTotalOperations1);
-                });
-
-        if (!nuevaContrasena.isEmpty()) {
-            int finalTotalOperations = totalOperations;
-            usuario.updatePassword(nuevaContrasena)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "Contraseña actualizada");
+                .addOnCompleteListener(profileTask -> {
+                    if (profileTask.isSuccessful()) {
+                        // Actualizar contraseña si se proporcionó una nueva
+                        if (!TextUtils.isEmpty(nuevaContrasena)) {
+                            usuario.updatePassword(nuevaContrasena)
+                                    .addOnCompleteListener(passwordTask -> {
+                                        if (passwordTask.isSuccessful()) {
+                                            guardarDatosEnFirestore(usuario, nuevoNombre, urlImagenPerfil);
+                                        } else {
+                                            resultadoActualizarUsuario.postValue("Error al actualizar contraseña: " +
+                                                    passwordTask.getException().getMessage());
+                                        }
+                                    });
+                        } else {
+                            guardarDatosEnFirestore(usuario, nuevoNombre, urlImagenPerfil);
                         }
-                        comprobarActualizacion(completedOperations, finalTotalOperations);
-                    });
-        }
+                    } else {
+                        resultadoActualizarUsuario.postValue("Error al actualizar perfil: " +
+                                profileTask.getException().getMessage());
+                    }
+                });
     }
 
+    private void guardarDatosEnFirestore(FirebaseUser usuario, String nombre, String urlImagenPerfil) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("nombre", nombre);
+        if (urlImagenPerfil != null) {
+            updates.put("UrlImagenPerfil", urlImagenPerfil);
+        }
+
+        db.collection("Usuarios").document(usuario.getUid())
+                .update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    resultadoActualizarUsuario.postValue("Datos actualizados correctamente");
+                    cargarDatosUsuario(); // Refrescar datos
+                })
+                .addOnFailureListener(e -> {
+                    resultadoActualizarUsuario.postValue("Error al actualizar Firestore: " + e.getMessage());
+                });
+    }
     private void comprobarActualizacion(int[] completedOperations, int totalOperations) {
         completedOperations[0]++;
         if (completedOperations[0] == totalOperations) {
@@ -179,7 +186,6 @@ public class UsuarioRepository {
         }
     }
 
-    // Nuevos métodos para el registro
     public void registrarUsuarioFirebase(String email, String password) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {

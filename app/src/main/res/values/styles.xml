@@ -17,11 +17,7 @@
         <!-- Configuración del dropdown -->
         <item name="android:popupBackground">@drawable/spinner_dropdown_background</item>
         <item name="android:dropDownSelector">@drawable/spinner_dropdown_selector</item>
-        <item name="android:dropDownVerticalOffset">4dp</item>
         <item name="android:dropDownWidth">match_parent</item>
-
-        <!-- Elimina esta línea ya que puede causar conflicto -->
-        <!-- <item name="materialThemeOverlay">@style/SpinnerThemeOverlay</item> -->
     </style>
 
 
