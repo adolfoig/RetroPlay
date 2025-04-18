@@ -23,5 +23,6 @@
     <color name="gris4">#474747</color>
     <color name="transparente">#80000000</color>
     <color name="amarillo2">#F0E200</color>
-
+    <color name="filas_grises">#8C8C8C</color>
+    <color name="background_juegos">#494949</color>
 </resources>

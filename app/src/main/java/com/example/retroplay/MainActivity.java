@@ -1,9 +1,7 @@
 package com.example.retroplay;
 
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -20,13 +18,14 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.bumptech.glide.Glide;
 import com.example.retroplay.Registro.LoginFragment;
+import com.example.retroplay.Viewmodel.UsuarioViewModel;
 import com.example.retroplay.databinding.ActivityMainBinding;
 import com.example.retroplay.databinding.NavHeaderBinding;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -34,12 +33,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     NavHeaderBinding headerBinding;
     private FirebaseAuth mAuth;
     NavController navController;
+    private UsuarioViewModel usuarioViewModel;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        usuarioViewModel = new ViewModelProvider(this).get(UsuarioViewModel.class);
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -53,14 +54,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // Configura el NavController (usa la variable de clase)
-        this.navController = ((NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment))
+        this.navController = ((NavHostFragment) Objects.requireNonNull(getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)))
                 .getNavController();
 
         if (currentUser == null) {
             ocultarInterfaz();
 
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.nav_host_fragment, new LoginFragment()) // Asegúrate de que el contenedor esté correctamente definido en el layout
+                    .replace(R.id.nav_host_fragment, new LoginFragment())
                     .commit();
         } else {
             irAlBottomMenu();
@@ -84,22 +85,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
 
         setupNavListener();
+        configurarObservadoresUsuario();
     }
 
-
-    private void mostrarLoginFragment() {
-        // Si el usuario no está autenticado, ocultamos la interfaz
-        ocultarInterfaz2();
-
-        // Reemplazamos el fragmento de Login
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.nav_host_fragment, new LoginFragment()) // Asegúrate de que el contenedor esté correctamente definido en el layout
-                .commit();
-    }
 
     private void irAlBottomMenu() {
         setSupportActionBar(binding.toolbar);
-        NavController navController = ((NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)).getNavController();
+        NavController navController = ((NavHostFragment) Objects.requireNonNull(getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment))).getNavController();
         NavigationUI.setupWithNavController(binding.bottomNavView, navController);
         NavigationUI.setupWithNavController(binding.toolbar, navController);
     }
@@ -165,13 +157,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    private void openFragment(Fragment fragment) {
-        // Reemplazamos el fragmento actual con el nuevo fragmento
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.nav_host_fragment, fragment)
-                .commit();
-    }
-
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
@@ -191,51 +176,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    private void datosUsuarioHeaderDrawer() {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null) return;
+    private void configurarObservadoresUsuario() {
+        usuarioViewModel.getDatosUsuario().observe(this, datosUsuario -> {
+            if (datosUsuario != null) {
+                // Actualizar nombre
+                String nombre = datosUsuario.get("nombre");
+                headerBinding.nombreUsuario.setText(nombre != null ? nombre : "Usuario");
 
-        // Configurar valores por defecto
-        headerBinding.nombreUsuario.setText("Usuario");
-        headerBinding.emailUsuario.setText(user.getEmail());
-        headerBinding.imageView.setImageResource(R.drawable.logo);
+                // Actualizar email
+                String email = datosUsuario.get("email");
+                if (email != null) {
+                    headerBinding.emailUsuario.setText(email);
+                }
 
-        // Obtener datos del usuario desde Firestore
-        FirebaseFirestore.getInstance()
-                .collection("Usuarios")
-                .document(user.getUid())
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null) {
-                        DocumentSnapshot doc = task.getResult();
-
-                        // Actualizar nombre si existe
-                        if (doc.contains("nombre")) {
-                            headerBinding.nombreUsuario.setText(doc.getString("nombre"));
-                        }
-
-                        // Cargar imagen si existe
-                        if (doc.contains("UrlImagenPerfil")) {
-                            String imageUrl = doc.getString("UrlImagenPerfil");
-                            if (imageUrl != null && !imageUrl.isEmpty()) {
-                                Glide.with(this)
-                                        .load(imageUrl)
-                                        .circleCrop() // Esta línea hace la imagen redonda
-                                        .placeholder(R.drawable.logo)
-                                        .error(R.drawable.logo)
-                                        .into(headerBinding.imageView);
-                            }
-                        }
+                // Actualizar imagen
+                String imageUrl = datosUsuario.get("urlImagen");
+                if (imageUrl != null && !imageUrl.isEmpty()) {
+                    Glide.with(this)
+                            .load(imageUrl)
+                            .circleCrop()
+                            .placeholder(R.drawable.logo)
+                            .error(R.drawable.logo)
+                            .into(headerBinding.imageView);
+                } else {
+                    // Si no hay URL en Firestore, intentar con la foto de Google
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    if (user != null && user.getPhotoUrl() != null) {
+                        Glide.with(this)
+                                .load(user.getPhotoUrl())
+                                .circleCrop()
+                                .into(headerBinding.imageView);
+                    } else {
+                        headerBinding.imageView.setImageResource(R.drawable.logo);
                     }
-                });
+                }
+            }
+        });
     }
 
-    @Override
-    public void onBackPressed() {
-        if(binding.drawerLayout.isDrawerOpen(GravityCompat.START)){
-            binding.drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
+    private void datosUsuarioHeaderDrawer() {
+        usuarioViewModel.cargarDatosUsuario();
     }
+
+
 }

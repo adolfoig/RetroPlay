@@ -196,17 +196,17 @@ public class ActualizarUsuarioFragment extends Fragment {
     }
 
     private void setupObservers() {
-        usuarioViewModel.getDatosUsuario().observe(getViewLifecycleOwner(), userData -> {
-            if (userData != null) {
-                binding.textoNombre.setText(usuarioViewModel.getUserName(userData));
+        usuarioViewModel.getDatosUsuario().observe(getViewLifecycleOwner(), datosUsuario -> {
+            if (datosUsuario != null) {
+                binding.textoNombre.setText(usuarioViewModel.getUserName(datosUsuario));
 
-                String email = usuarioViewModel.getUserEmail(userData);
+                String email = usuarioViewModel.getUserEmail(datosUsuario);
                 if (email != null) {
                     binding.textoEmail.setText(email);
                     binding.textoEmail.setEnabled(false);
                 }
 
-                currentImageUrl = usuarioViewModel.getUserImageUrl(userData);
+                currentImageUrl = usuarioViewModel.getUserImageUrl(datosUsuario);
                 if (currentImageUrl != null && !currentImageUrl.isEmpty()) {
                     Glide.with(requireContext())
                             .load(currentImageUrl)

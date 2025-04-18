@@ -2,20 +2,23 @@ package com.example.retroplay.Model;
 
 public class Puntuacion {
 
-    String idUsuario;
+    String nombreUsuario;
     int puntuacion;
+    private boolean esUsuarioActual;
 
-    public Puntuacion(String idUsuario, int puntuacion) {
-        this.idUsuario = idUsuario;
+
+    public Puntuacion(String nombreUsuario, int puntuacion, boolean esUsuarioActual) {
+        this.nombreUsuario = nombreUsuario;
         this.puntuacion = puntuacion;
+        this.esUsuarioActual = esUsuarioActual;
     }
 
-    public String getIdUsuario() {
-        return idUsuario;
+    public String getNombreUsuario() {
+        return nombreUsuario;
     }
 
-    public void setIdUsuario(String idUsuario) {
-        this.idUsuario = idUsuario;
+    public void setNombreUsuario(String idUsuario) {
+        this.nombreUsuario = idUsuario;
     }
 
     public int getPuntuacion() {
@@ -24,5 +27,13 @@ public class Puntuacion {
 
     public void setPuntuacion(int puntuacion) {
         this.puntuacion = puntuacion;
+    }
+
+    public boolean isEsUsuarioActual() {
+        return esUsuarioActual;
+    }
+
+    public void setEsUsuarioActual(boolean esUsuarioActual) {
+        this.esUsuarioActual = esUsuarioActual;
     }
 }

@@ -2,15 +2,16 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@color/gris_medio_oscuro"
     android:layout_height="match_parent"
+    android:background="@color/background_juegos"
     tools:context=".JuegosFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewJuegos"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        android:backgroundTint="@color/background_juegos"
         android:layout_marginTop="?attr/actionBarSize"
-        android:layout_marginBottom="80dp"
-        android:layout_height="match_parent"/>
-
+        android:layout_marginBottom="80dp"/>
 </FrameLayout>

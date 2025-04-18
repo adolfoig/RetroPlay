@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +29,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class RankingFragment extends Fragment {
 
@@ -185,25 +187,46 @@ public class RankingFragment extends Fragment {
         }
 
         List<Puntuacion> puntuaciones = new ArrayList<>();
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
+
         for (QueryDocumentSnapshot document : task.getResult()) {
             String idUsuario = document.getString("idUsuario");
             Long puntuacionMaxima = document.getLong("puntuacionMaxima");
             int puntuacion = puntuacionMaxima != null ? puntuacionMaxima.intValue() : 0;
-            puntuaciones.add(new Puntuacion(idUsuario, puntuacion));
-        }
 
-        Collections.sort(puntuaciones, (p1, p2) -> p2.getPuntuacion() - p1.getPuntuacion());
+            CompletableFuture<Void> future = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                future = new CompletableFuture<>();
+            }
+            futures.add(future);
 
-        for (int i = 0; i < puntuaciones.size(); i++) {
-            final int posicion = i + 1;
-            Puntuacion p = puntuaciones.get(i);
-
-            viewModel.obtenerNombreUsuario(p.getIdUsuario(), p.getPuntuacion(), posicion, new UserNameCallback() {
+            CompletableFuture<Void> finalFuture = future;
+            viewModel.obtenerNombreUsuario(idUsuario, puntuacion, 0, new UserNameCallback() {
                 @Override
                 public void onUserNameLoaded(String nombreUsuario, int puntuacion, int posicion, boolean esUsuarioActual) {
-                    agregarFilaTabla(nombreUsuario, puntuacion, posicion, esUsuarioActual);
+                    puntuaciones.add(new Puntuacion(nombreUsuario, puntuacion, esUsuarioActual));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        finalFuture.complete(null);
+                    }
                 }
             });
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                    .thenRun(() -> {
+                        // Ordenar por puntuación descendente
+                        Collections.sort(puntuaciones, (p1, p2) -> p2.getPuntuacion() - p1.getPuntuacion());
+
+                        // Limpiar tabla antes de agregar nuevas filas
+                        limpiarTablaPuntuaciones();
+
+                        // Agregar filas ordenadas
+                        for (int i = 0; i < puntuaciones.size(); i++) {
+                            Puntuacion p = puntuaciones.get(i);
+                            agregarFilaTabla(p.getNombreUsuario(), p.getPuntuacion(), i + 1, p.isEsUsuarioActual());
+                        }
+                    });
         }
     }
 

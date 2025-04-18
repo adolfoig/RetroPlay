@@ -82,10 +82,10 @@ public class JuegosFragment extends Fragment {
         });
     }
 
-    class JuegosViewHolder extends RecyclerView.ViewHolder {
+    static class JuegosViewHolder extends RecyclerView.ViewHolder {
         final ViewholderJuegosBinding binding;
 
-        public JuegosViewHolder(ViewholderJuegosBinding binding) {
+        public JuegosViewHolder(@NonNull ViewholderJuegosBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }

@@ -11,6 +11,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -62,14 +63,30 @@ public class UsuarioRepository {
                         Map<String, String> infoUsuario = new HashMap<>();
                         infoUsuario.put("email", email);
 
+                        // Verificar si el usuario es de Google y tiene foto
+                        boolean isGoogleUser = false;
+                        for (UserInfo userInfo : usuario.getProviderData()) {
+                            if ("google.com".equals(userInfo.getProviderId())) {
+                                isGoogleUser = true;
+                                break;
+                            }
+                        }
+
+                        String googlePhotoUrl = usuario.getPhotoUrl() != null ? usuario.getPhotoUrl().toString() : "";
+
                         if (documentSnapshot.exists()) {
                             String nombre = documentSnapshot.getString("nombre");
                             String urlImagen = documentSnapshot.getString("UrlImagenPerfil");
+
                             infoUsuario.put("nombre", nombre != null ? nombre : usuario.getDisplayName());
-                            infoUsuario.put("urlImagen", urlImagen != null ? urlImagen : "");
+                            // Si es usuario de Google y no hay URL en Firestore, usar la de Google
+                            infoUsuario.put("urlImagen",
+                                    (urlImagen != null && !urlImagen.isEmpty()) ? urlImagen :
+                                            (isGoogleUser ? googlePhotoUrl : ""));
                         } else {
                             infoUsuario.put("nombre", usuario.getDisplayName());
-                            infoUsuario.put("urlImagen", "");
+                            // Si es usuario de Google, usar su foto
+                            infoUsuario.put("urlImagen", isGoogleUser ? googlePhotoUrl : "");
                         }
 
                         datosUsuario.postValue(infoUsuario);
