@@ -26,9 +26,7 @@ import com.example.retroplay.Viewmodel.UsuarioViewModel;
 import com.example.retroplay.databinding.FragmentActualizarUsuarioBinding;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -198,15 +196,15 @@ public class ActualizarUsuarioFragment extends Fragment {
     private void setupObservers() {
         usuarioViewModel.getDatosUsuario().observe(getViewLifecycleOwner(), datosUsuario -> {
             if (datosUsuario != null) {
-                binding.textoNombre.setText(usuarioViewModel.getUserName(datosUsuario));
+                binding.textoNombre.setText(usuarioViewModel.getNombreUsuario(datosUsuario));
 
-                String email = usuarioViewModel.getUserEmail(datosUsuario);
+                String email = usuarioViewModel.getEmailUsuario(datosUsuario);
                 if (email != null) {
                     binding.textoEmail.setText(email);
                     binding.textoEmail.setEnabled(false);
                 }
 
-                currentImageUrl = usuarioViewModel.getUserImageUrl(datosUsuario);
+                currentImageUrl = usuarioViewModel.getUrlImagenPerfilUsuario(datosUsuario);
                 if (currentImageUrl != null && !currentImageUrl.isEmpty()) {
                     Glide.with(requireContext())
                             .load(currentImageUrl)

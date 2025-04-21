@@ -64,10 +64,10 @@ public class UsuarioRepository {
                         infoUsuario.put("email", email);
 
                         // Verificar si el usuario es de Google y tiene foto
-                        boolean isGoogleUser = false;
+                        boolean esUsuarioGoogle = false;
                         for (UserInfo userInfo : usuario.getProviderData()) {
                             if ("google.com".equals(userInfo.getProviderId())) {
-                                isGoogleUser = true;
+                                esUsuarioGoogle = true;
                                 break;
                             }
                         }
@@ -82,11 +82,11 @@ public class UsuarioRepository {
                             // Si es usuario de Google y no hay URL en Firestore, usar la de Google
                             infoUsuario.put("urlImagen",
                                     (urlImagen != null && !urlImagen.isEmpty()) ? urlImagen :
-                                            (isGoogleUser ? googlePhotoUrl : ""));
+                                            (esUsuarioGoogle ? googlePhotoUrl : ""));
                         } else {
                             infoUsuario.put("nombre", usuario.getDisplayName());
                             // Si es usuario de Google, usar su foto
-                            infoUsuario.put("urlImagen", isGoogleUser ? googlePhotoUrl : "");
+                            infoUsuario.put("urlImagen", esUsuarioGoogle ? googlePhotoUrl : "");
                         }
 
                         datosUsuario.postValue(infoUsuario);
@@ -226,13 +226,13 @@ public class UsuarioRepository {
                 });
     }
 
-    public void guardarDatosUsuarioFirestore(String userId, String nombre, String email, String profileImageUrl) {
+    public void guardarDatosUsuarioFirestore(String idUsuario, String nombre, String email, String profileImageUrl) {
         Map<String, Object> userData = new HashMap<>();
         userData.put("nombre", nombre);
         userData.put("email", email);
         userData.put("UrlImagenPerfil", profileImageUrl);
 
-        db.collection("Usuarios").document(userId)
+        db.collection("Usuarios").document(idUsuario)
                 .set(userData)
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "Datos actualizados en Firestore"))
                 .addOnFailureListener(e -> Log.e(TAG, "Error al actualizar Firestore", e));

@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -48,18 +47,18 @@ public class FavoritosFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
 
-        setupRecyclerView();
-        setupObservers();
+        configurarReyclerView();
+        configurarObservers();
     }
 
-    private void setupRecyclerView() {
+    private void configurarReyclerView() {
         binding.recyclerViewFavoritos.setLayoutManager(new GridLayoutManager(requireContext(), 2));
 
         adapter = new FavoritosAdapter();
         binding.recyclerViewFavoritos.setAdapter(adapter);
     }
 
-    private void setupObservers() {
+    private void configurarObservers() {
         viewModel.getFavoritos().observe(getViewLifecycleOwner(), juegos -> {
             if (juegos != null) {
                 adapter.establecerLista(juegos);
@@ -131,20 +130,20 @@ public class FavoritosFragment extends Fragment {
         }
 
         public void establecerLista(List<Juego> nuevaLista) {
-            int oldSize = listaFavoritos.size();
-            int newSize = nuevaLista.size();
+            int viejoSize = listaFavoritos.size();
+            int nuevoSize = nuevaLista.size();
 
             listaFavoritos.clear();
             listaFavoritos.addAll(nuevaLista);
 
-            if (oldSize == newSize) {
-                notifyItemRangeChanged(0, oldSize);
-            } else if (oldSize < newSize) {
-                if (oldSize > 0) notifyItemRangeChanged(0, oldSize);
-                notifyItemRangeInserted(oldSize, newSize - oldSize);
+            if (viejoSize == nuevoSize) {
+                notifyItemRangeChanged(0, viejoSize);
+            } else if (viejoSize < nuevoSize) {
+                if (viejoSize > 0) notifyItemRangeChanged(0, viejoSize);
+                notifyItemRangeInserted(viejoSize, nuevoSize - viejoSize);
             } else {
-                if (newSize > 0) notifyItemRangeChanged(0, newSize);
-                notifyItemRangeRemoved(newSize, oldSize - newSize);
+                if (nuevoSize > 0) notifyItemRangeChanged(0, nuevoSize);
+                notifyItemRangeRemoved(nuevoSize, viejoSize - nuevoSize);
             }
         }
 

@@ -31,7 +31,7 @@ public class RankingRepository {
                 .get();
     }
 
-    public Task<DocumentSnapshot> getUsuarioPorId(String userId) {
-        return db.collection("Usuarios").document(userId).get();
+    public Task<DocumentSnapshot> getUsuarioPorId(String idUsuario) {
+        return db.collection("Usuarios").document(idUsuario).get();
     }
 }

@@ -46,9 +46,9 @@ public class FavoritosRepository {
                 });
     }
 
-    private void obtenerJuegosPorIds(List<String> idJuegos) {
+    private void obtenerJuegosPorIds(List<String> listaIdJuegos) {
         db.collection("Juegos")
-                .whereIn("id", idJuegos)
+                .whereIn("id", listaIdJuegos)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

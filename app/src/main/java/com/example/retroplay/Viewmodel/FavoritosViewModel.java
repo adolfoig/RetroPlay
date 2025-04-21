@@ -10,7 +10,7 @@ import com.example.retroplay.Model.Juego;
 import java.util.List;
 
 public class FavoritosViewModel extends ViewModel {
-    private final FavoritosRepository repository = new FavoritosRepository();
+    private final FavoritosRepository favoritosRepository = new FavoritosRepository();
     private final MutableLiveData<Juego> juegoSeleccionado = new MutableLiveData<>();
     public final MutableLiveData<String> juegoEliminado = new MutableLiveData<>();
     public final MutableLiveData<String> errorMessage = new MutableLiveData<>();
@@ -22,11 +22,11 @@ public class FavoritosViewModel extends ViewModel {
     }
 
     public void cargarFavoritos() {
-        repository.cargarFavoritos();
+        favoritosRepository.cargarFavoritos();
     }
 
     public void eliminarFavorito(Juego juego) {
-        repository.eliminarFavorito(juego.getId(), success -> {
+        favoritosRepository.eliminarFavorito(juego.getId(), success -> {
             if (success) {
                 juego.setFavorito(false);
                 juegoEliminado.postValue("Juego eliminado de favoritos"); // Esto activará el Toast en el Fragment
@@ -38,7 +38,7 @@ public class FavoritosViewModel extends ViewModel {
 
     public void alternarFavorito(Juego juego) {
         if (juego.isFavorito()) {
-            repository.eliminarFavorito(juego.getId(), success -> {
+            favoritosRepository.eliminarFavorito(juego.getId(), success -> {
                 if (success) {
                     juego.setFavorito(false);
                     juegoEliminado.postValue("Juego eliminado de favoritos");
@@ -47,7 +47,7 @@ public class FavoritosViewModel extends ViewModel {
                 }
             });
         } else {
-            repository.agregarFavorito(juego.getId(), success -> {
+            favoritosRepository.agregarFavorito(juego.getId(), success -> {
                 if (success) {
                     juego.setFavorito(true);
                     favoritoAgregado.postValue("Juego añadido a favoritos");
@@ -59,7 +59,7 @@ public class FavoritosViewModel extends ViewModel {
     }
 
     public void verificarEstadoFavorito(Juego juego, FavoritosRepository.RepositoryCallback<Boolean> callback) {
-        repository.verificarEstadoFavorito(juego, callback);
+        favoritosRepository.verificarEstadoFavorito(juego, callback);
     }
 
     public void seleccionarJuego(Juego juego) {
@@ -67,7 +67,7 @@ public class FavoritosViewModel extends ViewModel {
     }
 
     // Getters para LiveData
-    public LiveData<List<Juego>> getFavoritos() { return repository.getFavoritosLiveData(); }
+    public LiveData<List<Juego>> getFavoritos() { return favoritosRepository.getFavoritosLiveData(); }
     public LiveData<Juego> getJuegoSeleccionado() { return juegoSeleccionado; }
     public LiveData<String> getJuegoEliminado() { return juegoEliminado; }
     public LiveData<String> getErrorMessage() { return errorMessage; }

@@ -48,12 +48,12 @@ public class JuegosFragment extends Fragment {
         adapter = new JuegosAdapter(navController, R.id.action_juegosFragment_to_detailFragment);
         juegosRecyclerView.setAdapter(adapter);
 
-        observarViewModel();
+        configurarObservadoresViewModel();
 
         return view;
     }
 
-    private void observarViewModel() {
+    private void configurarObservadoresViewModel() {
         juegosViewModel.getJuegos().observe(getViewLifecycleOwner(), juegos -> {
             if (juegos != null) {
                 adapter.establecerLista(juegos);

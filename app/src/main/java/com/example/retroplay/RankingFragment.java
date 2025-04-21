@@ -224,7 +224,7 @@ public class RankingFragment extends Fragment {
                         // Agregar filas ordenadas
                         for (int i = 0; i < puntuaciones.size(); i++) {
                             Puntuacion p = puntuaciones.get(i);
-                            agregarFilaTabla(p.getNombreUsuario(), p.getPuntuacion(), i + 1, p.isEsUsuarioActual());
+                            agregarFilaTabla(p.getNombreUsuario(), p.getPuntuacion(), i + 1, p.isUsuarioActual());
                         }
                     });
         }

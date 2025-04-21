@@ -56,21 +56,21 @@ public class JuegosRepository {
     }
 
     // Nuevos métodos para manejar puntuaciones
-    public void fetchScore(String gameId, MutableLiveData<Integer> scoreLiveData, MutableLiveData<String> errorLiveData) {
+    public void obtenerPuntuacion(String idJuego, MutableLiveData<Integer> puntuacionLiveData, MutableLiveData<String> errorLiveData) {
         executorService.execute(() -> {
             try {
-                String result = getScoreFromServer();
+                String result = cargarPuntuacionDelServidor();
                 JSONObject jsonObject = new JSONObject(result);
                 int score = jsonObject.getInt("score");
-                scoreLiveData.postValue(score);
-                saveScore(gameId, score, new MutableLiveData<>());
+                puntuacionLiveData.postValue(score);
+                guardarPuntuacion(idJuego, score, new MutableLiveData<>());
             } catch (JSONException e) {
                 errorLiveData.postValue("Error al parsear JSON: " + e.getMessage());
             }
         });
     }
 
-    private String getScoreFromServer() {
+    private String cargarPuntuacionDelServidor() {
         StringBuilder result = new StringBuilder();
         HttpURLConnection conn = null;
         BufferedReader reader = null;
@@ -101,54 +101,54 @@ public class JuegosRepository {
         return "";
     }
 
-    public void saveScore(String gameId, int score, MutableLiveData<Boolean> successLiveData) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) return;
+    public void guardarPuntuacion(String idJuego, int puntuacion, MutableLiveData<Boolean> successLiveData) {
+        FirebaseUser usuario = FirebaseAuth.getInstance().getCurrentUser();
+        if (usuario == null) return;
 
-        String userId = user.getUid();
+        String idUsuario = usuario.getUid();
         String fechaActual = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
 
         db.collection("Puntuaciones")
-                .whereEqualTo("idUsuario", userId)
-                .whereEqualTo("idJuego", gameId)
+                .whereEqualTo("idUsuario", idUsuario)
+                .whereEqualTo("idJuego", idJuego)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                        updateExistingScore(task.getResult().getDocuments().get(0), score, fechaActual, successLiveData);
+                        actualizarPuntuacion(task.getResult().getDocuments().get(0), puntuacion, fechaActual, successLiveData);
                     } else {
-                        createNewScore(userId, gameId, score, fechaActual, successLiveData);
+                        crearPuntuacion(idUsuario, idJuego, puntuacion, fechaActual, successLiveData);
                     }
                 });
     }
 
-    private void updateExistingScore(DocumentSnapshot doc, int score, String fecha, MutableLiveData<Boolean> successLiveData) {
-        int maxScore = doc.getLong("puntuacionMaxima").intValue();
-        String maxScoreDate = doc.getString("fechaPuntuacionMaxima");
+    private void actualizarPuntuacion(DocumentSnapshot doc, int puntuacion, String fecha, MutableLiveData<Boolean> successLiveData) {
+        int puntuacionMaxima = doc.getLong("puntuacionMaxima").intValue();
+        String fechaPuntuacionMaxima = doc.getString("fechaPuntuacionMaxima");
 
-        int newMaxScore = Math.max(score, maxScore);
+        int nuevaPuntuacionMaxima = Math.max(puntuacion, puntuacionMaxima);
         HashMap<String, Object> data = new HashMap<>();
-        data.put("puntuacionActual", (long) score);
+        data.put("puntuacionActual", (long) puntuacion);
         data.put("fechaPuntuacionActual", fecha);
-        data.put("puntuacionMaxima", (long) newMaxScore);
-        data.put("fechaPuntuacionMaxima", newMaxScore > maxScore ? fecha : maxScoreDate);
+        data.put("puntuacionMaxima", (long) nuevaPuntuacionMaxima);
+        data.put("fechaPuntuacionMaxima", nuevaPuntuacionMaxima > puntuacionMaxima ? fecha : fechaPuntuacionMaxima);
 
         db.collection("Puntuaciones")
                 .document(doc.getId())
                 .update(data)
                 .addOnSuccessListener(aVoid -> {
-                    checkAchievements(doc.getString("idJuego"), score);
+                    verificarLogro(doc.getString("idJuego"), puntuacion);
                     successLiveData.postValue(true);
                 })
                 .addOnFailureListener(e -> successLiveData.postValue(false));
     }
 
-    private void createNewScore(String userId, String gameId, int score, String fecha, MutableLiveData<Boolean> successLiveData) {
+    private void crearPuntuacion(String idUsuario, String idJuego, int puntuacion, String fecha, MutableLiveData<Boolean> successLiveData) {
         HashMap<String, Object> data = new HashMap<>();
-        data.put("idUsuario", userId);
-        data.put("idJuego", gameId);
-        data.put("puntuacionActual", (long) score);
+        data.put("idUsuario", idUsuario);
+        data.put("idJuego", idJuego);
+        data.put("puntuacionActual", (long) puntuacion);
         data.put("fechaPuntuacionActual", fecha);
-        data.put("puntuacionMaxima", (long) score);
+        data.put("puntuacionMaxima", (long) puntuacion);
         data.put("fechaPuntuacionMaxima", fecha);
 
         db.collection("Puntuaciones")
@@ -157,35 +157,35 @@ public class JuegosRepository {
                 .addOnFailureListener(e -> successLiveData.postValue(false));
     }
 
-    private void checkAchievements(String gameId, int score) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) return;
+    private void verificarLogro(String idJuego, int puntuacion) {
+        FirebaseUser usuario = FirebaseAuth.getInstance().getCurrentUser();
+        if (usuario == null) return;
 
         db.collection("LogrosDisponibles")
-                .whereEqualTo("idJuego", gameId)
+                .whereEqualTo("idJuego", idJuego)
                 .get()
                 .addOnSuccessListener(query -> {
                     for (DocumentSnapshot doc : query.getDocuments()) {
                         Logro logro = doc.toObject(Logro.class);
-                        if (logro != null && score >= logro.getPuntuacion()) {
-                            verifyAndSaveAchievement(user.getUid(), doc.getId(), gameId);
+                        if (logro != null && puntuacion >= logro.getPuntuacion()) {
+                            verificarYGuardarlogro(usuario.getUid(), doc.getId(), idJuego);
                         }
                     }
                 });
     }
 
-    private void verifyAndSaveAchievement(String userId, String achievementId, String gameId) {
+    private void verificarYGuardarlogro(String idUsuario, String logro, String idJuego) {
         db.collection("LogrosObtenidos")
-                .whereEqualTo("idUsuario", userId)
-                .whereEqualTo("idLogro", achievementId)
+                .whereEqualTo("idUsuario", idUsuario)
+                .whereEqualTo("idLogro", logro)
                 .get()
                 .addOnSuccessListener(query -> {
                     if (query.isEmpty()) {
                         Map<String, Object> data = new HashMap<>();
-                        data.put("idUsuario", userId);
-                        data.put("idLogro", achievementId);
+                        data.put("idUsuario", idUsuario);
+                        data.put("idLogro", logro);
                         data.put("fechaObtencion", new Date());
-                        data.put("idJuego", gameId);
+                        data.put("idJuego", idJuego);
 
                         db.collection("LogrosObtenidos").add(data);
                     }

@@ -55,11 +55,11 @@ public class UsuarioViewModel extends ViewModel {
     }
 
     // Asegúrate de que este método esté correctamente implementado
-    public void guardarDatosUsuario(String userId, String nombre, String email, String profileImageUrl) {
-        usuarioRepository.guardarDatosUsuarioFirestore(userId, nombre, email, profileImageUrl);
+    public void guardarDatosUsuario(String idUsuario, String nombre, String email, String UrlImagenPerfil) {
+        usuarioRepository.guardarDatosUsuarioFirestore(idUsuario, nombre, email, UrlImagenPerfil);
     }
 
-    public void registrarUsuario(String nombre, String email, String password, String profileImageUrl) {
+    public void registrarUsuario(String nombre, String email, String password, String UrlImagenPerfil) {
         usuarioRepository.registrarUsuarioFirebase(email, password);
 
         // Observamos el resultado del registro en Firebase
@@ -72,7 +72,7 @@ public class UsuarioViewModel extends ViewModel {
                             user.getUid(),
                             nombre,
                             email,
-                            profileImageUrl
+                            UrlImagenPerfil
                     );
                 }
             }
@@ -85,21 +85,21 @@ public class UsuarioViewModel extends ViewModel {
     }
 
     // Métodos de ayuda
-    public String getUserEmail(Map<String, String> userData) {
+    public String getEmailUsuario(Map<String, String> userData) {
         if (userData != null && userData.containsKey("email")) {
             return userData.get("email");
         }
         return null;
     }
 
-    public String getUserName(Map<String, String> userData) {
+    public String getNombreUsuario(Map<String, String> userData) {
         if (userData != null && userData.containsKey("nombre")) {
             return userData.get("nombre");
         }
         return null;
     }
 
-    public String getUserImageUrl(Map<String, String> userData) {
+    public String getUrlImagenPerfilUsuario(Map<String, String> userData) {
         if (userData != null && userData.containsKey("urlImagen")) {
             return userData.get("urlImagen");
         }

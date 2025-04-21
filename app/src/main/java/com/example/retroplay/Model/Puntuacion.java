@@ -4,13 +4,13 @@ public class Puntuacion {
 
     String nombreUsuario;
     int puntuacion;
-    private boolean esUsuarioActual;
+    private boolean usuarioActual;
 
 
     public Puntuacion(String nombreUsuario, int puntuacion, boolean esUsuarioActual) {
         this.nombreUsuario = nombreUsuario;
         this.puntuacion = puntuacion;
-        this.esUsuarioActual = esUsuarioActual;
+        this.usuarioActual = esUsuarioActual;
     }
 
     public String getNombreUsuario() {
@@ -29,11 +29,11 @@ public class Puntuacion {
         this.puntuacion = puntuacion;
     }
 
-    public boolean isEsUsuarioActual() {
-        return esUsuarioActual;
+    public boolean isUsuarioActual() {
+        return usuarioActual;
     }
 
-    public void setEsUsuarioActual(boolean esUsuarioActual) {
-        this.esUsuarioActual = esUsuarioActual;
+    public void setUsuarioActual(boolean usuarioActual) {
+        this.usuarioActual = usuarioActual;
     }
 }

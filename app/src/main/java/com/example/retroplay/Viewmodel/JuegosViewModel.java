@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.example.retroplay.Model.Juego;
 import com.example.retroplay.Repository.JuegosRepository;
@@ -16,7 +15,7 @@ import java.util.List;
 public class JuegosViewModel extends AndroidViewModel {
     private final JuegosRepository repository = new JuegosRepository();
     private final MutableLiveData<List<Juego>> juegosLiveData = new MutableLiveData<>();
-    private final MutableLiveData<Integer> scoreLiveData = new MutableLiveData<>();
+    private final MutableLiveData<Integer> puntuacion = new MutableLiveData<>();
     private final MutableLiveData<Boolean> saveScoreLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> errorLiveData = new MutableLiveData<>();
 
@@ -37,12 +36,12 @@ public class JuegosViewModel extends AndroidViewModel {
     }
 
     // Nuevos métodos para puntuaciones
-    public void fetchScore(String gameId) {
-        repository.fetchScore(gameId, scoreLiveData, errorLiveData);
+    public void fetchScore(String idJuego) {
+        repository.obtenerPuntuacion(idJuego, puntuacion, errorLiveData);
     }
 
     public LiveData<Integer> getScore() {
-        return scoreLiveData;
+        return puntuacion;
     }
 
     public LiveData<Boolean> getSaveScoreResult() {

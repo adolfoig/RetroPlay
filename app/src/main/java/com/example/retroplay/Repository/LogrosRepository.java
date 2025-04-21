@@ -19,9 +19,9 @@ public class LogrosRepository {
         return db.collection("LogrosDisponibles").get();
     }
 
-    public Task<QuerySnapshot> getLogrosObtenidos(String userId) {
+    public Task<QuerySnapshot> getLogrosObtenidos(String idUsuario) {
         return db.collection("LogrosObtenidos")
-                .whereEqualTo("idUsuario", userId)
+                .whereEqualTo("idUsuario", idUsuario)
                 .get();
     }
 

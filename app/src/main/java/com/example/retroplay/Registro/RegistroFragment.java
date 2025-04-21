@@ -22,7 +22,6 @@ import com.example.retroplay.Supebase.SupabaseStorageApi;
 import com.example.retroplay.Utils.ImageUtils;
 import com.example.retroplay.Viewmodel.UsuarioViewModel;
 import com.example.retroplay.databinding.FragmentRegistroBinding;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +38,7 @@ public class RegistroFragment extends Fragment {
     private FragmentRegistroBinding binding;
     private static final int PICK_IMAGE_REQUEST = 1;
     private UsuarioViewModel usuarioViewModel;
-    private Uri imageUri;
+    private Uri imagenUri;
     private static final String SUPABASE_AUTH_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImplcWh5empqd215YnZtbGl4aW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ2OTc0MjgsImV4cCI6MjA2MDI3MzQyOH0.04H44bmAJpwZo2wLQ92FghRse4KLSOLQJd9OICJJVvo";
     private static final String BUCKET_NAME = "imagenes";
 
@@ -108,8 +107,8 @@ public class RegistroFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK && data != null && data.getData() != null) {
-            imageUri = data.getData();
-            binding.imagen.setImageURI(imageUri);
+            imagenUri = data.getData();
+            binding.imagen.setImageURI(imagenUri);
         }
     }
 
@@ -139,29 +138,29 @@ public class RegistroFragment extends Fragment {
             return;
         }
 
-        if (imageUri != null) {
-            uploadProfileImageToSupabase(nombre, email, password);
+        if (imagenUri != null) {
+            subirImagen(nombre, email, password);
         } else {
             usuarioViewModel.registrarUsuario(nombre, email, password, null);
         }
     }
 
-    private void uploadProfileImageToSupabase(String nombre, String email, String password) {
+    private void subirImagen(String nombre, String email, String password) {
         try {
-            File imageFile = ImageUtils.getFileFromUri(requireContext(), imageUri);
-            String fileName = email.hashCode() + ".jpg"; // Usamos hash del email como nombre temporal
+            File file = ImageUtils.getFileFromUri(requireContext(), imagenUri);
+            String nombreArchivo = email.hashCode() + ".jpg";
 
-            RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), imageFile);
-            MultipartBody.Part body = MultipartBody.Part.createFormData("file", fileName, requestFile);
+            RequestBody requestBody = RequestBody.create(MediaType.parse("image/*"), file);
+            MultipartBody.Part body = MultipartBody.Part.createFormData("file", nombreArchivo, requestBody);
 
             SupabaseStorageApi api = SupabaseClient.getClient().create(SupabaseStorageApi.class);
-            Call<Void> call = api.uploadImage(SUPABASE_AUTH_TOKEN, BUCKET_NAME, fileName, body);
+            Call<Void> call = api.uploadImage(SUPABASE_AUTH_TOKEN, BUCKET_NAME, nombreArchivo, body);
 
             call.enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful()) {
-                        String imageUrl = SupabaseClient.BASE_URL + "/storage/v1/object/public/" + BUCKET_NAME + "/" + fileName;
+                        String imageUrl = SupabaseClient.BASE_URL + "/storage/v1/object/public/" + BUCKET_NAME + "/" + nombreArchivo;
                         // Pasar todos los parámetros al ViewModel
                         usuarioViewModel.registrarUsuario(nombre, email, password, imageUrl);
                     }

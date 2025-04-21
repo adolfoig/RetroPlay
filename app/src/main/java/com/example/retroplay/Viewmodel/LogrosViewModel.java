@@ -14,15 +14,15 @@ import java.util.Collections;
 import java.util.List;
 
 public class LogrosViewModel extends ViewModel {
-    private final LogrosRepository repository;
+    private final LogrosRepository logrosRepository;
     private List<Logro> listaLogros = new ArrayList<>();
 
     public LogrosViewModel() {
-        repository = new LogrosRepository();
+        logrosRepository = new LogrosRepository();
     }
 
     public void cargarLogrosDesdeFireBase(LogrosFragment.LogrosCallback callback) {
-        repository.getLogrosDisponibles().addOnCompleteListener(task -> {
+        logrosRepository.getLogrosDisponibles().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 listaLogros.clear();
                 for (DocumentSnapshot doc : task.getResult()) {
@@ -45,10 +45,10 @@ public class LogrosViewModel extends ViewModel {
     }
 
     private void verificarLogrosObtenidos(LogrosFragment.LogrosCallback callback) {
-        FirebaseUser user = repository.getUsuarioActual();
+        FirebaseUser usuario = logrosRepository.getUsuarioActual();
 
         // Add null check for user
-        if (user == null) {
+        if (usuario == null) {
             for (Logro logro : listaLogros) {
                 logro.setObtenido(false);
             }
@@ -56,7 +56,7 @@ public class LogrosViewModel extends ViewModel {
             return;
         }
 
-        repository.getLogrosObtenidos(user.getUid()).addOnCompleteListener(task -> {
+        logrosRepository.getLogrosObtenidos(usuario.getUid()).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 List<String> logrosObtenidosIds = new ArrayList<>();
                 for (DocumentSnapshot doc : task.getResult()) {

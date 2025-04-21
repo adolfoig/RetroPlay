@@ -2,7 +2,6 @@ package com.example.retroplay;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,12 +22,12 @@ public class JugarJuegoFragment extends Fragment {
     private FragmentJugarJuegoBinding binding;
     private WebView gameWebView;
     private String idJuego;
-    private JuegosViewModel viewModel;
+    private JuegosViewModel juegosViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        viewModel = new ViewModelProvider(requireActivity()).get(JuegosViewModel.class);
+        juegosViewModel = new ViewModelProvider(requireActivity()).get(JuegosViewModel.class);
     }
 
     @Override
@@ -49,13 +48,13 @@ public class JugarJuegoFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null) {
             idJuego = args.getString("idJuego");
-            loadGame(idJuego);
+            cargarJuegos(idJuego);
         }
 
-        setupObservers();
+        configurarObservers();
     }
 
-    private void loadGame(String gameId) {
+    private void cargarJuegos(String gameId) {
         if (gameId != null) {
             switch (gameId) {
                 case "1":
@@ -71,8 +70,8 @@ public class JugarJuegoFragment extends Fragment {
         }
     }
 
-    private void setupObservers() {
-        viewModel.getScore().observe(getViewLifecycleOwner(), score -> {
+    private void configurarObservers() {
+        juegosViewModel.getScore().observe(getViewLifecycleOwner(), score -> {
             if (score != null && isAdded() && getActivity() != null) {
                 Intent intent = new Intent(requireActivity(), MainActivity.class);
                 intent.putExtra("puntuacion", String.valueOf(score));
@@ -80,7 +79,7 @@ public class JugarJuegoFragment extends Fragment {
             }
         });
 
-        viewModel.getError().observe(getViewLifecycleOwner(), error -> {
+        juegosViewModel.getError().observe(getViewLifecycleOwner(), error -> {
             if (error != null) {
                 Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
             }
@@ -95,7 +94,7 @@ public class JugarJuegoFragment extends Fragment {
             if (getActivity() instanceof MainActivity) {
                 ((MainActivity) getActivity()).mostrarToolBar();
             }
-            viewModel.fetchScore(idJuego);
+            juegosViewModel.fetchScore(idJuego);
         }
     }
 }
