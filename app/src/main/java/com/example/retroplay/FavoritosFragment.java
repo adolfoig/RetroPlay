@@ -185,7 +185,8 @@ public class FavoritosFragment extends Fragment {
     private void navegarAWebView(String idJuego) {
         Bundle bundle = new Bundle();
         bundle.putString("idJuego", idJuego);
-        navController.navigate(R.id.action_favoritosFragment_to_detailFragment, bundle);
+
+        navController.navigate(R.id.action_favoritosFragment_to_jugarJuegoFragment, bundle);
     }
 
     @Override
