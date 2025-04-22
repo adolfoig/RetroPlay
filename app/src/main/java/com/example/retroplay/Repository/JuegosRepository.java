@@ -65,7 +65,7 @@ public class JuegosRepository {
                 puntuacionLiveData.postValue(score);
                 guardarPuntuacion(idJuego, score, new MutableLiveData<>());
             } catch (JSONException e) {
-                errorLiveData.postValue("Error al parsear JSON: " + e.getMessage());
+                Log.d("Puntuacion","Error al parsear JSON: " + e.getMessage());
             }
         });
     }
