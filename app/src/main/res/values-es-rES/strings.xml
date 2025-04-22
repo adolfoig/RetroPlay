@@ -10,7 +10,7 @@
 
     <!-- Login fragment -->
     <string name="registro" tools:ignore="ExtraTranslation">REGISTRATE</string>
-    <string name="iniciasesion" tools:ignore="MissingTranslation">INICIA SESION</string>
+    <string name="iniciasesion" tools:ignore="MissingTranslation">INICIAR SESION</string>
     <string name="correoElectronico" tools:ignore="ExtraTranslation">Correo electrónico</string>
     <string name="contraseña" tools:ignore="ExtraTranslation">Contraseña</string>
     <string name="iniciarSesion" tools:ignore="ExtraTranslation">Iniciar sesión</string>
