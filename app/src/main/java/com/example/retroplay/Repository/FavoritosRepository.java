@@ -1,7 +1,5 @@
 package com.example.retroplay.Repository;
 
-import android.widget.Toast;
-
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.retroplay.Model.Juego;
@@ -18,13 +16,23 @@ import java.util.List;
 import java.util.Map;
 
 public class FavoritosRepository {
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final FirebaseAuth auth = FirebaseAuth.getInstance();
-    FirebaseUser usuario = auth.getCurrentUser();
 
+    private FirebaseFirestore db;
+    private FirebaseAuth auth;
     private final MutableLiveData<List<Juego>> favoritosLiveData = new MutableLiveData<>();
 
+    public FavoritosRepository() {
+        this(FirebaseFirestore.getInstance(), FirebaseAuth.getInstance());
+    }
+
+    // Constructor para pruebas (inyección de dependencias)
+    public FavoritosRepository(FirebaseFirestore db, FirebaseAuth auth) {
+        this.db = db;
+        this.auth = auth;
+    }
+
     public void cargarFavoritos() {
+        FirebaseUser usuario = auth.getCurrentUser();
         if (usuario == null) return;
 
         db.collection("Favoritos")
@@ -63,6 +71,7 @@ public class FavoritosRepository {
     }
 
     public void agregarFavorito(String idJuego, RepositoryCallback<Void> callback) {
+        FirebaseUser usuario = auth.getCurrentUser();
         if (usuario != null) {
             Map<String, Object> favorito = new HashMap<>();
             favorito.put("idUsuario", usuario.getUid());
@@ -79,6 +88,7 @@ public class FavoritosRepository {
     }
 
     public void eliminarFavorito(String idJuego, RepositoryCallback<Void> callback) {
+        FirebaseUser usuario = auth.getCurrentUser();
         if (usuario != null) {
             db.collection("Favoritos")
                     .whereEqualTo("idUsuario", usuario.getUid())
@@ -113,6 +123,7 @@ public class FavoritosRepository {
     }
 
     public void verificarEstadoFavorito(Juego juego, RepositoryCallback<Boolean> callback) {
+        FirebaseUser usuario = auth.getCurrentUser();
         if (usuario == null) {
             if (callback != null) callback.onComplete(false);
             return;
@@ -123,10 +134,9 @@ public class FavoritosRepository {
                 .whereEqualTo("idJuego", juego.getId())
                 .get()
                 .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                        if (callback != null) callback.onComplete(true);
-                    } else {
-                        if (callback != null) callback.onComplete(false);
+                    if (callback != null) {
+                        boolean esFavorito = task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty();
+                        callback.onComplete(esFavorito);
                     }
                 });
     }

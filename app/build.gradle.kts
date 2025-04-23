@@ -89,4 +89,16 @@ dependencies {
 
     implementation(libs.play.services.auth.v2100)
 
+    testImplementation ("junit:junit:4.13.2")
+    testImplementation ("org.mockito:mockito-core:3.11.2")
+    androidTestImplementation ("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation ("androidx.test.espresso:espresso-core:3.4.0")
+    androidTestImplementation ("com.google.firebase:firebase-firestore:24.0.0")
+    androidTestImplementation ("org.mockito:mockito-android:3.11.2")
+
+    testImplementation ("org.robolectric:robolectric:4.11.1")
+    testImplementation ("org.mockito:mockito-core:5.12.0")
+    testImplementation ("androidx.test:core:1.5.0")
+
+
 }
