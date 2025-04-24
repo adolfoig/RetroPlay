@@ -12,8 +12,10 @@ import com.example.retroplay.Repository.JuegosRepository;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,30 +23,36 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class JuegosRepositoryInstrumentedTest {
 
     private JuegosRepository juegosRepository;
     private FirebaseAuth auth;
+    private FirebaseFirestore db;
     private CountDownLatch latch;
 
     @Before
     public void setUp() {
-        // Inicializa Firebase en el contexto de prueba
         FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext());
         auth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
         juegosRepository = new JuegosRepository();
-        latch = new CountDownLatch(1); // Para sincronizar pruebas asíncronas
+    }
+
+    @After
+    public void tearDown() {
+        juegosRepository.cleanup();
     }
 
     @Test
     public void testGetJuegos() throws InterruptedException {
+        latch = new CountDownLatch(1);
         auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         juegosRepository.getJuegos().observeForever(juegos -> {
                             assertNotNull(juegos);
+                            assertTrue(juegos.size() > 0);
                             latch.countDown();
                         });
                     } else {
@@ -53,12 +61,12 @@ public class JuegosRepositoryInstrumentedTest {
                     }
                 });
 
-        latch.await(10, TimeUnit.SECONDS);
+        assertTrue(latch.await(10, TimeUnit.SECONDS));
     }
 
     @Test
     public void testObtenerPuntuacion() throws InterruptedException {
-        // Primero nos autenticamos
+        latch = new CountDownLatch(1);
         auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
                 .addOnCompleteListener(authTask -> {
                     if (authTask.isSuccessful()) {
@@ -67,15 +75,11 @@ public class JuegosRepositoryInstrumentedTest {
 
                         String idJuegoTest = "1";
 
-                        // Llamamos al método real (sin mocking)
                         juegosRepository.obtenerPuntuacion(idJuegoTest, puntuacionLiveData, errorLiveData);
 
-                        // Observamos los resultados
                         puntuacionLiveData.observeForever(score -> {
                             if (score != null) {
                                 assertNotNull(score);
-                                // Como no mockeamos, no sabemos el valor exacto esperado
-                                // pero podemos verificar que es un número válido
                                 assertTrue(score >= 0);
                                 latch.countDown();
                             }
@@ -93,11 +97,31 @@ public class JuegosRepositoryInstrumentedTest {
                     }
                 });
 
-        latch.await(10, TimeUnit.SECONDS);
+        assertTrue(latch.await(10, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void testCargarPuntuacionDelServidor() throws InterruptedException {
+        latch = new CountDownLatch(1);
+
+        new Thread(() -> {
+            try {
+                String result = juegosRepository.cargarPuntuacionDelServidor();
+                assertNotNull(result);
+                assertTrue(result.contains("score") || result.isEmpty());
+                latch.countDown();
+            } catch (Exception e) {
+                fail("Error en cargarPuntuacionDelServidor: " + e.getMessage());
+                latch.countDown();
+            }
+        }).start();
+
+        assertTrue(latch.await(10, TimeUnit.SECONDS));
     }
 
     @Test
     public void testGuardarPuntuacion() throws InterruptedException {
+        latch = new CountDownLatch(1);
         auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
                 .addOnCompleteListener(authTask -> {
                     if (authTask.isSuccessful()) {
@@ -120,43 +144,58 @@ public class JuegosRepositoryInstrumentedTest {
                     }
                 });
 
-        latch.await(10, TimeUnit.SECONDS);
+        assertTrue(latch.await(10, TimeUnit.SECONDS));
     }
 
     @Test
     public void testActualizarPuntuacion() throws InterruptedException {
-        CountDownLatch latch = new CountDownLatch(1);
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        latch = new CountDownLatch(1);
 
         auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
                 .addOnCompleteListener(authTask -> {
                     if (authTask.isSuccessful()) {
                         MutableLiveData<Boolean> successLiveData = new MutableLiveData<>();
 
-                        // Suponiendo que ya existe un documento con este ID en la colección "Puntuaciones"
-                        String docId = "YBhSkaMPdyCijdOi5kBu"; // Cambia esto por el ID real del documento
-                        int nuevaPuntuacion = 200;
-                        String fecha = "2025-04-24";
+                        // Primero creamos una puntuación para luego actualizarla
+                        FirebaseUser user = auth.getCurrentUser();
+                        String idJuego = "juegoTestActualizar";
+                        int puntuacionInicial = 50;
+                        String fecha = "2025-04-24 12:00:00";
 
-                        db.collection("Puntuaciones").document(docId).get()
-                                .addOnSuccessListener(doc -> {
-                                    if (doc.exists()) {
-                                        juegosRepository.actualizarPuntuacion(doc, nuevaPuntuacion, fecha, successLiveData);
+                        // Creamos una puntuación para actualizar
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("idUsuario", user.getUid());
+                        data.put("idJuego", idJuego);
+                        data.put("puntuacionActual", puntuacionInicial);
+                        data.put("fechaPuntuacionActual", fecha);
+                        data.put("puntuacionMaxima", puntuacionInicial);
+                        data.put("fechaPuntuacionMaxima", fecha);
+
+                        db.collection("Puntuaciones")
+                                .add(data)
+                                .addOnSuccessListener(documentReference -> {
+                                    // Ahora obtenemos el documento para actualizarlo
+                                    documentReference.get().addOnSuccessListener(documentSnapshot -> {
+                                        int nuevaPuntuacion = 75;
+                                        juegosRepository.actualizarPuntuacion(
+                                                documentSnapshot,
+                                                nuevaPuntuacion,
+                                                "2025-04-24 12:30:00",
+                                                successLiveData
+                                        );
 
                                         successLiveData.observeForever(success -> {
                                             if (success != null) {
                                                 assertTrue(success);
+                                                // Limpieza: eliminar el documento de prueba
+                                                documentReference.delete();
                                                 latch.countDown();
                                             }
                                         });
-                                    } else {
-                                        fail("Documento de prueba no encontrado");
-                                        latch.countDown();
-                                    }
+                                    });
                                 })
                                 .addOnFailureListener(e -> {
-                                    fail("Error obteniendo documento: " + e.getMessage());
+                                    fail("Error creando documento de prueba: " + e.getMessage());
                                     latch.countDown();
                                 });
                     } else {
@@ -165,12 +204,12 @@ public class JuegosRepositoryInstrumentedTest {
                     }
                 });
 
-        assertTrue(latch.await(10, TimeUnit.SECONDS));
+        assertTrue(latch.await(20, TimeUnit.SECONDS)); // Más tiempo para esta prueba
     }
 
     @Test
     public void testCrearPuntuacion() throws InterruptedException {
-        CountDownLatch latch = new CountDownLatch(1);
+        latch = new CountDownLatch(1);
 
         auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
                 .addOnCompleteListener(authTask -> {
@@ -181,16 +220,33 @@ public class JuegosRepositoryInstrumentedTest {
                         MutableLiveData<Boolean> successLiveData = new MutableLiveData<>();
 
                         String idUsuario = usuario.getUid();
-                        String idJuego = "juegoTestCrear";
+                        String idJuego = "juegoTestCrear" + System.currentTimeMillis(); // ID único
                         int puntuacion = 120;
-                        String fecha = "2025-04-24";
+                        String fecha = "2025-04-24 12:00:00";
 
                         juegosRepository.crearPuntuacion(idUsuario, idJuego, puntuacion, fecha, successLiveData);
 
                         successLiveData.observeForever(success -> {
                             if (success != null) {
                                 assertTrue(success);
-                                latch.countDown();
+
+                                // Verificar que realmente se creó
+                                db.collection("Puntuaciones")
+                                        .whereEqualTo("idUsuario", idUsuario)
+                                        .whereEqualTo("idJuego", idJuego)
+                                        .get()
+                                        .addOnSuccessListener(querySnapshot -> {
+                                            assertTrue(!querySnapshot.isEmpty());
+                                            // Limpieza: eliminar el documento de prueba
+                                            for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                                doc.getReference().delete();
+                                            }
+                                            latch.countDown();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            fail("Error verificando creación: " + e.getMessage());
+                                            latch.countDown();
+                                        });
                             }
                         });
 
@@ -200,94 +256,109 @@ public class JuegosRepositoryInstrumentedTest {
                     }
                 });
 
-        assertTrue("El test superó el tiempo de espera", latch.await(10, TimeUnit.SECONDS));
+        assertTrue("El test superó el tiempo de espera", latch.await(15, TimeUnit.SECONDS));
     }
-
-    private void esperarLogroGuardado(String idUsuario, String idLogro, CountDownLatch latch, FirebaseFirestore db, int intentosRestantes) {
-        if (intentosRestantes <= 0) {
-            fail("El logro no se guardó a tiempo");
-            latch.countDown();
-            return;
-        }
-
-        db.collection("LogrosUsuario")
-                .whereEqualTo("idUsuario", idUsuario)
-                .whereEqualTo("idLogro", idLogro)
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    if (!querySnapshot.isEmpty()) {
-                        assertTrue(true);
-                        latch.countDown();
-                    } else {
-                        // Reintenta luego de 500 ms
-                        new Thread(() -> {
-                            try {
-                                Thread.sleep(500);
-                                esperarLogroGuardado(idUsuario, idLogro, latch, db, intentosRestantes - 1);
-                            } catch (InterruptedException e) {
-                                fail("Error esperando logro: " + e.getMessage());
-                                latch.countDown();
-                            }
-                        }).start();
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    fail("Error consultando logro: " + e.getMessage());
-                    latch.countDown();
-                });
-    }
-
 
     @Test
-    public void testVerificarYGuardarLogro() throws InterruptedException {
-        CountDownLatch latch = new CountDownLatch(1);
+    public void testVerificarLogro() throws InterruptedException {
+        latch = new CountDownLatch(1);
 
         auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
                 .addOnCompleteListener(authTask -> {
                     if (authTask.isSuccessful()) {
-                        FirebaseUser usuario = auth.getCurrentUser();
-                        assertNotNull(usuario);
+                        FirebaseUser user = auth.getCurrentUser();
 
-                        String idUsuario = usuario.getUid();
-                        String logro = "logro_test";
-                        String idJuego = "juego_test";
+                        // Primero necesitamos un juego con logros definidos
+                        String idJuegoConLogros = "1"; // Asume que el juego 1 tiene logros definidos
+                        int puntuacionAlta = 1000; // Asume que esto desbloquea un logro
 
-                        // Verificamos que no exista el logro primero (para limpieza)
+                        // Verificamos el logro
+                        juegosRepository.verificarLogro(idJuegoConLogros, puntuacionAlta);
+
+                        // Esperamos un momento para que se complete la operación
+                        new Thread(() -> {
+                            try {
+                                Thread.sleep(3000); // Espera suficiente para la operación
+
+                                // Verificamos si se guardó el logro
+                                db.collection("LogrosObtenidos")
+                                        .whereEqualTo("idUsuario", user.getUid())
+                                        .whereEqualTo("idJuego", idJuegoConLogros)
+                                        .get()
+                                        .addOnSuccessListener(querySnapshot -> {
+                                            assertTrue(!querySnapshot.isEmpty());
+                                            latch.countDown();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            fail("Error verificando logro: " + e.getMessage());
+                                            latch.countDown();
+                                        });
+                            } catch (InterruptedException e) {
+                                fail("Error en espera: " + e.getMessage());
+                                latch.countDown();
+                            }
+                        }).start();
+                    } else {
+                        fail("Error en autenticación");
+                        latch.countDown();
+                    }
+                });
+
+        assertTrue(latch.await(15, TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void testVerificarYGuardarLogro() throws InterruptedException {
+        latch = new CountDownLatch(1);
+
+        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+                .addOnCompleteListener(authTask -> {
+                    if (authTask.isSuccessful()) {
+                        FirebaseUser user = auth.getCurrentUser();
+
+                        // Necesitamos un logro existente para probar
+                        String idLogroExistente = "logro1"; // Asume que existe este ID en LogrosDisponibles
+                        String idJuego = "1";
+
+                        // Primero eliminamos cualquier logro previo para este usuario
                         db.collection("LogrosObtenidos")
-                                .whereEqualTo("idUsuario", idUsuario)
-                                .whereEqualTo("idLogro", logro)
+                                .whereEqualTo("idUsuario", user.getUid())
+                                .whereEqualTo("idLogro", idLogroExistente)
                                 .get()
-                                .addOnCompleteListener(cleanupTask -> {
-                                    if (cleanupTask.isSuccessful()) {
-                                        // Eliminamos si ya existe (para empezar limpio)
-                                        for (QueryDocumentSnapshot doc : cleanupTask.getResult()) {
-                                            doc.getReference().delete();
-                                        }
-
-                                        // Ejecutamos el test
-                                        juegosRepository.verificarYGuardarLogro(idUsuario, logro, idJuego);
-
-                                        // Verificamos después de un breve retardo
-                                        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                                            db.collection("LogrosObtenidos")
-                                                    .whereEqualTo("idUsuario", idUsuario)
-                                                    .whereEqualTo("idLogro", logro)
-                                                    .get()
-                                                    .addOnCompleteListener(verificationTask -> {
-                                                        if (verificationTask.isSuccessful()) {
-                                                            assertFalse("El logro debería haberse creado",
-                                                                    verificationTask.getResult().isEmpty());
-                                                            latch.countDown();
-                                                        } else {
-                                                            fail("Error al verificar creación de logro");
-                                                            latch.countDown();
-                                                        }
-                                                    });
-                                        }, 2000); // Espera 2 segundos para la operación async
-                                    } else {
-                                        fail("Error en limpieza inicial");
-                                        latch.countDown();
+                                .addOnSuccessListener(querySnapshot -> {
+                                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                        doc.getReference().delete();
                                     }
+
+                                    // Ahora probamos verificarYGuardarlogro
+                                    juegosRepository.verificarYGuardarlogro(user.getUid(), idLogroExistente, idJuego);
+
+                                    // Esperamos y verificamos
+                                    new Thread(() -> {
+                                        try {
+                                            Thread.sleep(3000);
+
+                                            db.collection("LogrosObtenidos")
+                                                    .whereEqualTo("idUsuario", user.getUid())
+                                                    .whereEqualTo("idLogro", idLogroExistente)
+                                                    .get()
+                                                    .addOnSuccessListener(newQuerySnapshot -> {
+                                                        assertTrue(!newQuerySnapshot.isEmpty());
+                                                        latch.countDown();
+                                                    })
+                                                    .addOnFailureListener(e -> {
+                                                        fail("Error verificando logro: " + e.getMessage());
+                                                        latch.countDown();
+                                                    });
+                                        } catch (InterruptedException e) {
+                                            fail("Error en espera: " + e.getMessage());
+                                            latch.countDown();
+                                        }
+                                    }).start();
+                                })
+                                .addOnFailureListener(e -> {
+                                    fail("Error limpiando logros previos: " + e.getMessage());
+                                    latch.countDown();
                                 });
                     } else {
                         fail("Error en autenticación");
@@ -295,7 +366,6 @@ public class JuegosRepositoryInstrumentedTest {
                     }
                 });
 
-        assertTrue("El test superó el tiempo de espera", latch.await(10, TimeUnit.SECONDS));
+        assertTrue(latch.await(20, TimeUnit.SECONDS));
     }
-
 }
