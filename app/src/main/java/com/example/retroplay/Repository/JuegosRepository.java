@@ -70,7 +70,7 @@ public class JuegosRepository {
         });
     }
 
-    private String cargarPuntuacionDelServidor() {
+    public String cargarPuntuacionDelServidor() {
         StringBuilder result = new StringBuilder();
         HttpURLConnection conn = null;
         BufferedReader reader = null;
@@ -121,7 +121,7 @@ public class JuegosRepository {
                 });
     }
 
-    private void actualizarPuntuacion(DocumentSnapshot doc, int puntuacion, String fecha, MutableLiveData<Boolean> successLiveData) {
+    public void actualizarPuntuacion(DocumentSnapshot doc, int puntuacion, String fecha, MutableLiveData<Boolean> successLiveData) {
         int puntuacionMaxima = doc.getLong("puntuacionMaxima").intValue();
         String fechaPuntuacionMaxima = doc.getString("fechaPuntuacionMaxima");
 
@@ -142,7 +142,7 @@ public class JuegosRepository {
                 .addOnFailureListener(e -> successLiveData.postValue(false));
     }
 
-    private void crearPuntuacion(String idUsuario, String idJuego, int puntuacion, String fecha, MutableLiveData<Boolean> successLiveData) {
+    public void crearPuntuacion(String idUsuario, String idJuego, int puntuacion, String fecha, MutableLiveData<Boolean> successLiveData) {
         HashMap<String, Object> data = new HashMap<>();
         data.put("idUsuario", idUsuario);
         data.put("idJuego", idJuego);
@@ -157,7 +157,7 @@ public class JuegosRepository {
                 .addOnFailureListener(e -> successLiveData.postValue(false));
     }
 
-    private void verificarLogro(String idJuego, int puntuacion) {
+    public void verificarLogro(String idJuego, int puntuacion) {
         FirebaseUser usuario = FirebaseAuth.getInstance().getCurrentUser();
         if (usuario == null) return;
 
@@ -174,7 +174,7 @@ public class JuegosRepository {
                 });
     }
 
-    private void verificarYGuardarlogro(String idUsuario, String logro, String idJuego) {
+    public void verificarYGuardarlogro(String idUsuario, String logro, String idJuego) {
         db.collection("LogrosObtenidos")
                 .whereEqualTo("idUsuario", idUsuario)
                 .whereEqualTo("idLogro", logro)
