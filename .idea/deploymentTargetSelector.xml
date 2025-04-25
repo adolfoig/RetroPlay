@@ -14,10 +14,10 @@
       <SelectionState runConfigName="testCrearPuntuacion()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testGuardarPuntuacion()">
+      <SelectionState runConfigName="FavoritosViewModelInstrumentedTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="FavoritosViewModelInstrumentedTest">
+      <SelectionState runConfigName="JuegosViewModelInstrumentedTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
