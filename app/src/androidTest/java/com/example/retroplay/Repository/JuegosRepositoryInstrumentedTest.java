@@ -1,4 +1,4 @@
-package com.example.retroplay;
+package com.example.retroplay.Repository;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -8,7 +8,6 @@ import static org.junit.Assert.fail;
 import androidx.lifecycle.MutableLiveData;
 import androidx.test.core.app.ApplicationProvider;
 
-import com.example.retroplay.Repository.JuegosRepository;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;

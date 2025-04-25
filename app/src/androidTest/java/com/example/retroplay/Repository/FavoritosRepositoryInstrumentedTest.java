@@ -1,10 +1,9 @@
-package com.example.retroplay;
+package com.example.retroplay.Repository;
 
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.example.retroplay.Model.Juego;
-import com.example.retroplay.Repository.FavoritosRepository;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 
