@@ -36,7 +36,7 @@ public class LogrosRepositoryInstrumentedTest {
 
     @Test
     public void testGetLogrosDisponibles() throws InterruptedException {
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         logrosRepository.getLogrosDisponibles()
@@ -60,7 +60,7 @@ public class LogrosRepositoryInstrumentedTest {
 
     @Test
     public void testGetLogrosObtenidos() throws InterruptedException {
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = auth.getCurrentUser();
@@ -86,7 +86,7 @@ public class LogrosRepositoryInstrumentedTest {
 
     @Test
     public void testGetUsuarioActual() throws InterruptedException {
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = logrosRepository.getUsuarioActual();

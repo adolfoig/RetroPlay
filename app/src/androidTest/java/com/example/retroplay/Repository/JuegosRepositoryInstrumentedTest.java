@@ -1,6 +1,5 @@
 package com.example.retroplay.Repository;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -46,7 +45,7 @@ public class JuegosRepositoryInstrumentedTest {
     @Test
     public void testGetJuegos() throws InterruptedException {
         latch = new CountDownLatch(1);
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         juegosRepository.getJuegos().observeForever(juegos -> {
@@ -66,7 +65,7 @@ public class JuegosRepositoryInstrumentedTest {
     @Test
     public void testObtenerPuntuacion() throws InterruptedException {
         latch = new CountDownLatch(1);
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(authTask -> {
                     if (authTask.isSuccessful()) {
                         MutableLiveData<Integer> puntuacionLiveData = new MutableLiveData<>();
@@ -121,7 +120,7 @@ public class JuegosRepositoryInstrumentedTest {
     @Test
     public void testGuardarPuntuacion() throws InterruptedException {
         latch = new CountDownLatch(1);
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(authTask -> {
                     if (authTask.isSuccessful()) {
                         MutableLiveData<Boolean> successLiveData = new MutableLiveData<>();
@@ -150,7 +149,7 @@ public class JuegosRepositoryInstrumentedTest {
     public void testActualizarPuntuacion() throws InterruptedException {
         latch = new CountDownLatch(1);
 
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(authTask -> {
                     if (authTask.isSuccessful()) {
                         MutableLiveData<Boolean> successLiveData = new MutableLiveData<>();
@@ -210,7 +209,7 @@ public class JuegosRepositoryInstrumentedTest {
     public void testCrearPuntuacion() throws InterruptedException {
         latch = new CountDownLatch(1);
 
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(authTask -> {
                     if (authTask.isSuccessful()) {
                         FirebaseUser usuario = auth.getCurrentUser();
@@ -262,7 +261,7 @@ public class JuegosRepositoryInstrumentedTest {
     public void testVerificarLogro() throws InterruptedException {
         latch = new CountDownLatch(1);
 
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(authTask -> {
                     if (authTask.isSuccessful()) {
                         FirebaseUser user = auth.getCurrentUser();
@@ -310,7 +309,7 @@ public class JuegosRepositoryInstrumentedTest {
     public void testVerificarYGuardarLogro() throws InterruptedException {
         latch = new CountDownLatch(1);
 
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(authTask -> {
                     if (authTask.isSuccessful()) {
                         FirebaseUser user = auth.getCurrentUser();
