@@ -37,7 +37,7 @@ public class RankingRepositoryInstrumentedTest {
 
     @Test
     public void testGetIdUsuarioActual() throws InterruptedException {
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         String userId = rankingRepository.getIdusuarioActual();
@@ -54,7 +54,7 @@ public class RankingRepositoryInstrumentedTest {
 
     @Test
     public void testCargarJuegos() throws InterruptedException {
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         rankingRepository.cargarJuegos()
@@ -79,7 +79,7 @@ public class RankingRepositoryInstrumentedTest {
 
     @Test
     public void testCargarPuntuaciones() throws InterruptedException {
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         // Usamos un juego de prueba (asegúrate que exista en tu Firestore)
@@ -115,7 +115,7 @@ public class RankingRepositoryInstrumentedTest {
 
     @Test
     public void testGetUsuarioPorId() throws InterruptedException {
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         // Usamos el ID del usuario actual para la prueba

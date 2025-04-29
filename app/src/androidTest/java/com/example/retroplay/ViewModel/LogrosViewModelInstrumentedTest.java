@@ -59,7 +59,7 @@ public class LogrosViewModelInstrumentedTest {
 
     @Test
     public void testCargarLogrosAutenticado() throws InterruptedException {
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         TestCallback callback = new TestCallback(latch);
@@ -75,7 +75,7 @@ public class LogrosViewModelInstrumentedTest {
 
     @Test
     public void testLogrosOrdenadosCorrectamente() throws InterruptedException {
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         TestCallback callback = new TestCallback(latch);
@@ -120,7 +120,7 @@ public class LogrosViewModelInstrumentedTest {
 
     @Test
     public void testVerificarEstadosLogros() throws InterruptedException {
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         TestCallback callback = new TestCallback(latch);

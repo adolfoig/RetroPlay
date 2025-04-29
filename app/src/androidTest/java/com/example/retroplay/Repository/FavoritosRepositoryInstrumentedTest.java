@@ -35,7 +35,7 @@ public class FavoritosRepositoryInstrumentedTest {
     @Test
     public void testAgregarYEliminarFavorito() throws InterruptedException {
         // Autentica un usuario de prueba (ejemplo: correo/contraseña)
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         String idJuegoTest = "1"; // ID de un juego de prueba
@@ -79,7 +79,7 @@ public class FavoritosRepositoryInstrumentedTest {
 
     @Test
     public void testCargarFavoritos() throws InterruptedException {
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         repository.cargarFavoritos();

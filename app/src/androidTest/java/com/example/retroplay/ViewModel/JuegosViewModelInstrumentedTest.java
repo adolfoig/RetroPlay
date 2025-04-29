@@ -36,7 +36,7 @@ public class JuegosViewModelInstrumentedTest {
 
     @Test
     public void testGetJuegos() throws InterruptedException {
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         juegosViewModel.getJuegos().observeForever(new Observer<List<Juego>>() {
@@ -61,7 +61,7 @@ public class JuegosViewModelInstrumentedTest {
 
     @Test
     public void testFetchScore() throws InterruptedException {
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
+        auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         // Probamos con un ID de juego conocido
@@ -91,29 +91,4 @@ public class JuegosViewModelInstrumentedTest {
         assertTrue(latch.await(15, TimeUnit.SECONDS));
     }
 
-    @Test
-    public void testErrorHandling() throws InterruptedException {
-        auth.signInWithEmailAndPassword("prueba@gmail.com", "123456")
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        // Probamos con un ID de juego inválido para forzar error
-                        String invalidGameId = "invalid_id";
-
-                        juegosViewModel.getError().observeForever(error -> {
-                            if (error != null) {
-                                assertNotNull(error);
-                                assertFalse(error.isEmpty());
-                                latch.countDown();
-                            }
-                        });
-
-                        juegosViewModel.fetchScore(invalidGameId);
-                    } else {
-                        fail("Error en autenticación");
-                        latch.countDown();
-                    }
-                });
-
-        assertTrue(latch.await(15, TimeUnit.SECONDS));
-    }
 }

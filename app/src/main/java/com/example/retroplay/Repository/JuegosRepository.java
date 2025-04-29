@@ -32,7 +32,7 @@ import java.util.concurrent.Executors;
 public class JuegosRepository {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private final String IP = "172.16.134.12";  // Dirección IP del servidor
+    private final String IP = "192.168.1.43";  // Dirección IP del servidor
     private final int PUERTO = 3000;  // Puerto del servidor
     private final String URL = "http://" + IP + ":" + PUERTO + "/score";  // Crear la URL
 
