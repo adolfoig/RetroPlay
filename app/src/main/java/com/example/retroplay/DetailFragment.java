@@ -30,8 +30,8 @@ public class DetailFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(getArguments()!=null){
-            juego=(Juego) getArguments().getSerializable("juego");
+        if (getArguments() != null) {
+            juego = (Juego) getArguments().getSerializable("juego");
         }
 
         favoritosViewModel = new ViewModelProvider(requireActivity()).get(FavoritosViewModel.class);
@@ -42,13 +42,16 @@ public class DetailFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentDetailBinding.inflate(inflater, container, false);
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment);
+
+        configurarObservadoresViewModel();
+
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        NavController navController= Navigation.findNavController(view);
+        NavController navController = Navigation.findNavController(view);
 
         actualizarIconoFavorito(binding.imagenEstrella, juego.isFavorito());
 
@@ -64,7 +67,7 @@ public class DetailFragment extends Fragment {
 
         binding.btnJugar.setOnClickListener(v -> navegarAWebView(juego.getId()));
 
-        if(juego !=null){
+        if (juego != null) {
             binding.textNombreJuego.setText(juego.getNombre());
 
             int colorAmarillo = ContextCompat.getColor(requireContext(), R.color.amarillo2);
@@ -97,10 +100,32 @@ public class DetailFragment extends Fragment {
             }
             binding.textoDescripcion.setText(juego.getDescripcion());
 
-        }else{
+        } else {
             navController.popBackStack();
             Toast.makeText(getContext(), "Error al cargar el juego.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void configurarObservadoresViewModel() {
+        favoritosViewModel.getErrorMessage().observe(getViewLifecycleOwner(), mensaje -> {
+            if (mensaje != null) {
+                Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        favoritosViewModel.getFavoritoAgregado().observe(getViewLifecycleOwner(), mensaje -> {
+            if (mensaje != null) {
+                Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
+                favoritosViewModel.favoritoAgregado.setValue(null);
+            }
+        });
+
+        favoritosViewModel.getJuegoEliminado().observe(getViewLifecycleOwner(), mensaje -> {
+            if (mensaje != null) {
+                Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
+                favoritosViewModel.juegoEliminado.setValue(null);
+            }
+        });
     }
 
     private void actualizarIconoFavorito(ImageButton imagenEstrella, boolean esFavorito) {
