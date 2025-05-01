@@ -66,7 +66,6 @@ public class JuegosFragment extends Fragment {
             }
         });
 
-        // Añade este nuevo observer
         favoritosViewModel.getFavoritoAgregado().observe(getViewLifecycleOwner(), mensaje -> {
             if (mensaje != null) {
                 Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
