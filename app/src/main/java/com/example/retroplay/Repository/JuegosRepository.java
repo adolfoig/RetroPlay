@@ -34,7 +34,7 @@ public class JuegosRepository {
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private final String IP = "192.168.1.43";  // Dirección IP del servidor
     private final int PUERTO = 3000;  // Puerto del servidor
-    private final String URL = "http://" + IP + ":" + PUERTO + "/score";  // Crear la URL
+    private final String URL = "https://7cd1a43d-f123-432a-8a32-15d60b150f6c-00-1jwr28pe3c5ky.kirk.replit.dev/score";  // Crear la URL
 
     // Métodos existentes para obtener juegos
     public MutableLiveData<List<Juego>> getJuegos() {

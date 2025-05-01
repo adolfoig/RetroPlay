@@ -1,6 +1,7 @@
 // Definir variables para la IP, puerto y el score
 const ip = '192.168.1.43';
 const puerto = '3000';
+const serverUrl = "https://7cd1a43d-f123-432a-8a32-15d60b150f6c-00-1jwr28pe3c5ky.kirk.replit.dev";
 
 // Enviar la puntuación al servidor cuando el juego termina
                     const finalScore = 0; // Obtén la puntuación actual
@@ -13,25 +14,25 @@ const puerto = '3000';
                     });
 
 // Función para enviar la puntuación al servidor
-async function sendScore(score) {
-    try {
-        const response = await fetch(`http://${ip}:${puerto}/score`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ score: score }), // Envía la puntuación como JSON
-        });
-        if (!response.ok) {
-            throw new Error('Error al enviar la puntuación');
-        }
+    async function sendScore(score) {
+        try {
+        const response = await fetch(`${serverUrl}/score`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ score: score }), // Envía la puntuación como JSON
+            });
+            if (!response.ok) {
+                throw new Error('Error al enviar la puntuación');
+            }
 
-        const data = await response.json();
-        console.log('Respuesta del servidor:', data);
-    } catch (error) {
-        console.error('Error:', error);
+            const data = await response.json();
+            console.log('Respuesta del servidor:', data);
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
-}
 
 // Función para obtener la puntuación del servidor
 async function getScore() {
