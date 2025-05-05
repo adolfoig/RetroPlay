@@ -24,7 +24,7 @@ public class RankingViewModel extends ViewModel {
     }
 
     public String getCurrentUserId() {
-        return rankingRepository.getIdusuarioActual();
+        return rankingRepository.getIdUsuarioActual();
     }
 
     public void cargarJuegos(RankingFragment.JuegoLoadingCallback callback) {

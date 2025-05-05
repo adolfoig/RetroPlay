@@ -16,7 +16,7 @@ public class RankingRepository {
         firebaseAuth = FirebaseAuth.getInstance();
     }
 
-    public String getIdusuarioActual() {
+    public String getIdUsuarioActual() {
         return firebaseAuth.getCurrentUser() != null ? firebaseAuth.getCurrentUser().getUid() : null;
     }
 
