@@ -29,7 +29,7 @@ public class FavoritosViewModel extends ViewModel {
         favoritosRepository.eliminarFavorito(juego.getId(), success -> {
             if (success) {
                 juego.setFavorito(false);
-                juegoEliminado.postValue("Juego eliminado de favoritos"); // Esto activará el Toast en el Fragment
+                juegoEliminado.postValue("Juego eliminado de favoritos");
             } else {
                 errorMessage.postValue("Error al eliminar favorito");
             }
@@ -67,9 +67,19 @@ public class FavoritosViewModel extends ViewModel {
     }
 
     // Getters para LiveData
-    public LiveData<List<Juego>> getFavoritos() { return favoritosRepository.getFavoritosLiveData(); }
-    public LiveData<Juego> getJuegoSeleccionado() { return juegoSeleccionado; }
-    public LiveData<String> getJuegoEliminado() { return juegoEliminado; }
-    public LiveData<String> getErrorMessage() { return errorMessage; }
-    public LiveData<String> getFavoritoAgregado() { return favoritoAgregado; }
+    public LiveData<List<Juego>> getFavoritos() {
+        return favoritosRepository.getFavoritosLiveData();
+    }
+    public LiveData<Juego> getJuegoSeleccionado() {
+        return juegoSeleccionado;
+    }
+    public LiveData<String> getJuegoEliminado() {
+        return juegoEliminado;
+    }
+    public LiveData<String> getErrorMessage() {
+        return errorMessage;
+    }
+    public LiveData<String> getFavoritoAgregado() {
+        return favoritoAgregado;
+    }
 }

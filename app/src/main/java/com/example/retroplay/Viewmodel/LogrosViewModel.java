@@ -47,7 +47,6 @@ public class LogrosViewModel extends ViewModel {
     private void verificarLogrosObtenidos(LogrosFragment.LogrosCallback callback) {
         FirebaseUser usuario = logrosRepository.getUsuarioActual();
 
-        // Add null check for user
         if (usuario == null) {
             for (Logro logro : listaLogros) {
                 logro.setObtenido(false);

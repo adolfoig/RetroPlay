@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     NavController navController;
     private UsuarioViewModel usuarioViewModel;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,12 +47,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         headerBinding = NavHeaderBinding.bind(binding.navigationDrawer.getHeaderView(0));
 
-
-
         // Bloquear giro de pantalla
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        // Configura el NavController (usa la variable de clase)
         this.navController = ((NavHostFragment) Objects.requireNonNull(getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)))
                 .getNavController();
 
@@ -87,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setupNavListener();
         configurarObservadoresUsuario();
     }
-
 
     private void irAlBottomMenu() {
         setSupportActionBar(binding.toolbar);
@@ -133,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         binding.bottomNavView.setVisibility(View.GONE);
     }
 
-    // Método para ver si estás en el fragment jugarJuegos, login o registro y ocultar el menú
+    // Metodo para ver si estás en el fragment jugarJuegos, login o registro y ocultar el menú
     private void setupNavListener() {
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             int destinationId = destination.getId();
@@ -152,7 +147,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 ocultarBottomNavView();
             }
             else {
-                mostrarInterfaz2(); // Muestra la interfaz por defecto en otros fragmentos
+                // Muestra la interfaz por defecto en otros fragmentos
+                mostrarInterfaz2();
             }
         });
     }
@@ -217,6 +213,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void datosUsuarioHeaderDrawer() {
         usuarioViewModel.cargarDatosUsuario();
     }
-
-
 }

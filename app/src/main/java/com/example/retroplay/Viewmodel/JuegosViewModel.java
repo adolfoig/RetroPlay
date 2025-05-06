@@ -16,7 +16,6 @@ public class JuegosViewModel extends AndroidViewModel {
     private final JuegosRepository repository = new JuegosRepository();
     private final MutableLiveData<List<Juego>> juegosLiveData = new MutableLiveData<>();
     private final MutableLiveData<Integer> puntuacion = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> saveScoreLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> errorLiveData = new MutableLiveData<>();
 
     public JuegosViewModel(@NonNull Application application) {
@@ -42,10 +41,6 @@ public class JuegosViewModel extends AndroidViewModel {
 
     public LiveData<Integer> getScore() {
         return puntuacion;
-    }
-
-    public LiveData<Boolean> getSaveScoreResult() {
-        return saveScoreLiveData;
     }
 
     public LiveData<String> getError() {

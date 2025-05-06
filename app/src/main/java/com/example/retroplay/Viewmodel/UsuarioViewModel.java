@@ -16,8 +16,7 @@ public class UsuarioViewModel extends ViewModel {
         this.usuarioRepository = new UsuarioRepository();
     }
 
-    // Métodos para exponer LiveData
-    public LiveData<Map<String, String>> getDatosUsuario() {
+        public LiveData<Map<String, String>> getDatosUsuario() {
         return usuarioRepository.getDatosUsuario();
     }
 
@@ -33,7 +32,6 @@ public class UsuarioViewModel extends ViewModel {
         return usuarioRepository.getErrorRegistro();
     }
 
-    // Métodos de negocio
     public void cargarDatosUsuario() {
         usuarioRepository.cargarDatosUsuario();
     }
@@ -49,25 +47,13 @@ public class UsuarioViewModel extends ViewModel {
         );
     }
 
-    // Añadir observador para cambios en el resultado
-    public LiveData<String> observeUpdateResult() {
-        return usuarioRepository.getResultadoActualizacionUsuario();
-    }
-
-    // Asegúrate de que este método esté correctamente implementado
-    public void guardarDatosUsuario(String idUsuario, String nombre, String email, String UrlImagenPerfil) {
-        usuarioRepository.guardarDatosUsuarioFirestore(idUsuario, nombre, email, UrlImagenPerfil);
-    }
-
     public void registrarUsuario(String nombre, String email, String password, String UrlImagenPerfil) {
         usuarioRepository.registrarUsuarioFirebase(email, password);
 
-        // Observamos el resultado del registro en Firebase
         getRegistroExitoso().observeForever(success -> {
             if (success) {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if (user != null) {
-                    // Guardamos los datos adicionales en Firestore
                     usuarioRepository.guardarDatosUsuarioFirestore(
                             user.getUid(),
                             nombre,
@@ -84,7 +70,6 @@ public class UsuarioViewModel extends ViewModel {
         usuarioRepository.cerrarSesion();
     }
 
-    // Métodos de ayuda
     public String getEmailUsuario(Map<String, String> userData) {
         if (userData != null && userData.containsKey("email")) {
             return userData.get("email");

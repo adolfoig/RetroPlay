@@ -54,7 +54,4 @@ public class CerrarSesionFragment extends Fragment {
         assert getActivity() != null;
         getActivity().finish();
     }
-
-
-
 }

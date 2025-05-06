@@ -64,7 +64,6 @@ public class ActualizarUsuarioFragment extends Fragment {
         super.onCreate(savedInstanceState);
         usuarioViewModel = new ViewModelProvider(this).get(UsuarioViewModel.class);
 
-        // Create a proper Retrofit instance for SupabaseStorageApi
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://jeqhyzjjwmybvmliximh.supabase.co")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -248,7 +247,6 @@ public class ActualizarUsuarioFragment extends Fragment {
     }
 
     public LiveData<String> uploadImage(File imageFile, String customFileName) {
-        // LiveData en el que devolveremos la URL pública de la imagen generada
         MutableLiveData<String> liveDataUrl = new MutableLiveData<>();
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), imageFile);
         MultipartBody.Part body = MultipartBody.Part.createFormData("file", customFileName, requestFile);
@@ -265,30 +263,22 @@ public class ActualizarUsuarioFragment extends Fragment {
                 body
         );;
 
-        // Enviamos la petición
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    // Esta URL será la que guardemos en nuestra base de datos
                     String fileUrl = response.raw().request().url().toString();
-
-                    // Almacenamos el valor en el LiveData
                     liveDataUrl.postValue(fileUrl);
                 } else {
-                    // Si no se ha podido completar la petición, devolvemos null
                     liveDataUrl.postValue(null);
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                // Si no se ha podido completar la petición, devolvemos null
                 liveDataUrl.postValue(null);
             }
         });
-
-        // Devolvemos el LiveData con la URL de nuestra imagen
         return liveDataUrl;
     }
 

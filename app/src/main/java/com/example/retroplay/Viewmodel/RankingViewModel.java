@@ -31,7 +31,7 @@ public class RankingViewModel extends ViewModel {
         rankingRepository.cargarJuegos().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 listaJuegos.clear();
-                listaJuegos.add(new Juego());  // Elemento por defecto
+                listaJuegos.add(new Juego());
 
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     Juego juego = document.toObject(Juego.class);
