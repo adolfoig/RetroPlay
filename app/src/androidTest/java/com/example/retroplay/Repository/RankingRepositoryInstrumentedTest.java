@@ -40,7 +40,7 @@ public class RankingRepositoryInstrumentedTest {
         auth.signInWithEmailAndPassword("pruebaTest@gmail.com", "123456")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        String userId = rankingRepository.getIdusuarioActual();
+                        String userId = rankingRepository.getIdUsuarioActual();
                         assertNotNull(userId);
                         assertEquals(auth.getCurrentUser().getUid(), userId);
                     } else {

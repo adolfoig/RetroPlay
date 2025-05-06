@@ -90,7 +90,7 @@ public class RankingRepositoryInstrumentedTest {
     @Test
     public void testGetIdUsuarioActual_Autenticado() throws InterruptedException {
         signInOrCreateTestUser(() -> {
-            String userId = rankingRepository.getIdusuarioActual();
+            String userId = rankingRepository.getIdUsuarioActual();
             assertNotNull(userId);
             assertFalse(userId.isEmpty());
             latch.countDown();
@@ -106,7 +106,7 @@ public class RankingRepositoryInstrumentedTest {
     public void testGetIdUsuarioActual_NoAutenticado() throws InterruptedException {
         auth.signOut();
         Thread.sleep(1000);
-        String userId = rankingRepository.getIdusuarioActual();
+        String userId = rankingRepository.getIdUsuarioActual();
         assertNull(userId);
     }
 
