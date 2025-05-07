@@ -15,6 +15,7 @@
     <string name="contraseña" tools:ignore="ExtraTranslation">Contraseña</string>
     <string name="iniciarSesion" tools:ignore="ExtraTranslation">Iniciar sesión</string>
     <string name="irRegistro" tools:ignore="ExtraTranslation">¿Aún no tienes cuenta? Regístrate aquí!!</string>
+    <string name="iniciandosesion" tools:ignore="ExtraTranslation">Iniciando sesión...</string>
 
     <!-- Registro fragment -->
     <string name="registrate" tools:ignore="ExtraTranslation">REGISTRATE</string>
@@ -22,6 +23,8 @@
     <string name="confirmarPassword" tools:ignore="ExtraTranslation">Repetir contraseña</string>
     <string name="fotoPerfil" tools:ignore="ExtraTranslation">Elige una foto de perfil</string>
     <string name="registrarse" tools:ignore="ExtraTranslation">Registrarse</string>
+    <string name="registrando" tools:ignore="ExtraTranslation">Registrando usuario...</string>
+
 
     <!-- Bottom menu -->
     <string name="juegos" tools:ignore="ExtraTranslation,MissingTranslation">Juegos</string>

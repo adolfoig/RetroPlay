@@ -138,6 +138,8 @@ public class RegistroFragment extends Fragment {
             return;
         }
 
+        binding.btnRegistrarUsuario.setText(R.string.registrando);
+
         if (imagenUri != null) {
             subirImagen(nombre, email, password);
         } else {

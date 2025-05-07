@@ -228,6 +228,8 @@ public class LoginFragment extends Fragment {
             Toast.makeText(getActivity(), "El correo tiene que contener un @", Toast.LENGTH_SHORT).show();
         }
 
+        binding.loginButton.setText(R.string.iniciandosesion);
+
         mAuth.signInWithEmailAndPassword(email, contrasena)
                 .addOnCompleteListener(getActivity(), task -> {
                     if (task.isSuccessful()) {
