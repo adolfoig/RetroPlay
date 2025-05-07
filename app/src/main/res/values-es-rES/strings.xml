@@ -38,6 +38,10 @@
     <string name="cambiarImagen" tools:ignore="ExtraTranslation,MissingTranslation">Cambiar imagen de perfil</string>
     <string name="passwordAntigua" tools:ignore="ExtraTranslation,MissingTranslation">Escribe la antigua contraseña</string>
     <string name="passwordNueva" tools:ignore="ExtraTranslation,MissingTranslation">Escribe la nueva contraseña</string>
+    <string name="passwordActual" translatable="false" tools:ignore="ExtraTranslation">Contraseña actual</string>
+    <string name="actualizandoUsuario" translatable="false" tools:ignore="ExtraTranslation">Actualizando usuario</string>
+
+
 
     <!-- Cerrar sesion fragment -->
     <string name="cerrarsesion" tools:ignore="ExtraTranslation,MissingTranslation">Cerrar sesión</string>

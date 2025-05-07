@@ -97,7 +97,7 @@
         app:hintTextColor="@color/azul"
         android:textColorHint="@color/textoLoginRegister"
         app:boxBackgroundColor="@color/gris"
-        android:hint="@string/contraseña">
+        android:hint="@string/passwordActual">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textoPasswordAntigua"

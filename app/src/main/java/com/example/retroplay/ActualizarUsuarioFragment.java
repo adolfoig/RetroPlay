@@ -126,6 +126,8 @@ public class ActualizarUsuarioFragment extends Fragment {
                 return;
             }
 
+            binding.btnRegistrarUsuario.setText(R.string.actualizandoUsuario);
+
             if (imageUri != null) {
                 // Generar nombre único para la imagen
                 String nombreImagen = obtenerNombreArchivo(currentImageUrl)+ ".jpg";

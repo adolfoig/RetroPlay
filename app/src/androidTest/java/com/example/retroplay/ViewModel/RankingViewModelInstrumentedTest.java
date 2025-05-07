@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
-public class RankingRepositoryInstrumentedTest {
+public class RankingViewModelInstrumentedTest {
 
     private RankingRepository rankingRepository;
     private FirebaseAuth auth;

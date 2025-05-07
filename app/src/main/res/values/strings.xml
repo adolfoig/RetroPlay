@@ -39,6 +39,9 @@
     <string name="cambiarImagen" tools:ignore="ExtraTranslation,MissingTranslation">Change profile picture</string>
     <string name="passwordAntigua" tools:ignore="ExtraTranslation,MissingTranslation">Enter the old password</string>
     <string name="passwordNueva" tools:ignore="ExtraTranslation,MissingTranslation">Enter a new password</string>
+    <string name="passwordActual" translatable="false" tools:ignore="ExtraTranslation">Current password</string>
+    <string name="actualizandoUsuario" translatable="false" tools:ignore="ExtraTranslation">Updating user...</string>
+
 
     <!-- Cerrar sesion fragment -->
     <string name="cerrarsesion" tools:ignore="ExtraTranslation,MissingTranslation">Log out</string>
