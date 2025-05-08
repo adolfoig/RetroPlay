@@ -150,9 +150,10 @@ public class LoginFragment extends Fragment {
             GoogleSignInAccount cuenta = task.getResult(ApiException.class);
             Log.d("GoogleSignIn", "Inicio de sesión con Google exitoso. Usuario: " + cuenta.getEmail());
             firebaseAuthWithGoogle(cuenta);
+            binding.loginButton.setText(R.string.iniciandosesion);
         } catch (ApiException e) {
             Log.e("GoogleSignIn", "Error al iniciar sesión con Google. Código: " + e.getStatusCode(), e);
-            Toast.makeText(getActivity(), "Error en el inicio de sesión con Google: " + e.getStatusCode(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Error en el inicio de sesión con Google: ", Toast.LENGTH_SHORT).show();
         }
     }
 

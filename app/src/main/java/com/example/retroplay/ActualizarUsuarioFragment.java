@@ -318,4 +318,8 @@ public class ActualizarUsuarioFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
+
+
+    
 }
