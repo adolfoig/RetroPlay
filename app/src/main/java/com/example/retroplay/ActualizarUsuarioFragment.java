@@ -2,12 +2,14 @@ package com.example.retroplay;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -72,10 +74,30 @@ public class ActualizarUsuarioFragment extends Fragment {
         supabaseStorageApi = retrofit.create(SupabaseStorageApi.class);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentActualizarUsuarioBinding.inflate(inflater, container, false);
+        View view = binding.getRoot();
+
+        view.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                View currentFocus = getActivity().getCurrentFocus();
+                if (currentFocus != null) {
+                    currentFocus.clearFocus();
+
+                    // Ocultar el teclado
+                    android.view.inputmethod.InputMethodManager imm =
+                            (android.view.inputmethod.InputMethodManager) getActivity().getSystemService(getContext().INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
+                    }
+                }
+            }
+            return false;
+        });
+
         return binding.getRoot();
     }
 
@@ -127,6 +149,7 @@ public class ActualizarUsuarioFragment extends Fragment {
             }
 
             binding.btnRegistrarUsuario.setText(R.string.actualizandoUsuario);
+            binding.btnRegistrarUsuario.setEnabled(false);
 
             if (imageUri != null) {
                 // Generar nombre único para la imagen
@@ -142,6 +165,27 @@ public class ActualizarUsuarioFragment extends Fragment {
                         currentImageUrl
                 );
             }
+
+            usuarioViewModel.getResultadoActualizacion().observe(getViewLifecycleOwner(), resultado -> {
+                // Restaurar el botón en cualquier caso
+                binding.btnRegistrarUsuario.setText(R.string.actualizar);
+                binding.btnRegistrarUsuario.setEnabled(true);
+
+                if (resultado != null) {
+                    if (resultado.equals("Datos actualizados correctamente")) {
+                        mostrarToast("Perfil actualizado correctamente");
+                        usuarioViewModel.cerrarSesion();
+                        irALogin();
+                    } else if (resultado.equals("Contraseña actual incorrecta")) {
+                        mostrarToast("La contraseña actual es incorrecta");
+                    } else if (resultado.equals("La nueva contraseña no puede ser igual a la actual")) {
+                        mostrarToast("La nueva contraseña debe ser diferente a la actual");
+                    } else if (resultado.startsWith("Error")) {
+                        mostrarToast(resultado);
+                    }
+                }
+            });
+
         });
     }
 

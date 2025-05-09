@@ -126,12 +126,7 @@ public class LoginFragment extends Fragment {
                             Toast.makeText(getActivity(), "Error al procesar el resultado", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        String errorMsg = "Código de resultado: " + result.getResultCode();
-                        if (data != null && data.getExtras() != null) {
-                            errorMsg += ", Extras: " + data.getExtras().toString();
-                        }
-                        Log.e("GoogleSignIn", errorMsg);
-                        Toast.makeText(getActivity(), "Error en el inicio de sesión: " + errorMsg, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "Error en el inicio de sesión", Toast.LENGTH_LONG).show();
                     }
                 }
         );
@@ -150,7 +145,6 @@ public class LoginFragment extends Fragment {
             GoogleSignInAccount cuenta = task.getResult(ApiException.class);
             Log.d("GoogleSignIn", "Inicio de sesión con Google exitoso. Usuario: " + cuenta.getEmail());
             firebaseAuthWithGoogle(cuenta);
-            binding.loginButton.setText(R.string.iniciandosesion);
         } catch (ApiException e) {
             Log.e("GoogleSignIn", "Error al iniciar sesión con Google. Código: " + e.getStatusCode(), e);
             Toast.makeText(getActivity(), "Error en el inicio de sesión con Google: ", Toast.LENGTH_SHORT).show();
@@ -225,20 +219,28 @@ public class LoginFragment extends Fragment {
             Toast.makeText(getActivity(), "Completa todos los campos", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        binding.loginButton.setText(R.string.iniciandosesion);
         if(!email.contains("@")){
             Toast.makeText(getActivity(), "El correo tiene que contener un @", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         binding.loginButton.setText(R.string.iniciandosesion);
+        binding.loginButton.setEnabled(false);
 
         mAuth.signInWithEmailAndPassword(email, contrasena)
                 .addOnCompleteListener(getActivity(), task -> {
+
+                    binding.loginButton.setText(R.string.iniciarSesion);
+                    binding.loginButton.setEnabled(true);
+
                     if (task.isSuccessful()) {
                         FirebaseUser usuario = mAuth.getCurrentUser();
                         Toast.makeText(getActivity(), "Inicio de sesión exitoso: " + usuario.getEmail(), Toast.LENGTH_SHORT).show();
                         irAMain();
                     } else {
-                        Toast.makeText(getActivity(), "Login incorrecto ", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Inicio de sesión incorrecto", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

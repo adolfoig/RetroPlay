@@ -139,12 +139,28 @@ public class RegistroFragment extends Fragment {
         }
 
         binding.btnRegistrarUsuario.setText(R.string.registrando);
+        binding.btnRegistrarUsuario.setEnabled(false);
+
 
         if (imagenUri != null) {
             subirImagen(nombre, email, password);
         } else {
             usuarioViewModel.registrarUsuario(nombre, email, password, null);
         }
+
+        usuarioViewModel.getRegistroExitoso().observe(getViewLifecycleOwner(), exito -> {
+            // Restaurar el botón independientemente del resultado
+            binding.btnRegistrarUsuario.setText(R.string.registrarse);
+            binding.btnRegistrarUsuario.setEnabled(true);
+        });
+
+        usuarioViewModel.getErrorRegistro().observe(getViewLifecycleOwner(), error -> {
+            if (error != null) {
+                // Restaurar el botón cuando hay error
+                binding.btnRegistrarUsuario.setText(R.string.registrarse);
+                binding.btnRegistrarUsuario.setEnabled(true);
+            }
+        });
     }
 
     private void subirImagen(String nombre, String email, String password) {
