@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -158,11 +159,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int itemId = item.getItemId();
         binding.drawerLayout.closeDrawer(GravityCompat.START);
 
+        // Verificar si el usuario inició sesión con Google
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        boolean isGoogleUser = currentUser != null && !currentUser.getProviderData().isEmpty()
+                && currentUser.getProviderData().get(1).getProviderId().equals("google.com");
+
         // Usamos post para asegurar que la navegación ocurra después de cerrar el drawer
         binding.getRoot().post(() -> {
             if (itemId == R.id.nav_actualizarUsuario) {
-                navController.navigate(R.id.actualizarUsuarioFragment);
-                ocultarBottomNavView();
+                if (isGoogleUser) {
+                    // Mostrar mensaje indicando que no se puede actualizar cuenta de Google
+                    Toast.makeText(this, "No puedes actualizar una cuenta de Google", Toast.LENGTH_SHORT).show();
+                } else {
+                    navController.navigate(R.id.actualizarUsuarioFragment);
+                    ocultarBottomNavView();
+                }
             } else if (itemId == R.id.nav_cerrarSesion) {
                 navController.navigate(R.id.cerrarSesionFragment);
                 ocultarBottomNavView();
