@@ -6,7 +6,13 @@ const serverUrl = "https://7cd1a43d-f123-432a-8a32-15d60b150f6c-00-1jwr28pe3c5ky
 ***** DECLARATIONS: *****
 ************************/
 
+//Envía puntuación 0 si no se ha acabado la partida
+sendScore(0);
 
+// Opcional: Obtener la puntuación más reciente del servidor
+getScore().then((latestScore) => {
+    console.log('Última puntuación del servidor:', latestScore);
+});
 
 let cvs         //  canvas
 let ctx         //  context'2d'
