@@ -2,6 +2,7 @@ package com.example.retroplay;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,15 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.retroplay.Viewmodel.JuegosViewModel;
 import com.example.retroplay.databinding.FragmentJugarJuegoBinding;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
 
 public class JugarJuegoFragment extends Fragment {
@@ -71,14 +81,49 @@ public class JugarJuegoFragment extends Fragment {
     }
 
     private void configurarObservers() {
-
-
         juegosViewModel.getError().observe(getViewLifecycleOwner(), error -> {
             if (error != null) {
                 Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+    private void enviarPuntuacionCero() {
+        new Thread(() -> {
+            try {
+                URL url = new URL("https://7cd1a43d-f123-432a-8a32-15d60b150f6c-00-1jwr28pe3c5ky.kirk.replit.dev/score");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+                conn.setDoOutput(true);
+                conn.setInstanceFollowRedirects(false);   // Para ver si hay 301/302
+
+                String json = "{\"score\":0}";
+                try (OutputStream os = conn.getOutputStream()) {
+                    os.write(json.getBytes("utf-8"));
+                }
+
+                int code = conn.getResponseCode();
+                String msg  = conn.getResponseMessage();
+
+                // Lee cuerpo (input o error-stream) para pasarlo al Logcat
+                InputStream is = (code >= 400) ? conn.getErrorStream() : conn.getInputStream();
+                String body = "";
+                if (is != null) {
+                    body = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
+                            .lines().collect(Collectors.joining("\n"));
+                }
+
+                Log.d("POST", "Status: " + code + " " + msg + "\nBody: " + body);
+                conn.disconnect();
+
+            } catch (Exception e) {
+                Log.e("POST", "Excepción al enviar", e);
+            }
+        }).start();
+    }
+
+
 
     @Override
     public void onDestroyView() {
@@ -90,5 +135,7 @@ public class JugarJuegoFragment extends Fragment {
             }
             juegosViewModel.fetchScore(idJuego);
         }
+        enviarPuntuacionCero();
+
     }
 }
