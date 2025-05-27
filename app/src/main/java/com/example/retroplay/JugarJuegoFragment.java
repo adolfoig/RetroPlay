@@ -71,13 +71,7 @@ public class JugarJuegoFragment extends Fragment {
     }
 
     private void configurarObservers() {
-        juegosViewModel.getScore().observe(getViewLifecycleOwner(), score -> {
-            if (score != null && isAdded() && getActivity() != null) {
-                Intent intent = new Intent(requireActivity(), MainActivity.class);
-                intent.putExtra("puntuacion", String.valueOf(score));
-                startActivity(intent);
-            }
-        });
+
 
         juegosViewModel.getError().observe(getViewLifecycleOwner(), error -> {
             if (error != null) {
