@@ -7,6 +7,6 @@ Tienes que darle al icono de la hamburguesa (4 rayas) /File/Sync Project with Gr
 6. Las puntuaciones se envían a un servidor Replit. Para que se envíen las puntuaciones al servidor y se guarden en la base de datos tiene que estar el servidor levantado.
 
 Repositorios de los juegos:
-1. https://github.com/daleharvey/pacman/blob/master
-2. https://github.com/noanonoa/flappy-bird
-3. https://github.com/llop/classic-tetris-js
+1. Pacman: https://github.com/daleharvey/pacman/blob/master
+2. Flappy Bird: https://github.com/noanonoa/flappy-bird
+3. Tetris: https://github.com/llop/classic-tetris-js
