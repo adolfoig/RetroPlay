@@ -164,8 +164,6 @@ public class JugarJuegoFragment extends Fragment {
             if (getActivity() instanceof MainActivity) {
                 ((MainActivity) getActivity()).mostrarToolBar();
             }
-            //juegosViewModel.fetchScore(idJuego);
         }
-        enviarPuntuacionCero();
     }
 }
