@@ -80,13 +80,38 @@ public class JugarJuegoFragment extends Fragment {
         }
     }
 
+    // En JugarJuegoFragment.java
     private void configurarObservers() {
+
         juegosViewModel.getError().observe(getViewLifecycleOwner(), error -> {
             if (error != null) {
-                Toast.makeText(getActivity(), error, Toast.LENGTH_SHORT).show();
+                showToast(error);
+            }
+        });
+
+        juegosViewModel.getPuntuacionGuardada().observe(getViewLifecycleOwner(), success -> {
+            if (success == null) return;
+
+            if (success) {
+                showToast("Puntuación guardada correctamente");
+            } else {
+                showToast("Error al guardar la puntuación");
+            }
+        });
+
+        juegosViewModel.getServidorError().observe(getViewLifecycleOwner(), error -> {
+            if (error != null) {
+                showToast(error);
             }
         });
     }
+
+    private void showToast(String mensaje) {
+        // requireContext() lanza IllegalStateException si el fragmento ya no está añadido,
+        // así que no necesitas chequear isAdded() cada vez
+        Toast.makeText(requireContext(), mensaje, Toast.LENGTH_SHORT).show();
+    }
+
 
     private void enviarPuntuacionCero() {
         new Thread(() -> {
@@ -123,7 +148,13 @@ public class JugarJuegoFragment extends Fragment {
         }).start();
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        juegosViewModel.fetchScore(idJuego);
+        enviarPuntuacionCero();
 
+    }
 
     @Override
     public void onDestroyView() {
@@ -133,9 +164,8 @@ public class JugarJuegoFragment extends Fragment {
             if (getActivity() instanceof MainActivity) {
                 ((MainActivity) getActivity()).mostrarToolBar();
             }
-            juegosViewModel.fetchScore(idJuego);
+            //juegosViewModel.fetchScore(idJuego);
         }
         enviarPuntuacionCero();
-
     }
 }

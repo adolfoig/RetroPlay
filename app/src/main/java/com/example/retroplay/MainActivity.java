@@ -19,6 +19,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.bumptech.glide.Glide;
 import com.example.retroplay.Registro.LoginFragment;
+import com.example.retroplay.Viewmodel.JuegosViewModel;
 import com.example.retroplay.Viewmodel.UsuarioViewModel;
 import com.example.retroplay.databinding.ActivityMainBinding;
 import com.example.retroplay.databinding.NavHeaderBinding;
@@ -35,12 +36,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseAuth mAuth;
     NavController navController;
     private UsuarioViewModel usuarioViewModel;
+    private JuegosViewModel juegosViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         usuarioViewModel = new ViewModelProvider(this).get(UsuarioViewModel.class);
+        juegosViewModel = new ViewModelProvider(this).get(JuegosViewModel.class);
+
 
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -83,6 +87,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         setupNavListener();
         configurarObservadoresUsuario();
+
+        juegosViewModel.getPuntuacionGuardada().observe(this, success -> {
+            if (success == null) return;
+            Toast.makeText(this,
+                    success ? "Puntuación guardada correctamente"
+                            : "Error al guardar la puntuación",
+                    Toast.LENGTH_SHORT).show();
+        });
+
+        juegosViewModel.getServidorError().observe(this, err -> {
+            if (err != null && !err.trim().isEmpty()) {
+                Toast.makeText(this, err, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
     }
 
     private void irAlBottomMenu() {
